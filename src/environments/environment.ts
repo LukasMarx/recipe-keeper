@@ -1,3 +1,3 @@
 export const environment = {
-  origin: 'https://cookbook-api.lukas-marx.com',
+  origin: 'https://cookbook-api.lukas-marx.com/v1',
 };
