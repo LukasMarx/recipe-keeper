@@ -1,0 +1,14 @@
+@use 'sass:map';
+@use '@angular/material' as mat;
+
+@mixin theme($theme) {
+  .add {
+    background-color: mat.get-theme-color($theme, primary);
+    color: mat.get-theme-color($theme, on-primary);
+    border: 8px solid mat.get-theme-color($theme, surface);
+  }
+
+  nav {
+    background-color: mat.get-theme-color($theme, surface-container);
+  }
+}

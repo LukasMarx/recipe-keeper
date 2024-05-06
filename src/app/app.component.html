@@ -1,0 +1,11 @@
+<div class="theme-container">
+@if (!hideHeader()) {
+  <app-header></app-header>
+}
+<div class="content">
+  <router-outlet (activate)="modify()" (deactivate)="modify()"></router-outlet>
+</div>
+@if(!hideNavbar()) {
+  <app-navbar></app-navbar>
+}
+</div>
