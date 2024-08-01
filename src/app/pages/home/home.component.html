@@ -2,7 +2,7 @@
   [recipes]="recipes$ | async"
   (onRecipeClick)="onClick($event)"
 ></app-recipe-list>
-<button class="fab" mat-fab extended>
+<button class="fab" mat-fab extended (click)="addRecipe()">
   <mat-icon>add</mat-icon>
   Recipe
 </button>
