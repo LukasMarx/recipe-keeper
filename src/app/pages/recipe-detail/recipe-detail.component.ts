@@ -12,6 +12,15 @@ import { RecipeService } from '../../services/recipe.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DurationPipe } from '../../pipes/duration.pipe';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { IngredientListComponent } from '../../components/ingredient-list/ingredient-list.component';
+import { MatDialog } from '@angular/material/dialog';
+import { ScheduleRecipeModalComponent } from '../../components/modals/schedule-recipe-modal/schedule-recipe-modal.component';
+import { Ingredient } from '../../interfaces/ingredient';
+import { Instruction } from '../../interfaces/instruction';
+import { Recipe } from '../../interfaces/recipe';
+import { InstructionListComponent } from '../../components/instruction-list/instruction-list.component';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -28,14 +37,22 @@ import { DurationPipe } from '../../pipes/duration.pipe';
     ReactiveFormsModule,
     MatListModule,
     DurationPipe,
+    MatProgressSpinnerModule,
+    IngredientListComponent,
+    InstructionListComponent,
   ],
   templateUrl: './recipe-detail.component.html',
   styleUrl: './recipe-detail.component.scss',
 })
 export class RecipeDetailComponent {
-  private readonly recipeService = inject(RecipeService);
+  onDelete() {
+    throw new Error('Method not implemented.');
+  }
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
+  private readonly recipeService = inject(RecipeService);
   private readonly route = inject(ActivatedRoute);
+  private readonly dialogService = inject(MatDialog);
 
   recipe = signal<any>(undefined);
 
@@ -44,11 +61,48 @@ export class RecipeDetailComponent {
       const id = params['id'];
       this.recipeService
         .getRecipe(id)
-        .subscribe((recipe) => this.recipe.set(recipe));
+        .subscribe((recipe) => this.recipe.set(this.resolveRecipe(recipe)));
     });
   }
 
   onBack() {
-    this.router.navigate(['']);
+    this.location.back();
+  }
+
+  onEdit() {
+    this.router.navigate(['edit-recipe', this.recipe().id]);
+  }
+
+  public onSchedule() {
+    this.dialogService.open(ScheduleRecipeModalComponent, {
+      data: {
+        recipeId: this.recipe().id,
+        householdId: 1,
+      },
+    });
+  }
+
+  private resolveRecipe(recipe: Recipe) {
+    return {
+      ...recipe,
+      instructions: recipe.instructions.map((instruction: any) => {
+        return {
+          ...instruction,
+          ingredients: instruction.ingredients.map((ingredient: any) => {
+            const fullIngredient =
+              recipe.ingredientsList.find(
+                (i) => i.ingredientId === ingredient.id
+              ) ||
+              recipe.ingredientsList.find(
+                (i) => i.ingredientId === ingredient.id
+              );
+            return {
+              ...(fullIngredient as any),
+              id: ingredient,
+            } as Ingredient;
+          }),
+        } as Instruction;
+      }),
+    } as Recipe;
   }
 }

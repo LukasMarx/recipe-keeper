@@ -1,0 +1,58 @@
+<div class="page">
+  <mat-selection-list #shoes [multiple]="false">
+    @for (list of lists(); track list) {
+    <mat-list-option [value]="list">
+      <mat-icon matListItemIcon>receipt_long</mat-icon>
+      <div matListItemTitle>{{ list.name }}</div>
+      <div matListItemLine>{{ list.plannedDate | date }}</div>
+    </mat-list-option>
+    }
+  </mat-selection-list>
+
+  <button class="full-width" mat-stroked-button (click)="onAddList()">
+    <mat-icon>add</mat-icon>Add List
+  </button>
+  <div class="list">
+    <mat-selection-list class="full-width">
+      @for(group of groups();track group) {
+      <div mat-subheader>
+        {{ groceryListService.getCatergoryLabel(group) | async }}
+      </div>
+      @for (item of listItems()[group]; track item) {
+      <mat-list-option>
+        <mat-icon matListItemIcon>category</mat-icon>
+        <div matListItemTitle>{{ item.name }}</div>
+        <div matListItemLine>{{ item.amount }}{{ item.unit }}</div>
+      </mat-list-option>
+      } }
+    </mat-selection-list>
+  </div>
+</div>
+@if( isFooterActive() ) {
+<div class="backdrop" (click)="isFooterActive.set(false)"></div>
+}
+<div
+  class="footer grocery-list-footer"
+  [class.expanded]="isFooterActive()"
+  (click)="isFooterActive.set(true)"
+  #footer
+>
+  <div class="header">
+    <mat-form-field class="full-width">
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput placeholder="I need..." [formControl]="searchControl" />
+    </mat-form-field>
+    @if(isFooterActive()) {
+    <button mat-button (click)="onCancel($event)">Cancel</button>
+    }
+  </div>
+  <div class="suggestion-list">
+    @for (suggestion of suggestions(); track suggestion) {
+    <div class="suggestion" (click)="onSuggestionClick(suggestion)" matRipple>
+      <mat-card appearance="outlined">
+        <mat-card-content>{{ suggestion }}</mat-card-content>
+      </mat-card>
+    </div>
+    }
+  </div>
+</div>

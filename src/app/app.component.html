@@ -1,11 +1,14 @@
 <div class="theme-container">
-@if (!hideHeader()) {
-  <app-header></app-header>
-}
-<div class="content">
-  <router-outlet (activate)="modify()" (deactivate)="modify()"></router-outlet>
-</div>
-@if(!hideNavbar()) {
+  @if (!hideHeader()) {
+  <app-header [title]="title()"></app-header>
+  }
+  <div class="content">
+    <router-outlet
+      (activate)="modify($event)"
+      (deactivate)="modify($event)"
+    ></router-outlet>
+  </div>
+  @if(!hideNavbar()) {
   <app-navbar></app-navbar>
-}
+  }
 </div>

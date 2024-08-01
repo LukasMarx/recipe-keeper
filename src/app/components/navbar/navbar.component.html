@@ -1,12 +1,51 @@
 <nav>
   <ul>
-    <li><mat-icon fontIcon="home"></mat-icon></li>
-    <li><mat-icon fontIcon="list"></mat-icon></li>
-    <li class="add" (click)="addRecipe()"><mat-icon fontIcon="add"></mat-icon></li>
-    
     <li>
-      <mat-icon fontIcon="people"></mat-icon>
+      <button
+        mat-icon-button
+        routerLink="/recipes"
+        [routerLinkActive]="['active']"
+        aria-label="Home"
+      >
+        <mat-icon fontIcon="menu_book"></mat-icon>
+      </button>
     </li>
-    <li><mat-icon fontIcon="settings"></mat-icon></li>
+    <li>
+      <button
+        mat-icon-button
+        routerLink="/schedule"
+        [routerLinkActive]="['active']"
+        aria-label="Schedule"
+      >
+        <mat-icon fontIcon="calendar_month"></mat-icon>
+      </button>
+    </li>
+    <!-- <li class="add" (click)="addRecipe()">
+      <mat-icon fontIcon="add" aria-label="Add Recipe"></mat-icon>
+    </li> -->
+
+    <li>
+      <button
+        mat-icon-button
+        routerLink="/grocery-list"
+        [routerLinkActive]="['active']"
+      >
+        <mat-icon fontIcon="shopping_cart"></mat-icon>
+      </button>
+    </li>
+    <li>
+      <button
+        mat-icon-button
+        routerLink="/nutrition"
+        [routerLinkActive]="['nutrition']"
+      >
+        <mat-icon fontIcon="local_fire_department"></mat-icon>
+      </button>
+    </li>
+    <li>
+      <button mat-icon-button>
+        <mat-icon fontIcon="account_circle"></mat-icon>
+      </button>
+    </li>
   </ul>
 </nav>

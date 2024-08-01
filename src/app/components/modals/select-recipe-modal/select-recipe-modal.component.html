@@ -1,0 +1,52 @@
+<h2 mat-dialog-title>Schedule a recipe</h2>
+<mat-dialog-content>
+  <mat-stepper linear #stepper>
+    <mat-step>
+      <div class="content">
+        <ng-template matStepLabel>Choose a recipe</ng-template>
+        <mat-form-field class="full-width">
+          <input matInput placeholder="Search" />
+          <button matPrefix mat-icon-button aria-label="Clear">
+            <mat-icon>search</mat-icon>
+          </button>
+        </mat-form-field>
+        <app-recipe-list
+          style="padding: 0"
+          [recipes]="recipes"
+        ></app-recipe-list>
+      </div>
+      <mat-dialog-actions>
+        <button mat-button mat-dialog-close>Cancel</button>
+        <button mat-button matStepperNext cdkFocusInitial>Next</button>
+      </mat-dialog-actions>
+    </mat-step>
+
+    <mat-step>
+      <ng-template matStepLabel>Settings</ng-template>
+      <div class="content">
+        <h4>Settings</h4>
+        <mat-form-field>
+          <mat-label>Schedule for</mat-label>
+          <mat-select>
+            <mat-option value="1">Me</mat-option>
+            <mat-option value="2">Household</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Meal type</mat-label>
+          <mat-select>
+            <mat-option value="1">Breakfast</mat-option>
+            <mat-option value="2">Lunch</mat-option>
+            <mat-option value="3">Dinner</mat-option>
+            <mat-option value="4">Snack</mat-option>
+            <mat-option value="5">Other</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <mat-dialog-actions>
+        <button mat-button mat-dialog-close>Cancel</button>
+        <button mat-button cdkFocusInitial>Schedule</button>
+      </mat-dialog-actions>
+    </mat-step>
+  </mat-stepper>
+</mat-dialog-content>

@@ -1,12 +1,8 @@
-@for (recipe of recipes$ | async; track recipe.id) {
-  <div class="card-wrapper">
-    <mat-card (click)="onClick(recipe.id)">
-      <img class="image" [src]="recipe.imageUrl"/>
-      <mat-card-content>
-        <div class="card-content">
-          <span class="card-title">{{recipe.title}}</span>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
-}
+<app-recipe-list
+  [recipes]="recipes$ | async"
+  (onRecipeClick)="onClick($event)"
+></app-recipe-list>
+<button class="fab" mat-fab extended>
+  <mat-icon>add</mat-icon>
+  Recipe
+</button>

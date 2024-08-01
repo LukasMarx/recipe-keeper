@@ -1,0 +1,25 @@
+:host {
+  display: block;
+  padding-left: 15px;
+}
+
+.container {
+  border-left: 4px dashed #ccc;
+  overflow: visible;
+  padding-left: 24px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.circle {
+  display: flex;
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #ccc;
+
+  left: -17px;
+  align-items: center;
+  justify-content: center;
+}

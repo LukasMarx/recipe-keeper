@@ -1,9 +1,8 @@
-@use 'sass:map';
-@use '@angular/material' as mat;
+@use "sass:map";
+@use "@angular/material" as mat;
 
 @mixin theme($theme) {
-
   .step {
-    color:  mat.get-theme-color($theme, primary)
-  } 
+    color: mat.get-theme-color($theme, primary);
+  }
 }

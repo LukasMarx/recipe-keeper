@@ -1,0 +1,30 @@
+<h2 mat-dialog-title>Schedule recipe</h2>
+<mat-dialog-content>
+  <form [formGroup]="form">
+    <mat-form-field class="full-width">
+      <mat-label>Choose a date</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="date" />
+
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="picker"
+      ></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+    <mat-form-field class="full-width">
+      <mat-label>Meal type</mat-label>
+      <mat-select formControlName="mealType">
+        <mat-option value="BREAKFAST">Breakfast</mat-option>
+        <mat-option value="LUNCH">Lunch</mat-option>
+        <mat-option value="DINNER">Dinner</mat-option>
+        <mat-option value="SNACK">Snack</mat-option>
+        <mat-option value="OTHER">Other</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button (click)="onSubmit()" cdkFocusInitial>Ok</button>
+</mat-dialog-actions>

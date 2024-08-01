@@ -1,44 +1,49 @@
-
 // Custom Theming for Angular Material
 // For more information: https://material.angular.io/guide/theming
-@use '@angular/material' as mat;
-@use './app/components/navbar/_navbar-theme' as navbar;
-@use './app/components/header/_header-theme' as header;
+@use "@angular/material" as mat;
+@use "./app/components/navbar/_navbar-theme" as navbar;
+@use "./theme" as theme;
+@use "./app/components/header/_header-theme" as header;
+@use "./app/components/ingredient-list/ingredient-list.theme" as ingredientList;
 // Plus imports for other components in your app.
-@use './app/pages/new-recipe/new-recipe.theme' as newRecipePage;
-@use './app/pages/login/login-theme' as loginPage;
-@use './app/pages/register/register-theme' as registerPage;
-
+@use "./app/pages/new-recipe/new-recipe.theme" as newRecipePage;
+@use "./app/pages/recipe-detail/recipe-detail.theme" as recipeDetailPage;
+@use "./app/pages/login/login-theme" as loginPage;
+@use "./app/pages/register/register-theme" as registerPage;
+@use "./app/pages/grocery-list//grocery-list.theme" as groceryList;
 
 @include mat.core();
 
-
 // Define the theme object.
-$recipe-keeper-theme: mat.define-theme((
-  color: (
-    theme-type: light,
-    primary: mat.$chartreuse-palette,
-    tertiary: mat.$chartreuse-palette,
-  ),
-  density: (
-    scale: 0,
+$recipe-keeper-theme: mat.define-theme(
+  (
+    color: (
+      theme-type: light,
+      primary: mat.$chartreuse-palette,
+      tertiary: mat.$chartreuse-palette,
+    ),
+    density: (
+      scale: 0,
+    ),
   )
-));
-$recipe-keeper-theme-dark: mat.define-theme((
-  color: (
-    theme-type: dark,
-    primary: mat.$chartreuse-palette,
-    tertiary: mat.$chartreuse-palette,
-  ),
-  density: (
-    scale: 0,
+);
+$recipe-keeper-theme-dark: mat.define-theme(
+  (
+    color: (
+      theme-type: dark,
+      primary: mat.$chartreuse-palette,
+      tertiary: mat.$chartreuse-palette,
+    ),
+    density: (
+      scale: 0,
+    ),
   )
-));
+);
 
 @mixin body($theme) {
   body {
-    color: mat.get-theme-color($theme, on-surface)
-  } 
+    color: mat.get-theme-color($theme, on-surface);
+  }
 }
 
 // Include theme styles for core and each component used in your app.
@@ -48,32 +53,37 @@ $recipe-keeper-theme-dark: mat.define-theme((
   @include mat.all-component-themes($recipe-keeper-theme);
   @include navbar.theme($recipe-keeper-theme);
   @include header.theme($recipe-keeper-theme);
+  @include theme.theme($recipe-keeper-theme);
 
   @include newRecipePage.theme($recipe-keeper-theme);
+  @include ingredientList.theme($recipe-keeper-theme);
   @include loginPage.theme($recipe-keeper-theme);
   @include registerPage.theme($recipe-keeper-theme);
-
+  @include recipeDetailPage.theme($recipe-keeper-theme);
+  @include groceryList.theme($recipe-keeper-theme);
 
   --page-padding: 16px;
 
   background-color: mat.get-theme-color($recipe-keeper-theme, surface);
   color: mat.get-theme-color($recipe-keeper-theme, on-surface);
-  
+
   .dark {
     @include mat.all-component-themes($recipe-keeper-theme-dark);
+    @include theme.theme($recipe-keeper-theme);
     @include navbar.theme($recipe-keeper-theme-dark);
     @include header.theme($recipe-keeper-theme-dark);
-  
+    @include ingredientList.theme($recipe-keeper-theme-dark);
+
     @include newRecipePage.theme($recipe-keeper-theme-dark);
     @include loginPage.theme($recipe-keeper-theme-dark);
     @include registerPage.theme($recipe-keeper-theme-dark);
-  
+    @include recipeDetailPage.theme($recipe-keeper-theme-dark);
+    @include groceryList.theme($recipe-keeper-theme-dark);
+
     background-color: mat.get-theme-color($recipe-keeper-theme-dark, surface);
     color: mat.get-theme-color($recipe-keeper-theme-dark, on-surface);
   }
 }
-
-
 
 // Comment out the line below if you want to use the pre-defined typography utility classes.
 // For more information: https://material.angular.io/guide/typography#using-typography-styles-in-your-application.
@@ -81,4 +91,3 @@ $recipe-keeper-theme-dark: mat.define-theme((
 
 // Comment out the line below if you want to use the deprecated `color` inputs.
 // @include mat.color-variants-backwards-compatibility($theme);
-

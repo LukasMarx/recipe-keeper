@@ -1,63 +1,68 @@
-<header class="header" (click)="onBack()">
-  <button mat-icon-button color="primary" ><mat-icon>arrow_back</mat-icon> </button>
-  {{recipe().title}}
+@if(recipe()) {
+<header class="header">
+  <button mat-icon-button color="primary" (click)="onBack()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  {{ recipe().title }}
   <div style="flex: 1"></div>
+  <button mat-icon-button color="primary" (click)="onDelete()">
+    <mat-icon>more_vert</mat-icon>
+  </button>
 </header>
 <div class="content">
-
   <mat-tab-group>
     <mat-tab label="Info">
       <div class="tab-page">
         <img class="image" [src]="recipe().imageUrl" />
 
-
-        <mat-chip-set aria-label="Dog selection" style="margin-bottom: 8px;">
+        <mat-chip-set aria-label="Dog selection" style="margin-bottom: 8px">
           <mat-chip>
             <mat-icon matChipAvatar fontIcon="schedule" />
-            {{recipe().totalTime | duration}}
+            {{ recipe().totalTime | duration }}
           </mat-chip>
           @if(recipe().calories) {
-            <mat-chip>
-              <mat-icon matChipAvatar fontIcon="bolt" />
-              {{recipe().calories }} calories
-            </mat-chip>
+          <mat-chip>
+            <mat-icon matChipAvatar fontIcon="bolt" />
+            {{ recipe().calories }} calories
+          </mat-chip>
           }
           <mat-chip>
             <mat-icon matChipAvatar fontIcon="people" />
-            {{recipe().recipeYield}} portions
+            {{ recipe().recipeYield }} portions
           </mat-chip>
         </mat-chip-set>
 
-        <span class="detail-description">{{recipe().description}}</span>
+        <span class="detail-description">{{ recipe().description }}</span>
+
+        <span class="section-title">Ingredients</span>
+        <app-ingredient-list
+          class="ingredient-list"
+          [ingredients]="recipe().ingredientsList"
+        ></app-ingredient-list>
       </div>
     </mat-tab>
-    <mat-tab label="Ingredients">
+    <!-- <mat-tab label="Ingredients">
       <div class="tab-page">
-        <mat-list role="list">
-          @for(ingredient of recipe().ingredients; track ingredient) {
-          <mat-list-item role="listitem">{{ingredient}}</mat-list-item>
-          }
-        </mat-list>
+       
       </div>
-    </mat-tab>
+    </mat-tab> -->
     <mat-tab label="Instructions">
       <div class="tab-page">
-        <div class="instruction-list">
-          @for(instruction of recipe().instructions; track instruction; let idx = $index) {
-          @if (instruction.type === "group") {
-          <h3>{{instruction.name}}</h3>
-          @for(element of instruction.steps; track element.text; let idx = $index) {
-          <span class="step">Step {{idx + 1}}</span>
-          <div class="instruction">{{element.text}}</div>
-          }
-          } @else {
-          <span class="step">Step {{idx + 1}}</span>
-          <div class="instruction">{{instruction.text || instruction}}</div>
-          }
-          }
-        </div>
+        <app-instruction-list
+          [instructions]="recipe().instructions"
+        ></app-instruction-list>
       </div>
     </mat-tab>
   </mat-tab-group>
-
+  <div class="recipe-detail-footer">
+    <div style="flex: 1"></div>
+    <button mat-flat-button color="primary" (click)="onSchedule()">
+      Schedule
+    </button>
+  </div>
 </div>
+} @else {
+<div class="loading">
+  <mat-spinner></mat-spinner>
+</div>
+}

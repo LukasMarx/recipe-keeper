@@ -1,5 +1,5 @@
-@use 'sass:map';
-@use '@angular/material' as mat;
+@use "sass:map";
+@use "@angular/material" as mat;
 
 @mixin theme($theme) {
   .add {
@@ -10,5 +10,9 @@
 
   nav {
     background-color: mat.get-theme-color($theme, surface-container);
+  }
+
+  .active {
+    color: mat.get-theme-color($theme, primary);
   }
 }

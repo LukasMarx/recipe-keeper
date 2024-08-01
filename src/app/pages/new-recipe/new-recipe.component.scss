@@ -1,4 +1,4 @@
-@use '@angular/material' as mat;
+@use "@angular/material" as mat;
 
 :host {
   display: flex;
@@ -6,7 +6,6 @@
   height: 100%;
   @include mat.form-field-density(-3);
 }
-
 
 .tab-page {
   padding-top: 32px;
@@ -23,8 +22,6 @@
   border-radius: 16px;
 }
 
-
-
 form {
   flex: 1;
   min-height: 0;
@@ -39,18 +36,18 @@ form {
 .header {
   height: 64px;
   width: 100%;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   font-optical-sizing: auto;
   font-weight: bold;
   font-style: normal;
-  font-size: 28px;
+  font-size: 14px;
   padding: 8px 16px;
   box-sizing: border-box;
   display: flex;
   align-items: center;
 }
 
-.full-width{
+.full-width {
   width: 100%;
 }
 
@@ -68,10 +65,4 @@ mat-tab-group {
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-
-
-
-.instruction {
-
 }

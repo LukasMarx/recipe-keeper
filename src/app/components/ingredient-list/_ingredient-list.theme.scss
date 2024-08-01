@@ -1,0 +1,13 @@
+@use "sass:map";
+@use "@angular/material" as mat;
+
+@mixin theme($theme) {
+  .amount {
+    color: mat.get-theme-color($theme, on-surface-variant);
+    font-size: 14px;
+  }
+
+  .avatar {
+    background-color: mat.get-theme-color($theme, surface-container-high);
+  }
+}

@@ -1,0 +1,12 @@
+<div class="container">
+  @for(instructionStep of instructions(); track instructionStep; let i = $index)
+  {
+  <div class="circle">
+    <span>{{ i + 1 }}</span>
+  </div>
+  <app-instruction-list-item
+    [stepIndex]="i"
+    [instruction]="instructionStep"
+  ></app-instruction-list-item>
+  }
+</div>

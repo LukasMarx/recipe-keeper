@@ -1,0 +1,13 @@
+{
+  "groceryList.categories.dairy": "Milchprodukte",
+  "groceryList.categories.fruit": "Obst",
+  "groceryList.categories.vegetable": "Gemüse",
+  "groceryList.categories.pastry": "Gebäck",
+  "groceryList.categories.meat": "Fleisch",
+  "groceryList.categories.fish": "Fisch",
+  "groceryList.categories.finishedProduct": "Fertigprodukte",
+  "groceryList.categories.seasoning": "Gewürz",
+  "groceryList.categories.candy": "Süßigkeiten",
+  "groceryList.categories.beverages": "Getränke",
+  "groceryList.categories.other": "Sonstiges"
+}

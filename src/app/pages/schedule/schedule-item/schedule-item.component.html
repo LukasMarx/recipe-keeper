@@ -1,0 +1,35 @@
+<mat-card appearance="outlined">
+  <mat-card-content
+    ><div class="schedule-item-header">
+      <span class="title" style="font-weight: 500">{{ title() }}</span>
+      <div style="flex: 1"></div>
+      <button mat-icon-button aria-label="add" (click)="onAddClick()">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+
+    <div class="recipes">
+      @for(recipe of scheduledRecipes(); track recipe.id) {
+      <div class="schedule-item-recipe" (click)="onRecipeClick(recipe)">
+        <img
+          class="schedule-item-recipe-thumbnail"
+          [src]="recipe.recipe.imageUrl"
+          [alt]="recipe.recipe.title"
+        />
+        <div class="text">
+          <span>{{ recipe.recipe.title }}</span>
+          <span class="subtitle">{{ capitalize(recipe.mealType) }}</span>
+        </div>
+        <div style="flex: 1"></div>
+        <button
+          mat-icon-button
+          aria-label="remove"
+          (click)="onRemoveClick($event, recipe)"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+      }
+    </div>
+  </mat-card-content>
+</mat-card>

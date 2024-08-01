@@ -1,13 +1,15 @@
 import { Component, inject } from '@angular/core';
 import { RecipeService } from '../../services/recipe.service';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
 import { Router } from '@angular/router';
+import { RecipeListComponent } from '../../components/recipe-list/recipe-list.component';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, MatCardModule],
+  imports: [CommonModule, RecipeListComponent, MatIconModule, MatButtonModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })

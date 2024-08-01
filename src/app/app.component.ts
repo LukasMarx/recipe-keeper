@@ -15,8 +15,10 @@ export class AppComponent {
 
   hideHeader = signal(false);
   hideNavbar = signal(false);
+  title = signal('Cookbook');
 
-  modify() {
+  modify(event: any) {
+    this.title.set('Cookbook');
     if (this.router.url.split('?')[0] === '/new-recipe') {
       this.hideHeader.set(true);
       this.hideNavbar.set(true);
@@ -29,6 +31,14 @@ export class AppComponent {
     } else if (this.router.url.includes('recipe/')) {
       this.hideHeader.set(true);
       this.hideNavbar.set(true);
+    } else if (this.router.url.includes('schedule')) {
+      this.title.set('Schedule');
+      this.hideHeader.set(false);
+      this.hideNavbar.set(false);
+    } else if (this.router.url.includes('grocery-list')) {
+      this.title.set('Grocery list');
+      this.hideHeader.set(false);
+      this.hideNavbar.set(false);
     } else {
       this.hideHeader.set(false);
       this.hideNavbar.set(false);

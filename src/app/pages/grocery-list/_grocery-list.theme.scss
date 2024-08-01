@@ -1,0 +1,8 @@
+@use "sass:map";
+@use "@angular/material" as mat;
+
+@mixin theme($theme) {
+  .grocery-list-footer {
+    background-color: mat.get-theme-color($theme, surface-container);
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "groceryList.categories.dairy": "Dairy",
+  "groceryList.categories.fruit": "Fruit",
+  "groceryList.categories.vegetable": "Vegetable",
+  "groceryList.categories.pastry": "Pastry",
+  "groceryList.categories.meat": "Meat",
+  "groceryList.categories.fish": "Fish",
+  "groceryList.categories.finishedProduct": "Finished Product",
+  "groceryList.categories.seasoning": "Seasoning",
+  "groceryList.categories.candy": "Candy",
+  "groceryList.categories.beverages": "Beverages",
+  "groceryList.categories.other": "Other"
+}

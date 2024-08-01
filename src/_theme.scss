@@ -1,0 +1,13 @@
+@use "sass:map";
+@use "@angular/material" as mat;
+
+@mixin theme($theme) {
+  .title {
+    color: mat.get-theme-color($theme, primary);
+    font-size: 16px;
+  }
+  .subtitle {
+    color: mat.get-theme-color($theme, outline);
+    font-size: 14px;
+  }
+}

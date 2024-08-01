@@ -1,0 +1,11 @@
+<span class="title">{{ instruction()?.title }} </span>
+<mat-chip-set aria-label="Fish selection">
+  @for(ingredient of instruction()?.ingredients; track ingredient) {
+  <mat-chip
+    >{{ ingredient.amount }}{{ ingredient.unit }}
+    {{ ingredient.originalName }}</mat-chip
+  >
+
+  }
+</mat-chip-set>
+<p>{{ instruction()?.description }}</p>

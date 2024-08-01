@@ -1,0 +1,10 @@
+@for(day of (days$ | async); track day) {
+
+<app-schedule-item
+  [title]="day.formatedDate"
+  (addClicked)="onAddClicked(day)"
+  (removeClicked)="onRemoveClicked($event)"
+  [scheduledRecipes]="day.recipes"
+></app-schedule-item>
+
+}

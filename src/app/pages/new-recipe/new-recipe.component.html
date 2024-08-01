@@ -1,5 +1,9 @@
 <header class="header">
-  New Recipe
+  <button mat-icon-button color="primary" (click)="onBack()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  @if(form.value.id) { Edit: {{ form.value.title }}
+  } @else { New Recipe }
   <div style="flex: 1"></div>
   <button mat-stroked-button color="accent" (click)="onSave()">Save</button>
 </header>
@@ -11,70 +15,90 @@
         <img class="image" [src]="form.value.imageUrl" />
         <mat-form-field class="full-width">
           <mat-label>Title</mat-label>
-          <input matInput formControlName="title" [disabled]="true">
+          <input matInput formControlName="title" [disabled]="true" />
         </mat-form-field>
         <mat-form-field class="full-width">
           <mat-label>Description</mat-label>
-          <textarea matInput cdkTextareaAutosize cdkAutosizeMinRows="1" cdkAutosizeMaxRows="5"
-            formControlName="description"></textarea>
+          <textarea
+            matInput
+            cdkTextareaAutosize
+            cdkAutosizeMinRows="1"
+            cdkAutosizeMaxRows="5"
+            formControlName="description"
+          ></textarea>
         </mat-form-field>
         <div class="row">
           <mat-form-field class="full-width">
             <mat-label>Yield</mat-label>
-            <input type="number" matInput formControlName="recipeYield" [disabled]="true">
+            <input
+              type="number"
+              matInput
+              formControlName="recipeYield"
+              [disabled]="true"
+            />
           </mat-form-field>
           <mat-form-field class="full-width">
             <mat-label>Calories</mat-label>
-            <input type="number" matInput formControlName="calories" [disabled]="true">
+            <input
+              type="number"
+              matInput
+              formControlName="calories"
+              [disabled]="true"
+            />
           </mat-form-field>
-
-
         </div>
-        <mat-form-field class="full-width">
+        <!-- <mat-form-field class="full-width">
           <mat-label>Keywords</mat-label>
-          <mat-chip-grid #chipGrid aria-label="Enter keywords" formControlName="keywords">
+          <mat-chip-grid
+            #chipGrid
+            aria-label="Enter keywords"
+            formControlName="keywords"
+          >
             @for (keyword of form.value.keywords; track keyword) {
             <mat-chip-row (removed)="removeKeyword(keyword)">
-              {{keyword}}
+              {{ keyword }}
               <button matChipRemove aria-label="'remove ' + keyword">
                 <mat-icon>cancel</mat-icon>
               </button>
             </mat-chip-row>
             }
           </mat-chip-grid>
-          <input placeholder="New keyword..." [disabled]="true" [matChipInputFor]="chipGrid"
-            (matChipInputTokenEnd)="addKeyword($event)" />
-        </mat-form-field>
+          <input
+            placeholder="New keyword..."
+            [disabled]="true"
+            [matChipInputFor]="chipGrid"
+            (matChipInputTokenEnd)="addKeyword($event)"
+          />
+        </mat-form-field> -->
       </div>
     </mat-tab>
     <mat-tab label="Ingredients">
       <div class="tab-page">
-        <mat-list role="list">
-          @for(ingredient of form.value.ingredients; track ingredient) {
-          <mat-list-item role="listitem">{{ingredient}}</mat-list-item>
-          }
-        </mat-list>
+        <app-ingredient-list
+          [isInEditMode]="!!form.value.id"
+          [ingredients]="form.value.ingredientsList"
+        ></app-ingredient-list>
       </div>
     </mat-tab>
     <mat-tab label="Instructions">
       <div class="tab-page">
-        <div class="instruction-list">
-          @for(instruction of form.value.instructions; track instruction; let idx = $index) {
-            @if (instruction.type === "group") {
-              <h3>{{instruction.name}}</h3>
-              @for(element of instruction.steps; track element.text; let idx = $index) {
-                <span class="step">Step {{idx + 1}}</span>
-                <div class="instruction">{{element.text}}</div>
-              }
-            } @else {
-              <span class="step">Step {{idx + 1}}</span>
-              <div class="instruction">{{instruction.text || instruction}}</div>
-            }
-            
-          }
-        </div>
+        <app-instruction-list
+          [instructions]="form.value.instructions || []"
+        ></app-instruction-list>
+        <!-- <div class="instruction-list">
+          @for(instruction of form.value.instructions; track instruction; let
+          idx = $index) { @if (instruction.type === "group") {
+          <h3>{{ instruction.name }}</h3>
+          @for(element of instruction.steps; track element.text; let idx =
+          $index) {
+          <span class="step">Step {{ idx + 1 }}</span>
+          <div class="instruction">{{ element.text }}</div>
+          } } @else {
+          <span class="step">Step {{ idx + 1 }}</span>
+          <div class="instruction">{{ instruction.text || instruction }}</div>
+          } }
+        </div> -->
       </div>
     </mat-tab>
   </mat-tab-group>
-
 </form>

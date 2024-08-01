@@ -1,37 +1,9 @@
-
 :host {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  padding: 16px;
-  box-sizing: border-box;
+  display: block;
 }
 
-.image {
-  width: 100%;
-  object-fit: cover;
-  height: 100px;
-}
-
-
-.card-wrapper {
-  width: 100%;
-  min-width: 0;
-}
-
-mat-card {
-  overflow: hidden;
-}
-.card-content {
-  padding: 16px 0 0 0;
-  height: 44px;
-  display: flex;
-}
-
-.card-title {
-  font-size: 18px;
-  max-height: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-
+.fab {
+  position: fixed;
+  bottom: 72px;
+  right: 32px;
 }

@@ -1,0 +1,6 @@
+@for (recipe of recipes(); track recipe.id) {
+<app-recipe-list-item
+  [recipe]="recipe"
+  (click)="onClick(recipe.id)"
+></app-recipe-list-item>
+}

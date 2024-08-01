@@ -19,6 +19,13 @@ import { MatListModule } from '@angular/material/list';
 import { RecipeService } from '../../services/recipe.service';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Location } from '@angular/common';
+import { IngredientListComponent } from '../../components/ingredient-list/ingredient-list.component';
+import { InstructionListComponent } from '../../components/instruction-list/instruction-list.component';
+import { Instruction } from '../../interfaces/instruction';
+import { Recipe } from '../../interfaces/recipe';
+import { Ingredient } from '../../interfaces/ingredient';
 
 @Component({
   selector: 'app-new-recipe',
@@ -34,6 +41,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     CdkTextareaAutosize,
     ReactiveFormsModule,
     MatListModule,
+    IngredientListComponent,
+    InstructionListComponent,
   ],
   templateUrl: './new-recipe.component.html',
   styleUrl: './new-recipe.component.scss',
@@ -42,9 +51,11 @@ export class NewRecipeComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly recipeService = inject(RecipeService);
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
   private readonly snackbar = inject(MatSnackBar);
 
   public form = new FormGroup({
+    id: new FormControl(),
     title: new FormControl('', Validators.required),
     description: new FormControl(''),
     imageUrl: new FormControl(''),
@@ -52,26 +63,62 @@ export class NewRecipeComponent {
     recipeYield: new FormControl(1),
     calories: new FormControl(),
     ingredients: new FormControl([]),
-    instructions: new FormControl<any[]>([]),
+    instructions: new FormControl<Instruction[]>([]),
     prepTime: new FormControl(),
     cookTime: new FormControl(),
     totalTime: new FormControl(),
     videoThumbnailUrl: new FormControl(),
     videoUrl: new FormControl(),
     sourceUrl: new FormControl(),
+    ingredientsList: new FormControl(),
   });
 
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
-  ngOnInit() {
-    this.route.queryParamMap.subscribe((params) => {
+  constructor() {
+    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
       const recipeJSON = params.get('recipe');
       if (recipeJSON) {
         const recipe = JSON.parse(recipeJSON);
-        console.log(recipe);
-        this.form.patchValue(recipe);
+        const resolvedRecipe = this.resolveRecipe(recipe);
+        this.form.patchValue(resolvedRecipe as any);
       }
     });
+
+    this.route.params.pipe(takeUntilDestroyed()).subscribe((params) => {
+      const id = params['id'];
+      this.recipeService
+        .getRecipe(id, true)
+        .subscribe((recipe) => this.form.patchValue(recipe));
+    });
+  }
+
+  onBack() {
+    this.location.back();
+  }
+
+  private resolveRecipe(recipe: Recipe) {
+    return {
+      ...recipe,
+      instructions: recipe.instructions.map((instruction: any) => {
+        return {
+          ...instruction,
+          ingredients: instruction.ingredients.map((ingredient: any) => {
+            const fullIngredient =
+              recipe.ingredientsList.find(
+                (i) => i.nameSingularEnglish === ingredient
+              ) ||
+              recipe.ingredientsList.find(
+                (i) => i.namePluralEnglish === ingredient
+              );
+            return {
+              ...(fullIngredient as any),
+              id: ingredient,
+            } as Ingredient;
+          }),
+        } as Instruction;
+      }),
+    } as Recipe;
   }
 
   removeKeyword(keyword: string) {
@@ -94,12 +141,22 @@ export class NewRecipeComponent {
 
   onSave() {
     if (this.form.valid)
-      this.recipeService.postRecipe(this.form.value).subscribe(() => {
-        this.snackbar.open('Recipe saved sucessfully', undefined, {
-          verticalPosition: 'top',
-          duration: 3000,
+      if (this.form.value.id) {
+        this.recipeService.putRecipe(this.form.value).subscribe(() => {
+          this.snackbar.open('Recipe saved sucessfully', undefined, {
+            verticalPosition: 'top',
+            duration: 3000,
+          });
+          this.router.navigate(['']);
         });
-        this.router.navigate(['']);
-      });
+      } else {
+        this.recipeService.postRecipe(this.form.value).subscribe(() => {
+          this.snackbar.open('Recipe saved sucessfully', undefined, {
+            verticalPosition: 'top',
+            duration: 3000,
+          });
+          this.router.navigate(['']);
+        });
+      }
   }
 }
