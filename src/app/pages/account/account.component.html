@@ -1,0 +1,29 @@
+
+<div class="header">
+  <div class="circle account-circle"></div>
+  <div class="avatar"></div>
+  <span class="avatar-title">{{user()?.displayName}}</span>
+</div> 
+<mat-list>
+  <div mat-subheader>{{'settings'|transloco}}</div>
+    <mat-list-item mat-ripple routerLink="/household">
+      <mat-icon matListItemIcon>home</mat-icon>
+      <div matListItemTitle>{{ 'household' | transloco }}</div>
+      <div matListItemLine>{{ households()?.length ? (households()?.length + ' ' + 'households' | transloco) : 'none' | transloco }}</div>
+      <div matListItemMeta>
+          <mat-icon >chevron_right</mat-icon>
+      </div>
+    </mat-list-item>
+  
+  <mat-divider></mat-divider>
+  <div mat-subheader>{{'account' | transloco}}</div>
+ 
+    <mat-list-item mat-ripple >
+      <mat-icon matListItemIcon>person</mat-icon>
+      <div matListItemTitle>{{'my-profile' | transloco}}</div>
+      <div matListItemMeta>
+        <mat-icon >chevron_right</mat-icon>
+    </div>
+    </mat-list-item>
+  
+</mat-list>

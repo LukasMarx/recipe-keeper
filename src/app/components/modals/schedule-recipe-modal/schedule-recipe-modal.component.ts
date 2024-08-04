@@ -53,7 +53,7 @@ export class ScheduleRecipeModalComponent {
         .scheduleRecipe({
           recipeId: this.data.recipeId,
           scheduleDate: addMinutes(
-            new Date(dt.toLocaleDateString()),
+            new Date(dt),
             timezoneOffset * -1
           ).toISOString()!,
           householdId: this.data.householdId,

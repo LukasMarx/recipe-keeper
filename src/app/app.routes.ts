@@ -6,6 +6,8 @@ import { HomeComponent } from './pages/home/home.component';
 import { RecipeDetailComponent } from './pages/recipe-detail/recipe-detail.component';
 import { ScheduleComponent } from './pages/schedule/schedule.component';
 import { GroceryListComponent } from './pages/grocery-list/grocery-list.component';
+import { AccountComponent } from './pages/account/account.component';
+import { HouseholdComponent } from './pages/household/household.component';
 
 export const routes: Routes = [
   {
@@ -45,5 +47,13 @@ export const routes: Routes = [
   {
     path: 'grocery-list',
     component: GroceryListComponent,
+  },
+  {
+    path: 'account',
+    component: AccountComponent,
+  },
+  {
+    path: 'household',
+    component: HouseholdComponent,
   },
 ];

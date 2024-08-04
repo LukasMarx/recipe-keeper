@@ -5,12 +5,13 @@
 @use "./theme" as theme;
 @use "./app/components/header/_header-theme" as header;
 @use "./app/components/ingredient-list/ingredient-list.theme" as ingredientList;
+@use "./app/pages/grocery-list//grocery-list.theme" as groceryList;
 // Plus imports for other components in your app.
 @use "./app/pages/new-recipe/new-recipe.theme" as newRecipePage;
 @use "./app/pages/recipe-detail/recipe-detail.theme" as recipeDetailPage;
 @use "./app/pages/login/login-theme" as loginPage;
 @use "./app/pages/register/register-theme" as registerPage;
-@use "./app/pages/grocery-list//grocery-list.theme" as groceryList;
+@use "./app/pages/account/account-theme" as accountPage;
 
 @include mat.core();
 
@@ -57,10 +58,11 @@ $recipe-keeper-theme-dark: mat.define-theme(
 
   @include newRecipePage.theme($recipe-keeper-theme);
   @include ingredientList.theme($recipe-keeper-theme);
+  @include groceryList.theme($recipe-keeper-theme);
   @include loginPage.theme($recipe-keeper-theme);
   @include registerPage.theme($recipe-keeper-theme);
   @include recipeDetailPage.theme($recipe-keeper-theme);
-  @include groceryList.theme($recipe-keeper-theme);
+  @include accountPage.theme($recipe-keeper-theme);
 
   --page-padding: 16px;
 
@@ -73,12 +75,13 @@ $recipe-keeper-theme-dark: mat.define-theme(
     @include navbar.theme($recipe-keeper-theme-dark);
     @include header.theme($recipe-keeper-theme-dark);
     @include ingredientList.theme($recipe-keeper-theme-dark);
+    @include groceryList.theme($recipe-keeper-theme-dark);
 
     @include newRecipePage.theme($recipe-keeper-theme-dark);
     @include loginPage.theme($recipe-keeper-theme-dark);
     @include registerPage.theme($recipe-keeper-theme-dark);
     @include recipeDetailPage.theme($recipe-keeper-theme-dark);
-    @include groceryList.theme($recipe-keeper-theme-dark);
+    @include accountPage.theme($recipe-keeper-theme-dark);
 
     background-color: mat.get-theme-color($recipe-keeper-theme-dark, surface);
     color: mat.get-theme-color($recipe-keeper-theme-dark, on-surface);

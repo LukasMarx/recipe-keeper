@@ -77,7 +77,6 @@ export class RecipeDetailComponent {
     this.dialogService.open(ScheduleRecipeModalComponent, {
       data: {
         recipeId: this.recipe().id,
-        householdId: 1,
       },
     });
   }

@@ -39,7 +39,7 @@ export class ScheduleService {
 
   public getScheduledRecipes() {
     this.http
-      .get<ScheduledRecipe[]>('schedule/1')
+      .get<ScheduledRecipe[]>('schedule')
       .pipe(
         map((scheduleRecipe) => {
           return scheduleRecipe.map(({ scheduledDate, ...rest }) => ({
