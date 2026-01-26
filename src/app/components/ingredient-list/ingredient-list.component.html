@@ -24,7 +24,7 @@
   </div>
   <div class="text">
     <span class="title">{{
-      ingredient.amount > 1
+      (ingredient.amount > 1 && !ingredient.unit)
         ? ingredient.originalNamePlural
         : ingredient.originalName
     }}</span>

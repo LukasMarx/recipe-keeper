@@ -1,15 +1,21 @@
 <h2 mat-dialog-title>Recipe from URL</h2>
 <mat-dialog-content>
   @if(isLoading()) {
-  <mat-spinner></mat-spinner>
+  <div class="loading-container">
+    <mat-progress-spinner
+      color="primary"
+      mode="indeterminate"
+      diameter="50"
+    ></mat-progress-spinner>
+    <p>Parsing recipe from URL...</p>
+    <p>This can take a moment</p>
+  </div>
   } @else {
-
   <p>Enter the URL of a website with the recipe you want to import</p>
   <mat-form-field style="width: 100%">
     <mat-label>Recipe URL</mat-label>
     <input matInput [(ngModel)]="url" />
   </mat-form-field>
-
   }
 </mat-dialog-content>
 <mat-dialog-actions>
