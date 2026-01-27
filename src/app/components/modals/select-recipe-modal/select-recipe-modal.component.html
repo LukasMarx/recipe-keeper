@@ -1,51 +1,91 @@
 <h2 mat-dialog-title>Schedule a recipe</h2>
 <mat-dialog-content>
   <mat-stepper linear #stepper>
-    <mat-step>
+    <mat-step [completed]="!!selectedRecipe()">
       <div class="content">
         <ng-template matStepLabel>Choose a recipe</ng-template>
         <mat-form-field class="full-width">
-          <input matInput placeholder="Search" />
-          <button matPrefix mat-icon-button aria-label="Clear">
+          <input 
+            matInput 
+            placeholder="Search" 
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+          />
+          <button matPrefix mat-icon-button aria-label="Search">
             <mat-icon>search</mat-icon>
           </button>
         </mat-form-field>
         <app-recipe-list
           style="padding: 0"
-          [recipes]="recipes"
+          [recipes]="filteredRecipes"
+          [selectedRecipeId]="selectedRecipe()?.id"
+          (onRecipeClick)="onRecipeClick($event)"
         ></app-recipe-list>
       </div>
       <mat-dialog-actions>
         <button mat-button mat-dialog-close>Cancel</button>
-        <button mat-button matStepperNext cdkFocusInitial>Next</button>
+        <button 
+          mat-button 
+          matStepperNext 
+          [disabled]="!selectedRecipe()"
+          cdkFocusInitial
+        >
+          Next
+        </button>
       </mat-dialog-actions>
     </mat-step>
 
-    <mat-step>
+    <mat-step [stepControl]="form">
       <ng-template matStepLabel>Settings</ng-template>
       <div class="content">
-        <h4>Settings</h4>
-        <mat-form-field>
-          <mat-label>Schedule for</mat-label>
-          <mat-select>
-            <mat-option value="1">Me</mat-option>
-            <mat-option value="2">Household</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>Meal type</mat-label>
-          <mat-select>
-            <mat-option value="1">Breakfast</mat-option>
-            <mat-option value="2">Lunch</mat-option>
-            <mat-option value="3">Dinner</mat-option>
-            <mat-option value="4">Snack</mat-option>
-            <mat-option value="5">Other</mat-option>
-          </mat-select>
-        </mat-form-field>
+        <form [formGroup]="form">
+          <mat-form-field class="full-width">
+            <mat-label>Choose a date</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="date" />
+            <mat-datepicker-toggle
+              matIconSuffix
+              [for]="picker"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field class="full-width">
+            <mat-label>Meal type</mat-label>
+            <mat-select formControlName="mealType">
+              <mat-option value="BREAKFAST">Breakfast</mat-option>
+              <mat-option value="LUNCH">Lunch</mat-option>
+              <mat-option value="DINNER">Dinner</mat-option>
+              <mat-option value="SNACK">Snack</mat-option>
+              <mat-option value="OTHER">Other</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          @if (households$ | async; as households) {
+            @if (households.length > 1) {
+              <mat-form-field class="full-width">
+                <mat-label>Schedule for</mat-label>
+                <mat-select formControlName="householdId">
+                  <mat-option [value]="null">Personal</mat-option>
+                  @for (household of households; track household.id) {
+                    <mat-option [value]="household.id">{{ household.name }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            }
+          }
+        </form>
       </div>
       <mat-dialog-actions>
+        <button mat-button matStepperPrevious>Back</button>
         <button mat-button mat-dialog-close>Cancel</button>
-        <button mat-button cdkFocusInitial>Schedule</button>
+        <button 
+          mat-button 
+          (click)="onSubmit()" 
+          [disabled]="!form.valid"
+          cdkFocusInitial
+        >
+          Schedule
+        </button>
       </mat-dialog-actions>
     </mat-step>
   </mat-stepper>

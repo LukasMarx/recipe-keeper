@@ -8,6 +8,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
 import { RecipeService } from '../../services/recipe.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -36,6 +37,7 @@ import { Location } from '@angular/common';
     CdkTextareaAutosize,
     ReactiveFormsModule,
     MatListModule,
+    MatMenuModule,
     DurationPipe,
     MatProgressSpinnerModule,
     IngredientListComponent,
@@ -46,7 +48,9 @@ import { Location } from '@angular/common';
 })
 export class RecipeDetailComponent {
   onDelete() {
-    throw new Error('Method not implemented.');
+    this.recipeService.deleteRecipe(this.recipe().id).subscribe(() => {
+      this.location.back();
+    });
   }
   private readonly router = inject(Router);
   private readonly location = inject(Location);

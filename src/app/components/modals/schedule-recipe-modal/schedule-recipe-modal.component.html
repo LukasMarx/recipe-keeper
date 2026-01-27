@@ -21,10 +21,23 @@
         <mat-option value="OTHER">Other</mat-option>
       </mat-select>
     </mat-form-field>
+    @if (households$ | async; as households) {
+      @if (households.length > 1) {
+        <mat-form-field class="full-width">
+          <mat-label>Schedule for</mat-label>
+          <mat-select formControlName="householdId">
+            <mat-option [value]="null">Personal</mat-option>
+            @for (household of households; track household.id) {
+              <mat-option [value]="household.id">{{ household.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      }
+    }
   </form>
 </mat-dialog-content>
 
 <mat-dialog-actions>
   <button mat-button mat-dialog-close>Cancel</button>
-  <button mat-button (click)="onSubmit()" cdkFocusInitial>Ok</button>
+  <button mat-button (click)="onSubmit()" [disabled]="!form.valid" cdkFocusInitial>Ok</button>
 </mat-dialog-actions>

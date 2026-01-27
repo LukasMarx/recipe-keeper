@@ -12,16 +12,30 @@
 
 mat-card {
   overflow: hidden;
+  height: 100%;
+  box-sizing: border-box;
+  position: relative;
+  cursor: pointer;
+
+  &.selected::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 3px solid var(--mat-sys-primary, #4caf50);
+    border-radius: var(--mdc-elevated-card-container-shape, 12px);
+    pointer-events: none;
+  }
 }
+
 .card-content {
   padding: 16px 0 0 0;
-  height: 44px;
   display: flex;
 }
 
 .card-title {
-  font-size: 18px;
-  max-height: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 16px;
+  line-height: 1.25;
 }

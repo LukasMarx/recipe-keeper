@@ -33,6 +33,11 @@ export class RecipeService {
     return this.http.put(`recipe/${recipe.id}`, recipe);
   }
 
+  public deleteRecipe(id: number) {
+    this.cache.delete(id);
+    return this.http.delete(`recipe/${id}`);
+  }
+
   public getMyRecipes() {
     this.http
       .get('recipe')

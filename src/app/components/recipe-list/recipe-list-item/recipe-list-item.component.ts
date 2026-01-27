@@ -15,4 +15,5 @@ import { Recipe } from '../../../interfaces/recipe';
 })
 export class RecipeListItemComponent {
   public recipe = input<Recipe>();
+  public selected = input<boolean>(false);
 }

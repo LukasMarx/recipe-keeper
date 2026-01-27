@@ -57,12 +57,16 @@ export class ScheduleComponent {
         take(1)
       )
       .subscribe((recipes) => {
-        this.dialog.open(SelectRecipeModalComponent, {
+        const dialogRef = this.dialog.open(SelectRecipeModalComponent, {
           maxWidth: '100%',
           maxHeight: '100%',
           height: '100%',
-          data: { recipes },
+          data: { recipes, date: day.date },
           panelClass: 'full-screen-modal',
+        });
+        
+        dialogRef.afterClosed().subscribe(() => {
+          this.scheduleService.getScheduledRecipes();
         });
       });
   }

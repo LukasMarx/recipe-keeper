@@ -14,6 +14,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MealType, ScheduleService } from '../../../services/schedule.service';
+import { HouseholdService } from '../../../services/household.service';
 import { DIALOG_DATA } from '@angular/cdk/dialog';
 import { addMinutes } from 'date-fns';
 
@@ -37,12 +38,16 @@ import { addMinutes } from 'date-fns';
 })
 export class ScheduleRecipeModalComponent {
   private readonly scheduleService = inject(ScheduleService);
+  private readonly householdService = inject(HouseholdService);
   private readonly dialogRef = inject(MatDialogRef);
   private readonly data = inject(DIALOG_DATA);
+
+  public households$ = this.householdService.getAll();
 
   public form = new FormGroup({
     date: new FormControl(new Date(), Validators.required),
     mealType: new FormControl<MealType>('DINNER', Validators.required),
+    householdId: new FormControl<number | null>(null),
   });
 
   public onSubmit() {
@@ -56,7 +61,7 @@ export class ScheduleRecipeModalComponent {
             new Date(dt),
             timezoneOffset * -1
           ).toISOString()!,
-          householdId: this.data.householdId,
+          householdId: this.form.value.householdId || 0,
           mealType: this.form.value.mealType as MealType,
         })
         .subscribe(() => {

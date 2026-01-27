@@ -18,6 +18,7 @@ import { RecipeListItemComponent } from './recipe-list-item/recipe-list-item.com
 })
 export class RecipeListComponent {
   public recipes = input<Recipe[] | null>();
+  public selectedRecipeId = input<number | undefined>(undefined);
   public onRecipeClick = output<number>();
 
   onClick(recipeId: number) {

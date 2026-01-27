@@ -1,6 +1,7 @@
 @for (recipe of recipes(); track recipe.id) {
 <app-recipe-list-item
   [recipe]="recipe"
+  [selected]="recipe.id === selectedRecipeId()"
   (click)="onClick(recipe.id)"
 ></app-recipe-list-item>
 }
