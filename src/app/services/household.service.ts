@@ -38,6 +38,12 @@ export class HouseholdService {
     return this.http.post('household', input).pipe(tap(() => this.getAll()));
   }
 
+  public edit(input: { id: number; name: string }) {
+    return this.http
+      .put(`household/${input.id}`, { name: input.name })
+      .pipe(tap(() => this.getAll()));
+  }
+
   public invite(input: { householdId: number; recipientName: string }) {
     return this.http
       .post('household/invite', input)

@@ -1,4 +1,10 @@
-<h2 mat-dialog-title>Add household</h2>
+<h2 mat-dialog-title>
+    @if(isEditMode) {
+        {{ 'edit-household' | transloco }}
+    } @else {
+        {{ 'add-household' | transloco }}
+    }
+</h2>
 <mat-dialog-content>
   <form [formGroup]="form" style="margin-top: 4px;">
     <mat-form-field class="full-width">

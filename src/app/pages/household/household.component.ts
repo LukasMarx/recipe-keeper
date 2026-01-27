@@ -67,6 +67,12 @@ export class HouseholdComponent implements OnInit {
     this.dialogService.open(EditHouseholdModalComponent);
   }
 
+  onEdit(household: Household) {
+    this.dialogService.open(EditHouseholdModalComponent, {
+      data: { id: household.id, name: household.name },
+    });
+  }
+
   onBack() {
     this.location.back();
   }

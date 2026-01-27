@@ -16,7 +16,7 @@
         <button mat-icon-button (click)="onContextMenu($event)"
           [matMenuTriggerFor]="menu"><mat-icon>more_vert</mat-icon></button>
         <mat-menu #menu="matMenu">
-          <button mat-menu-item>{{'edit' | transloco}}</button>
+          <button mat-menu-item (click)="onEdit(household)">{{'edit' | transloco}}</button>
           <button mat-menu-item>{{'delete' | transloco}}</button>
         </mat-menu>
       </div>

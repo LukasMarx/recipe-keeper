@@ -1,6 +1,7 @@
 {
   "household": "Missing value for 'household'",
   "edit": "Missing value for 'edit'",
+  "edit-household": "Edit Household",
   "delete": "Missing value for 'delete'",
   "add-household": "Missing value for 'add-household'",
   "join-household": "Missing value for 'join-household'",
