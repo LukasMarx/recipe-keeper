@@ -12,6 +12,7 @@
 @use "./app/pages/login/login-theme" as loginPage;
 @use "./app/pages/register/register-theme" as registerPage;
 @use "./app/pages/account/account-theme" as accountPage;
+@use "./app/pages/home/home-theme" as homePage;
 
 @include mat.core();
 
@@ -63,6 +64,7 @@ $recipe-keeper-theme-dark: mat.define-theme(
   @include registerPage.theme($recipe-keeper-theme);
   @include recipeDetailPage.theme($recipe-keeper-theme);
   @include accountPage.theme($recipe-keeper-theme);
+  @include homePage.theme($recipe-keeper-theme);
 
   --page-padding: 16px;
 
@@ -82,6 +84,7 @@ $recipe-keeper-theme-dark: mat.define-theme(
     @include registerPage.theme($recipe-keeper-theme-dark);
     @include recipeDetailPage.theme($recipe-keeper-theme-dark);
     @include accountPage.theme($recipe-keeper-theme-dark);
+    @include homePage.theme($recipe-keeper-theme-dark);
 
     background-color: mat.get-theme-color($recipe-keeper-theme-dark, surface);
     color: mat.get-theme-color($recipe-keeper-theme-dark, on-surface);

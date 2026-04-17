@@ -1,8 +1,83 @@
-<app-recipe-list
-  [recipes]="recipes$ | async"
-  (onRecipeClick)="onClick($event)"
-></app-recipe-list>
-<button class="fab" mat-fab extended (click)="addRecipe()">
-  <mat-icon>add</mat-icon>
-  Recipe
-</button>
+<section class="home-page">
+  <header class="topbar">
+    <button
+      class="icon-button"
+      mat-icon-button
+      type="button"
+      aria-label="Search saved recipes"
+    >
+      <mat-icon>search</mat-icon>
+    </button>
+
+    <div class="brand" aria-label="RecipeKeeper home">
+      <img class="brand-logo" src="logo_small.png" alt="" />
+      <span class="brand-name">RecipeKeeper</span>
+    </div>
+
+    <button
+      class="icon-button"
+      mat-icon-button
+      type="button"
+      aria-label="Add recipe"
+      (click)="addRecipe()"
+    >
+      <mat-icon>add</mat-icon>
+    </button>
+  </header>
+
+  <section class="hero">
+    <h1 class="hero-title">My Cookbook</h1>
+    <p class="hero-subtitle">Your saved culinary inspirations.</p>
+  </section>
+
+  <section class="recipe-grid" aria-label="Saved recipes">
+    @if (recipes$ | async; as recipes) {
+      @if (recipes.length) {
+        @for (recipe of recipes; track recipe.id; let recipeIndex = $index) {
+          <button
+            class="recipe-card"
+            type="button"
+            (click)="onClick(recipe.id)"
+            [attr.aria-label]="'Open ' + getDisplayTitle(recipe)"
+          >
+            <div class="recipe-card__media">
+              @if (recipe.imageUrl) {
+                <img
+                  [src]="recipe.imageUrl"
+                  [alt]="getDisplayTitle(recipe)"
+                  [attr.loading]="recipeIndex < 2 ? 'eager' : 'lazy'"
+                  decoding="async"
+                />
+              } @else {
+                <div class="recipe-card__placeholder" aria-hidden="true">
+                  <mat-icon>restaurant_menu</mat-icon>
+                </div>
+              }
+
+              <span class="recipe-card__favorite" aria-hidden="true">
+                <mat-icon>favorite</mat-icon>
+              </span>
+            </div>
+
+            <span class="recipe-card__body">
+              <span class="recipe-card__title">{{ getDisplayTitle(recipe) }}</span>
+              <span class="recipe-card__meta">{{ getRecipeMeta(recipe) }}</span>
+            </span>
+          </button>
+        }
+      } @else {
+        <section class="empty-state" aria-label="No recipes saved yet">
+          <span class="empty-state__icon" aria-hidden="true">
+            <mat-icon>menu_book</mat-icon>
+          </span>
+          <h2>Start your cookbook</h2>
+          <p>Add a recipe and it will appear here in your collection.</p>
+          <button mat-flat-button type="button" (click)="addRecipe()">
+            <mat-icon>add</mat-icon>
+            Add recipe
+          </button>
+        </section>
+      }
+    }
+  </section>
+</section>

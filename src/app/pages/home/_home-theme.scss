@@ -1,0 +1,27 @@
+@use "sass:color";
+@use "@angular/material" as mat;
+
+@mixin theme($theme) {
+  app-home {
+    --home-background: #{mat.get-theme-color($theme, surface)};
+    --home-background-soft: #{color.mix(mat.get-theme-color($theme, surface-container), mat.get-theme-color($theme, surface), 42%)};
+    --home-background-glow: #{color.change(mat.get-theme-color($theme, primary), $alpha: 0.14)};
+    --home-text: #{mat.get-theme-color($theme, on-surface)};
+    --home-text-muted: #{color.mix(mat.get-theme-color($theme, outline), mat.get-theme-color($theme, on-surface), 32%)};
+    --home-brand: #{color.scale(mat.get-theme-color($theme, primary), $lightness: -38%)};
+    --home-brand-chip: #{color.change(mat.get-theme-color($theme, primary), $alpha: 0.14)};
+    --home-accent: #{color.scale(mat.get-theme-color($theme, primary), $lightness: -20%)};
+    --home-accent-strong: #{color.scale(mat.get-theme-color($theme, primary), $lightness: -32%)};
+    --home-card-background: #{color.mix(mat.get-theme-color($theme, surface-container), mat.get-theme-color($theme, surface), 56%)};
+    --home-card-media-background: #{color.change(mat.get-theme-color($theme, primary), $alpha: 0.08)};
+    --home-nav-background: #{color.change(mat.get-theme-color($theme, surface-container), $alpha: 0.94)};
+    --home-nav-text: #{color.mix(mat.get-theme-color($theme, outline), mat.get-theme-color($theme, on-surface), 30%)};
+    --home-nav-active-background: #{mat.get-theme-color($theme, primary)};
+    --home-nav-active-text: #{mat.get-theme-color($theme, on-primary)};
+    --home-profile-background: #{color.mix(mat.get-theme-color($theme, tertiary), mat.get-theme-color($theme, primary), 56%)};
+    --home-profile-shadow: #{color.scale(mat.get-theme-color($theme, primary), $lightness: -42%)};
+    --home-profile-icon: #{mat.get-theme-color($theme, on-primary)};
+    --home-profile-ring: #{mat.get-theme-color($theme, surface)};
+    --home-shadow: #{color.change(mat.get-theme-color($theme, on-surface), $alpha: 0.12)};
+  }
+}

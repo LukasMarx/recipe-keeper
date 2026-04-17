@@ -18,31 +18,37 @@ export class AppComponent {
   title = signal('Cookbook');
 
   modify(event: any) {
+    const currentUrl = this.router.url.split('?')[0];
+
     this.title.set('Cookbook');
-    if (this.router.url.split('?')[0] === '/new-recipe') {
+
+    if (currentUrl === '/recipes') {
+      this.hideHeader.set(true);
+      this.hideNavbar.set(false);
+    } else if (currentUrl === '/new-recipe') {
       this.hideHeader.set(true);
       this.hideNavbar.set(true);
     } else if (
-      this.router.url === '/login' ||
-      this.router.url === '/register'
+      currentUrl === '/login' ||
+      currentUrl === '/register'
     ) {
       this.hideHeader.set(true);
       this.hideNavbar.set(true);
-    } else if (this.router.url.includes('recipe/')) {
+    } else if (currentUrl.includes('recipe/')) {
       this.hideHeader.set(true);
       this.hideNavbar.set(true);
-    } else if (this.router.url.includes('schedule')) {
+    } else if (currentUrl.includes('schedule')) {
       this.title.set('Schedule');
       this.hideHeader.set(false);
       this.hideNavbar.set(false);
-    } else if (this.router.url.includes('grocery-list')) {
+    } else if (currentUrl.includes('grocery-list')) {
       this.title.set('Grocery list');
       this.hideHeader.set(true);
       this.hideNavbar.set(false);
-    } else if (this.router.url.includes('account')) {
+    } else if (currentUrl.includes('account')) {
       this.hideHeader.set(true);
       this.hideNavbar.set(false);
-    } else if (this.router.url.includes('household')) {
+    } else if (currentUrl.includes('household')) {
       this.hideHeader.set(true);
       this.hideNavbar.set(true);
     } else {
