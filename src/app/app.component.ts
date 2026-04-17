@@ -37,7 +37,7 @@ export class AppComponent {
       this.hideNavbar.set(false);
     } else if (this.router.url.includes('grocery-list')) {
       this.title.set('Grocery list');
-      this.hideHeader.set(false);
+      this.hideHeader.set(true);
       this.hideNavbar.set(false);
     } else if (this.router.url.includes('account')) {
       this.hideHeader.set(true);

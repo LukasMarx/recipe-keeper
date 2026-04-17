@@ -1,58 +1,115 @@
-<div class="page">
-  <mat-selection-list #shoes [multiple]="false">
-    @for (list of lists(); track list) {
-    <mat-list-option [value]="list">
-      <mat-icon matListItemIcon>receipt_long</mat-icon>
-      <div matListItemTitle>{{ list.name }}</div>
-      <div matListItemLine>{{ list.plannedDate | date }}</div>
-    </mat-list-option>
-    }
-  </mat-selection-list>
+<div class="grocery-screen">
+  <header class="topbar">
+    <button
+      type="button"
+      class="icon-button"
+      aria-label="Open shopping list settings"
+      (click)="onAddList()"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
 
-  <button class="full-width" mat-stroked-button (click)="onAddList()">
-    <mat-icon>add</mat-icon>Add List
-  </button>
-  <div class="list">
-    <mat-selection-list class="full-width">
-      @for(group of groups();track group) {
-      <div mat-subheader>
-        {{ groceryListService.getCatergoryLabel(group) | async }}
-      </div>
-      @for (item of listItems()[group]; track item) {
-      <mat-list-option>
-        <mat-icon matListItemIcon>category</mat-icon>
-        <div matListItemTitle>{{ item.name }}</div>
-        <div matListItemLine>{{ item.amount }}{{ item.unit }}</div>
-      </mat-list-option>
-      } }
-    </mat-selection-list>
-  </div>
-</div>
-@if( isFooterActive() ) {
-<div class="backdrop" (click)="isFooterActive.set(false)"></div>
-}
-<div
-  class="footer grocery-list-footer"
-  [class.expanded]="isFooterActive()"
-  (click)="isFooterActive.set(true)"
-  #footer
->
-  <div class="header">
-    <mat-form-field class="full-width">
-      <mat-icon matPrefix>search</mat-icon>
-      <input matInput placeholder="I need..." [formControl]="searchControl" />
-    </mat-form-field>
-    @if(isFooterActive()) {
-    <button mat-button (click)="onCancel($event)">Cancel</button>
-    }
-  </div>
-  <div class="suggestion-list">
-    @for (suggestion of suggestions(); track suggestion) {
-    <div class="suggestion" (click)="onSuggestionClick(suggestion)" matRipple>
-      <mat-card appearance="outlined">
-        <mat-card-content>{{ suggestion }}</mat-card-content>
-      </mat-card>
+    <div class="topbar-title">
+      <h1>Shopping List</h1>
     </div>
-    }
+  </header>
+
+  <section class="progress-block">
+    <div class="grocery-screen__inner">
+      <div class="progress-copy">
+        <span class="progress-label">List Progress</span>
+        <span class="progress-value"
+          >{{ checkedCount() }} / {{ totalCount() }} items</span
+        >
+      </div>
+
+      <div class="progress-track" aria-hidden="true">
+        <div
+          class="progress-bar"
+          [style.width.%]="progressPercent()"
+        ></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="grocery-screen__inner">
+    <section class="filters" aria-label="Category filters">
+      <button
+        type="button"
+        class="filter-chip"
+        [class.active]="selectedFilter() === 'all'"
+        (click)="selectFilter('all')"
+      >
+        All
+      </button>
+
+      @for (filter of availableFilters(); track filter) {
+      <button
+        type="button"
+        class="filter-chip"
+        [class.active]="selectedFilter() === filter"
+        (click)="selectFilter(filter)"
+      >
+        {{ groceryListService.getCatergoryLabel(filter) | async }}
+      </button>
+      }
+    </section>
+
+    <section class="sections">
+      @if (sections().length) { @for (section of sections(); track section.category) {
+      <div class="section">
+        <h2>{{ groceryListService.getCatergoryLabel(section.category) | async }}</h2>
+
+        <div class="section-items">
+          @for (item of section.items; track itemKey(item)) {
+          <button
+            type="button"
+            class="item-row"
+            [class.checked]="isItemChecked(item)"
+            [attr.aria-pressed]="isItemChecked(item)"
+            (click)="toggleItem(item)"
+          >
+            <span class="item-checkmark">
+              <mat-icon>check</mat-icon>
+            </span>
+
+            <span class="item-copy">
+              <span class="item-name">{{ formatName(item) }}</span>
+              <span class="item-meta">{{ formatAmount(item) }}</span>
+            </span>
+          </button>
+          }
+        </div>
+      </div>
+      } } @else {
+      <div class="empty-state">
+        <h2>Your list is empty</h2>
+        <p>Add items with the quick add bar or create a new list from the menu.</p>
+      </div>
+      }
+    </section>
   </div>
 </div>
+
+<form class="quick-add-shell grocery-list-footer" (submit)="$event.preventDefault(); onQuickAdd()">
+  <button
+    type="button"
+    class="quick-add-prefix"
+    aria-label="Create or edit shopping list"
+    (click)="onAddList()"
+  >
+    <mat-icon>add</mat-icon>
+  </button>
+
+  <input
+    type="text"
+    [formControl]="quickAddControl"
+    class="quick-add-input"
+    placeholder="Quick add item..."
+    aria-label="Quick add item"
+  />
+
+  <button type="submit" class="quick-add-submit" aria-label="Add grocery item">
+    <mat-icon>north</mat-icon>
+  </button>
+</form>

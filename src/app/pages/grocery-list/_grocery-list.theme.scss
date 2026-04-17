@@ -1,8 +1,20 @@
-@use "sass:map";
+@use "sass:color";
 @use "@angular/material" as mat;
 
 @mixin theme($theme) {
-  .grocery-list-footer {
-    background-color: mat.get-theme-color($theme, surface-container);
+  app-grocery-list {
+    --gl-s: #{mat.get-theme-color($theme, surface)};
+    --gl-c: #{mat.get-theme-color($theme, surface-container)};
+    --gl-e: #{color.mix(mat.get-theme-color($theme, surface-container), mat.get-theme-color($theme, surface), 70%)};
+    --gl-t: #{mat.get-theme-color($theme, on-surface)};
+    --gl-m: #{mat.get-theme-color($theme, outline)};
+    --gl-o: #{color.change(mat.get-theme-color($theme, outline), $alpha: 0.18)};
+    --gl-p: #{mat.get-theme-color($theme, primary)};
+    --gl-ps: #{color.change(mat.get-theme-color($theme, primary), $alpha: 0.18)};
+    --gl-pt: #{color.mix(mat.get-theme-color($theme, primary), mat.get-theme-color($theme, surface), 28%)};
+    --gl-pd: #{color.scale(mat.get-theme-color($theme, primary), $lightness: -20%)};
+    --gl-op: #{mat.get-theme-color($theme, on-primary)};
+    --gl-sh: #{color.change(mat.get-theme-color($theme, on-surface), $alpha: 0.14)};
+    --gl-sp: #{color.change(mat.get-theme-color($theme, primary), $alpha: 0.24)};
   }
 }

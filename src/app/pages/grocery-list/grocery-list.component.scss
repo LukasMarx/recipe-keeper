@@ -1,79 +1,290 @@
 :host {
-  display: flex;
-  flex-direction: column;
+  display: block;
   height: 100%;
-  gap: 16px;
   overflow: hidden;
   box-sizing: border-box;
+  background:
+    radial-gradient(circle at top right, var(--gl-ps), transparent 28%),
+    linear-gradient(180deg, var(--gl-e) 0%, var(--gl-s) 18%);
+  color: var(--gl-t);
 }
 
-[mat-stroked-button] {
-  flex-shrink: 0;
-}
-
-.page {
-  padding: var(--page-padding);
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  padding-bottom: 128px;
-}
-
-.list {
-  display: flex;
-  flex: 1;
-  width: 100%;
-}
-
-.footer {
-  position: fixed;
-
-  bottom: 56px;
-  width: 100%;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 32px 16px 0 16px;
-  border-top-left-radius: 32px;
-  border-top-right-radius: 32px;
-  width: 100%;
-  box-sizing: border-box;
-
-  .header {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-  }
-  .suggestion-list {
-    display: grid;
-    width: 100%;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-}
-
-.backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
+.grocery-screen {
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1;
-}
-
-.footer.expanded {
-  position: fixed;
-  height: 500px;
-  bottom: 0;
-  width: 100%;
-
-  align-items: baseline;
-  z-index: 2;
+  overflow-y: auto;
+  padding: 0 0 132px;
   box-sizing: border-box;
 }
 
-[mat-fab] {
-  margin-top: -24px;
+.grocery-screen__inner {
+  width: min(100%, 536px);
+  margin: 0 auto;
+  padding: 0 18px;
+  box-sizing: border-box;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 18px;
+  box-sizing: border-box;
+  background: var(--gl-e);
+  border-bottom: 1px solid var(--gl-o);
+}
+
+.topbar-title {
+  text-align: center;
+}
+
+.topbar-title h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  color: var(--gl-p);
+}
+
+.icon-button,
+.quick-add-prefix,
+.quick-add-submit {
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.icon-button {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gl-m);
+}
+
+.icon-button mat-icon,
+.quick-add-prefix mat-icon,
+.quick-add-submit mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.progress-block {
+  position: sticky;
+  top: 68px;
+  padding: 20px 0 6px;
+  background: var(--gl-s);
+}
+
+.progress-copy {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.progress-label {
+  font-size: 0.9rem;
+  color: var(--gl-m);
+}
+
+.progress-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--gl-p);
+}
+
+.progress-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--gl-c);
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--gl-pd) 0%, var(--gl-p) 100%);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 20px 0 10px;
+}
+
+.filter-chip {
+  min-height: 38px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--gl-c);
+  color: var(--gl-m);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.filter-chip.active {
+  background: var(--gl-pt);
+  color: var(--gl-pd);
+}
+
+.sections {
+  padding-top: 14px;
+}
+
+.section + .section {
+  margin-top: 30px;
+}
+
+.section h2,
+.empty-state h2 {
+  margin: 0 0 14px;
+  font-size: 1.35rem;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  color: var(--gl-t);
+}
+
+.item-row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  padding: 14px 0;
+  border: 0;
+  border-bottom: 1px solid var(--gl-o);
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.item-checkmark {
+  width: 24px;
+  height: 24px;
+  border: 1.25px solid var(--gl-m);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+}
+
+.item-checkmark mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.item-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.item-name {
+  font-size: 1.1rem;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  color: var(--gl-t);
+}
+
+.item-meta {
+  font-size: 0.82rem;
+  color: var(--gl-m);
+}
+
+.item-row.checked .item-checkmark {
+  border-color: var(--gl-p);
+  background: var(--gl-p);
+  color: var(--gl-op);
+}
+
+.item-row.checked .item-name,
+.item-row.checked .item-meta {
+  color: var(--gl-m);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.empty-state {
+  padding: 24px 0;
+}
+
+.empty-state p {
+  margin: 0;
+  max-width: 28ch;
+  color: var(--gl-m);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.quick-add-shell {
+  position: fixed;
+  left: 50%;
+  bottom: 82px;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 8px;
+  width: min(calc(100% - 28px), 500px);
+  padding: 6px 6px 6px 4px;
+  border-radius: 22px;
+  background: var(--gl-c);
+  box-shadow: 0 6px 16px var(--gl-sh);
+  transform: translateX(-50%);
+  box-sizing: border-box;
+}
+
+.quick-add-prefix {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gl-m);
+}
+
+.quick-add-input {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 0.9rem;
+  color: var(--gl-t);
+}
+
+.quick-add-input::placeholder {
+  color: var(--gl-m);
+}
+
+.quick-add-submit {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gl-p);
+  color: var(--gl-op);
+  box-shadow: 0 4px 10px var(--gl-sp);
+}
+
+@media (max-width: 480px) {
+  .progress-copy {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

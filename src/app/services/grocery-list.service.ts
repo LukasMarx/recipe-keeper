@@ -100,6 +100,22 @@ export class GroceryListService {
     }[category];
   }
 
+  public getCategoryIcon(category: string) {
+    return {
+      dairy: 'local_drink',
+      fruit: 'nutrition',
+      vegetable: 'eco',
+      pastry: 'bakery_dining',
+      meat: 'lunch_dining',
+      fish: 'set_meal',
+      finishedProduct: 'takeout_dining',
+      seasoning: 'grain',
+      candy: 'icecream',
+      beverages: 'local_bar',
+      other: 'category',
+    }[category] || 'category';
+  }
+
   private combineItems(items: SimpleGroceryListItem[]) {
     const combinedItems: GroceryListItem[] = [];
     items.forEach((item) => {
