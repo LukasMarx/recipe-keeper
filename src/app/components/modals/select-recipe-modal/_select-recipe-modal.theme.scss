@@ -1,0 +1,27 @@
+@use 'sass:color';
+@use '@angular/material' as mat;
+
+@mixin theme($theme) {
+  app-select-recipe-modal {
+    --srm-shell-bg: #{mat.get-theme-color($theme, surface-container-low)};
+    --srm-card-bg: #{mat.get-theme-color($theme, surface)};
+    --srm-card-border: #{color.change(mat.get-theme-color($theme, outline), $alpha: 0.14)};
+    --srm-card-shadow: #{color.change(mat.get-theme-color($theme, shadow), $alpha: 0.14)};
+    --srm-card-glow: #{color.change(mat.get-theme-color($theme, primary), $alpha: 0.12)};
+    --srm-text: #{mat.get-theme-color($theme, on-surface)};
+    --srm-muted: #{color.change(mat.get-theme-color($theme, on-surface), $alpha: 0.62)};
+    --srm-divider: #{color.change(mat.get-theme-color($theme, outline), $alpha: 0.18)};
+    --srm-primary: #{mat.get-theme-color($theme, primary)};
+    --srm-on-primary: #{mat.get-theme-color($theme, on-primary)};
+    --srm-primary-container: #{mat.get-theme-color($theme, primary-container)};
+    --srm-on-primary-container: #{mat.get-theme-color($theme, on-primary-container)};
+    --srm-surface-soft: #{mat.get-theme-color($theme, surface-container-low)};
+    --srm-surface-strong: #{mat.get-theme-color($theme, surface-container-high)};
+    --srm-selection: #{color.change(mat.get-theme-color($theme, primary), $alpha: 0.18)};
+    --srm-selection-shadow: #{color.change(mat.get-theme-color($theme, primary), $alpha: 0.24)};
+    --srm-control-border: #{color.change(mat.get-theme-color($theme, outline), $alpha: 0.26)};
+    --srm-overlay: #{color.change(mat.get-theme-color($theme, shadow), $alpha: 0.06)};
+    --srm-placeholder: #{color.change(mat.get-theme-color($theme, on-surface), $alpha: 0.42)};
+    --srm-primary-contrast: #{color.mix(mat.get-theme-color($theme, primary), mat.get-theme-color($theme, surface), 18%)};
+  }
+}

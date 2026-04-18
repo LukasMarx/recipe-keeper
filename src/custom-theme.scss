@@ -5,6 +5,7 @@
 @use "./theme" as theme;
 @use "./app/components/header/_header-theme" as header;
 @use "./app/components/ingredient-list/ingredient-list.theme" as ingredientList;
+@use "./app/components/modals/select-recipe-modal/select-recipe-modal.theme" as selectRecipeModal;
 @use "./app/pages/grocery-list//grocery-list.theme" as groceryList;
 // Plus imports for other components in your app.
 @use "./app/pages/new-recipe/new-recipe.theme" as newRecipePage;
@@ -59,6 +60,7 @@ $recipe-keeper-theme-dark: mat.define-theme(
 
   @include newRecipePage.theme($recipe-keeper-theme);
   @include ingredientList.theme($recipe-keeper-theme);
+  @include selectRecipeModal.theme($recipe-keeper-theme);
   @include groceryList.theme($recipe-keeper-theme);
   @include loginPage.theme($recipe-keeper-theme);
   @include registerPage.theme($recipe-keeper-theme);
@@ -77,6 +79,7 @@ $recipe-keeper-theme-dark: mat.define-theme(
     @include navbar.theme($recipe-keeper-theme-dark);
     @include header.theme($recipe-keeper-theme-dark);
     @include ingredientList.theme($recipe-keeper-theme-dark);
+    @include selectRecipeModal.theme($recipe-keeper-theme-dark);
     @include groceryList.theme($recipe-keeper-theme-dark);
 
     @include newRecipePage.theme($recipe-keeper-theme-dark);

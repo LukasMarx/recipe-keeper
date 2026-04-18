@@ -19,6 +19,21 @@ body {
   border-radius: 0;
 }
 
+.full-screen-modal .mat-mdc-dialog-surface {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.full-screen-modal .mat-mdc-dialog-container {
+  padding: 0;
+}
+
 .full-width {
   width: 100%;
 }

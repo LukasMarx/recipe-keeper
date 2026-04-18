@@ -17,10 +17,10 @@ export class RecipeService {
   constructor() {}
 
   public getRecipeFromUrl(url: string) {
-    return this.http.get<Recipe>('recipe/parse', {
-      params: {
+    return this.http.post<Recipe>('recipe/import', {
+
         url: url,
-      },
+      
     });
   }
 

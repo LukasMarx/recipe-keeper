@@ -1,92 +1,250 @@
-<h2 mat-dialog-title>Schedule a recipe</h2>
-<mat-dialog-content>
-  <mat-stepper linear #stepper>
-    <mat-step [completed]="!!selectedRecipe()">
-      <div class="content">
-        <ng-template matStepLabel>Choose a recipe</ng-template>
-        <mat-form-field class="full-width">
-          <input 
-            matInput 
-            placeholder="Search" 
-            [ngModel]="searchQuery()"
-            (ngModelChange)="searchQuery.set($event)"
-          />
-          <button matPrefix mat-icon-button aria-label="Search">
-            <mat-icon>search</mat-icon>
-          </button>
-        </mat-form-field>
-        <app-recipe-list
-          style="padding: 0"
-          [recipes]="filteredRecipes"
-          [selectedRecipeId]="selectedRecipe()?.id"
-          (onRecipeClick)="onRecipeClick($event)"
-        ></app-recipe-list>
-      </div>
-      <mat-dialog-actions>
-        <button mat-button mat-dialog-close>Cancel</button>
-        <button 
-          mat-button 
-          matStepperNext 
-          [disabled]="!selectedRecipe()"
-          cdkFocusInitial
+<div class="modal-shell">
+  <section class="modal-card" aria-label="Schedule a recipe">
+    <header class="modal-header" [class.modal-header--settings]="currentStep() === 2">
+      @if (currentStep() === 1) {
+        <div>
+          <h2>Schedule a recipe</h2>
+        </div>
+
+        <button
+          type="button"
+          class="icon-button"
+          aria-label="Close schedule recipe modal"
+          (click)="closeModal()"
         >
-          Next
+          <mat-icon>close</mat-icon>
         </button>
-      </mat-dialog-actions>
-    </mat-step>
+      } @else {
+        <button
+          type="button"
+          class="icon-button icon-button--edge"
+          aria-label="Close schedule recipe modal"
+          (click)="closeModal()"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
 
-    <mat-step [stepControl]="form">
-      <ng-template matStepLabel>Settings</ng-template>
-      <div class="content">
-        <form [formGroup]="form">
-          <mat-form-field class="full-width">
-            <mat-label>Choose a date</mat-label>
-            <input matInput [matDatepicker]="picker" formControlName="date" />
-            <mat-datepicker-toggle
-              matIconSuffix
-              [for]="picker"
-            ></mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
-          </mat-form-field>
+        <div class="modal-header__title">
+          <h2>Schedule Recipe</h2>
+        </div>
 
-          <mat-form-field class="full-width">
-            <mat-label>Meal type</mat-label>
-            <mat-select formControlName="mealType">
-              <mat-option value="BREAKFAST">Breakfast</mat-option>
-              <mat-option value="LUNCH">Lunch</mat-option>
-              <mat-option value="DINNER">Dinner</mat-option>
-              <mat-option value="SNACK">Snack</mat-option>
-              <mat-option value="OTHER">Other</mat-option>
-            </mat-select>
-          </mat-form-field>
+        <button
+          type="button"
+          class="header-action"
+          [disabled]="!form.valid || !selectedRecipe()"
+          (click)="onSubmit()"
+        >
+          Done
+        </button>
+      }
+    </header>
 
-          @if (households$ | async; as households) {
-            @if (households.length > 1) {
-              <mat-form-field class="full-width">
-                <mat-label>Schedule for</mat-label>
-                <mat-select formControlName="householdId">
-                  <mat-option [value]="null">Personal</mat-option>
-                  @for (household of households; track household.id) {
-                    <mat-option [value]="household.id">{{ household.name }}</mat-option>
-                  }
-                </mat-select>
-              </mat-form-field>
-            }
+    <div class="modal-progress" [class.modal-progress--settings]="currentStep() === 2" aria-label="Scheduling progress">
+      <button
+        type="button"
+        class="progress-step"
+        [class.progress-step--active]="currentStep() === 1"
+        [class.progress-step--complete]="currentStep() === 2"
+        (click)="goToStep(1)"
+      >
+        <span class="progress-step__badge">
+          @if (currentStep() === 2) {
+            <mat-icon>check</mat-icon>
+          } @else {
+            <span>1</span>
           }
-        </form>
-      </div>
-      <mat-dialog-actions>
-        <button mat-button matStepperPrevious>Back</button>
-        <button mat-button mat-dialog-close>Cancel</button>
-        <button 
-          mat-button 
-          (click)="onSubmit()" 
-          [disabled]="!form.valid"
+        </span>
+        <span class="progress-step__label">{{ currentStep() === 2 ? 'Recipe' : 'Choose a recipe' }}</span>
+      </button>
+
+      <span class="progress-divider" aria-hidden="true"></span>
+
+      <button
+        type="button"
+        class="progress-step"
+        [class.progress-step--active]="currentStep() === 2"
+        [disabled]="!selectedRecipe()"
+        (click)="goToStep(2)"
+      >
+        <span class="progress-step__badge">2</span>
+        <span class="progress-step__label">Settings</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      @if (currentStep() === 1) {
+        <section class="step-panel step-panel--recipes">
+          <label class="search-field" for="recipe-search">
+            <mat-icon>search</mat-icon>
+            <input
+              id="recipe-search"
+              type="search"
+              placeholder="Search your recipes..."
+              [value]="searchQuery()"
+              (input)="searchQuery.set($any($event.target).value)"
+            />
+          </label>
+
+          <div class="recipe-picker" role="list" aria-label="Available recipes">
+            @if (filteredRecipes().length) {
+              @for (recipe of filteredRecipes(); track recipe.id) {
+                <button
+                  type="button"
+                  class="recipe-row"
+                  [class.recipe-row--selected]="selectedRecipe()?.id === recipe.id"
+                  (click)="onRecipeClick(recipe.id)"
+                >
+                  @if (recipe.imageUrl) {
+                    <img
+                      class="recipe-row__image"
+                      [src]="recipe.imageUrl"
+                      [alt]="recipe.title"
+                    />
+                  } @else {
+                    <span class="recipe-row__image recipe-row__image--placeholder" aria-hidden="true">
+                      <mat-icon>restaurant</mat-icon>
+                    </span>
+                  }
+
+                  <span class="recipe-row__content">
+                    <span class="recipe-row__eyebrow">{{ getRecipeEyebrow(recipe) }}</span>
+                    <span class="recipe-row__title">{{ recipe.title }}</span>
+                  </span>
+
+                  <span class="recipe-row__selection" aria-hidden="true"></span>
+                </button>
+              }
+            } @else {
+              <div class="empty-state">
+                <mat-icon>search_off</mat-icon>
+                <p>No recipes match your search.</p>
+              </div>
+            }
+          </div>
+        </section>
+      } @else {
+        <section class="step-panel step-panel--settings">
+          @if (selectedRecipe(); as recipe) {
+            <article class="selected-recipe-card">
+              @if (recipe.imageUrl) {
+                <img class="selected-recipe-card__image" [src]="recipe.imageUrl" [alt]="recipe.title" />
+              } @else {
+                <span class="selected-recipe-card__image selected-recipe-card__image--placeholder" aria-hidden="true">
+                  <mat-icon>restaurant</mat-icon>
+                </span>
+              }
+
+              <div class="selected-recipe-card__content">
+                <h3>{{ recipe.title }}</h3>
+                @if (getRecipeMeta(recipe)) {
+                  <p>{{ getRecipeMeta(recipe) }}</p>
+                }
+              </div>
+            </article>
+          }
+
+          <form class="settings-form" [formGroup]="form">
+            <section class="settings-section">
+              <div class="section-heading">
+                <h3>Select date</h3>
+              </div>
+
+              <div class="date-strip" role="list" aria-label="Available dates">
+                @for (date of dateOptions; track date.getTime()) {
+                  <button
+                    type="button"
+                    class="date-pill"
+                    [class.date-pill--selected]="isDateSelected(date)"
+                    (click)="selectDate(date)"
+                  >
+                    <span class="date-pill__day">{{ formatDayLabel(date) }}</span>
+                    <span class="date-pill__date">{{ formatDateNumber(date) }}</span>
+                  </button>
+                }
+              </div>
+            </section>
+
+            <section class="settings-section">
+              <div class="section-heading">
+                <h3>Meal type</h3>
+              </div>
+
+              <div class="meal-grid" role="list" aria-label="Meal types">
+                @for (mealOption of mealOptions; track mealOption.type) {
+                  <button
+                    type="button"
+                    class="meal-card"
+                    [class.meal-card--selected]="isMealTypeSelected(mealOption.type)"
+                    (click)="selectMealType(mealOption.type)"
+                  >
+                    <mat-icon>{{ mealOption.icon }}</mat-icon>
+                    <span>{{ mealOption.label }}</span>
+                  </button>
+                }
+              </div>
+            </section>
+
+            @if (households$ | async; as households) {
+              @if (households.length > 1) {
+                <section class="settings-section">
+                  <div class="section-heading">
+                    <h3>Schedule for</h3>
+                  </div>
+
+                  <div class="household-chips" role="list" aria-label="Household options">
+                    <button
+                      type="button"
+                      class="household-chip"
+                      [class.household-chip--selected]="form.controls.householdId.value === null"
+                      (click)="selectHousehold(null)"
+                    >
+                      Personal
+                    </button>
+
+                    @for (household of households; track household.id) {
+                      <button
+                        type="button"
+                        class="household-chip"
+                        [class.household-chip--selected]="form.controls.householdId.value === household.id"
+                        (click)="selectHousehold(household.id)"
+                      >
+                        {{ household.name }}
+                      </button>
+                    }
+                  </div>
+                </section>
+              }
+            }
+          </form>
+        </section>
+      }
+    </div>
+
+    <footer class="modal-footer" [class.modal-footer--settings]="currentStep() === 2">
+      @if (currentStep() === 1) {
+        <button type="button" class="footer-link" (click)="closeModal()">Cancel</button>
+        <button
+          type="button"
+          class="footer-cta"
+          [disabled]="!selectedRecipe()"
+          (click)="goToStep(2)"
           cdkFocusInitial
         >
-          Schedule
+          <span>Next</span>
+          <mat-icon>arrow_forward</mat-icon>
         </button>
-      </mat-dialog-actions>
-    </mat-step>
-  </mat-stepper>
-</mat-dialog-content>
+      } @else {
+        <button
+          type="button"
+          class="footer-cta footer-cta--full"
+          [disabled]="!form.valid || !selectedRecipe()"
+          (click)="onSubmit()"
+          cdkFocusInitial
+        >
+          <mat-icon>{{ getMealOptionIcon(form.controls.mealType.value ?? 'DINNER') }}</mat-icon>
+          <span>Schedule</span>
+        </button>
+      }
+    </footer>
+  </section>
+</div>
