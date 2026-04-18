@@ -53,7 +53,10 @@ export class SelectRecipeModalComponent {
 
   public form = new FormGroup({
     date: new FormControl(this.data.date || new Date(), Validators.required),
-    mealType: new FormControl<MealType>('DINNER', Validators.required),
+    mealType: new FormControl<MealType>(
+      this.data.mealType || 'DINNER',
+      Validators.required
+    ),
     householdId: new FormControl<number | null>(null),
   });
 

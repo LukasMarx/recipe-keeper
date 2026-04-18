@@ -1,74 +1,156 @@
-@if(recipe()) {
-<header class="header">
-  <button mat-icon-button color="primary" (click)="onBack()">
-    <mat-icon>arrow_back</mat-icon>
-  </button>
-  {{ recipe().title }}
-  <div style="flex: 1"></div>
-  <button mat-icon-button color="primary" [matMenuTriggerFor]="menu">
-    <mat-icon>more_vert</mat-icon>
-  </button>
-  <mat-menu #menu="matMenu">
-    <button mat-menu-item (click)="onEdit()">
-      <mat-icon>edit</mat-icon>
-      <span>Edit</span>
+@if (recipe(); as currentRecipe) {
+<div class="detail-page">
+  <header class="detail-header">
+    <button
+      mat-icon-button
+      color="primary"
+      aria-label="Go back"
+      (click)="onBack()"
+    >
+      <mat-icon>arrow_back</mat-icon>
     </button>
-    <button mat-menu-item (click)="onDelete()">
-      <mat-icon>delete</mat-icon>
-      <span>Delete</span>
-    </button>
-  </mat-menu>
-</header>
-<div class="content">
-  <mat-tab-group>
-    <mat-tab label="Info">
-      <div class="tab-page">
-        <img class="image" [src]="recipe().imageUrl" />
 
-        <mat-chip-set aria-label="Dog selection" style="margin-bottom: 8px">
-          <mat-chip>
-            <mat-icon matChipAvatar fontIcon="schedule" />
-            {{ recipe().totalTime | duration }}
-          </mat-chip>
-          @if(recipe().calories) {
-          <mat-chip>
-            <mat-icon matChipAvatar fontIcon="bolt" />
-            {{ recipe().calories }} calories
-          </mat-chip>
+    <div class="detail-header__title">Recipe Details</div>
+
+    <button
+      mat-icon-button
+      color="primary"
+      aria-label="Recipe actions"
+      [matMenuTriggerFor]="menu"
+    >
+      <mat-icon>favorite</mat-icon>
+    </button>
+
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="onEdit()">
+        <mat-icon>edit</mat-icon>
+        <span>Edit</span>
+      </button>
+      <button mat-menu-item (click)="onDelete()">
+        <mat-icon>delete</mat-icon>
+        <span>Delete</span>
+      </button>
+    </mat-menu>
+  </header>
+
+  <div class="detail-scroll">
+    <section class="hero">
+      @if (currentRecipe.imageUrl) {
+      <img
+        class="hero__image"
+        [src]="currentRecipe.imageUrl"
+        [alt]="displayTitle(currentRecipe)"
+      />
+      }
+      <div class="hero__veil"></div>
+    </section>
+
+    <section class="summary-card">
+      <h1 class="summary-card__title">{{ displayTitle(currentRecipe) }}</h1>
+
+      @if (currentRecipe.description) {
+      <p class="summary-card__description">{{ displayDescription(currentRecipe) }}</p>
+      }
+
+
+      <div class="stats-grid">
+        <div class="stat-pill">
+          <mat-icon>schedule</mat-icon>
+          <span>{{ recipeTimeLabel(currentRecipe) }}</span>
+        </div>
+
+        @if (currentRecipe.calories) {
+        <div class="stat-pill">
+          <mat-icon>local_fire_department</mat-icon>
+          <span>{{ currentRecipe.calories }} kcal</span>
+        </div>
+        }
+
+        <div class="stat-pill">
+          <mat-icon>restaurant</mat-icon>
+          <span>{{ currentRecipe.recipeYield }} Portions</span>
+        </div>
+      </div>
+      
+      <div class="summary-card__actions">
+        <button class="schedule-button" mat-flat-button (click)="onSchedule()">
+          <mat-icon>calendar_month</mat-icon>
+          Schedule Meal
+        </button>
+      </div>
+    </section>
+
+    <section
+      class="panel-switch"
+      role="tablist"
+      aria-label="Recipe detail sections"
+    >
+      @for (section of sections; track section.id) {
+      <button
+        type="button"
+        role="tab"
+        class="panel-switch__button"
+        [class.is-active]="selectedSection() === section.id"
+        [attr.aria-selected]="selectedSection() === section.id"
+        [attr.tabindex]="selectedSection() === section.id ? 0 : -1"
+        (click)="selectSection(section.id)"
+      >
+        {{ section.label }}
+      </button>
+      }
+    </section>
+
+    <section class="panel-body">
+      @if (selectedSection() === 'ingredients') {
+      <div class="ingredient-stack">
+        @for (ingredient of currentRecipe.detailIngredients; track ingredient.key) {
+        <article class="ingredient-card">
+          <div class="ingredient-card__icon">
+            <mat-icon>{{ ingredient.icon }}</mat-icon>
+          </div>
+
+          <div class="ingredient-card__content">
+            <h2>{{ ingredient.title }}</h2>
+          </div>
+
+          @if (ingredient.amount) {
+          <div class="ingredient-card__amount">{{ ingredient.amount }}</div>
           }
-          <mat-chip>
-            <mat-icon matChipAvatar fontIcon="people" />
-            {{ recipe().recipeYield }} portions
-          </mat-chip>
-        </mat-chip-set>
+        </article>
+        } @empty {
+        <div class="empty-state">No ingredients available.</div>
+        }
+      </div>
+      } @else {
+      <div class="instruction-stack">
+        @for (instruction of currentRecipe.instructions; track $index; let index = $index) {
+        <article class="instruction-card">
+          <div class="instruction-card__index">{{ index + 1 }}</div>
 
-        <span class="detail-description">{{ recipe().description }}</span>
+          <div class="instruction-card__content">
+            @if (instruction.title) {
+            <h2>{{ instruction.title }}</h2>
+            }
 
-        <span class="section-title">Ingredients</span>
-        <app-ingredient-list
-          class="ingredient-list"
-          [ingredients]="recipe().ingredientsList"
-        ></app-ingredient-list>
+            <p>{{ instruction.description }}</p>
+
+            @if (instruction.ingredients?.length) {
+            <div class="instruction-card__chips">
+              @for (ingredient of instruction.ingredients; track ingredient.id) {
+              <span class="instruction-chip">
+                {{ instructionIngredientLabel(ingredient) }}
+              </span>
+              }
+            </div>
+            }
+          </div>
+        </article>
+        } @empty {
+        <div class="empty-state">No instructions available.</div>
+        }
       </div>
-    </mat-tab>
-    <!-- <mat-tab label="Ingredients">
-      <div class="tab-page">
-       
-      </div>
-    </mat-tab> -->
-    <mat-tab label="Instructions">
-      <div class="tab-page">
-        <app-instruction-list
-          [instructions]="recipe().instructions"
-        ></app-instruction-list>
-      </div>
-    </mat-tab>
-  </mat-tab-group>
-  <div class="recipe-detail-footer">
-    <div style="flex: 1"></div>
-    <button mat-flat-button color="primary" (click)="onSchedule()">
-      Schedule
-    </button>
+      }
+    </section>
   </div>
 </div>
 } @else {

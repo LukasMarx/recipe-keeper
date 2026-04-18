@@ -1,35 +1,73 @@
-<mat-card appearance="outlined">
-  <mat-card-content
-    ><div class="schedule-item-header">
-      <span class="title" style="font-weight: 500">{{ title() }}</span>
-      <div style="flex: 1"></div>
-      <button mat-icon-button aria-label="add" (click)="onAddClick()">
-        <mat-icon>add</mat-icon>
-      </button>
+<article
+  class="day-card"
+  [class.day-card--today]="day().isToday"
+  [class.day-card--empty]="day().isEmpty"
+>
+  <div class="day-card__header">
+    <div>
+      <p class="day-card__eyebrow">{{ day().sectionLabel }}</p>
+      <h2>{{ day().shortDateLabel }}</h2>
     </div>
 
-    <div class="recipes">
-      @for(recipe of scheduledRecipes(); track recipe.id) {
-      <div class="schedule-item-recipe" (click)="onRecipeClick(recipe)">
-        <img
-          class="schedule-item-recipe-thumbnail"
-          [src]="recipe.recipe.imageUrl"
-          [alt]="recipe.recipe.title"
-        />
-        <div class="text">
-          <span>{{ recipe.recipe.title }}</span>
-          <span class="subtitle">{{ capitalize(recipe.mealType) }}</span>
-        </div>
-        <div style="flex: 1"></div>
-        <button
-          mat-icon-button
-          aria-label="remove"
-          (click)="onRemoveClick($event, recipe)"
-        >
-          <mat-icon>delete</mat-icon>
-        </button>
-      </div>
+    @if (day().caloriesLabel) {
+      <div class="day-card__calories">{{ day().caloriesLabel }}</div>
+    }
+  </div>
+
+  @if (day().isEmpty) {
+    <button
+      type="button"
+      class="day-card__empty-state"
+      (click)="onAddClick('DINNER')"
+      [attr.aria-label]="'Plan meals for ' + day().fullDateLabel"
+    >
+      <span class="day-card__empty-icon">
+        <mat-icon>no_meals</mat-icon>
+      </span>
+      <span>Tap to plan meals</span>
+    </button>
+  } @else {
+    <div class="meal-groups">
+      @for (mealGroup of day().mealGroups; track mealGroup.mealType) {
+        @if (mealGroup.recipes.length) {
+          @for (recipe of mealGroup.recipes; track recipe.id) {
+            <div class="meal-row" (click)="onRecipeClick(recipe)">
+              <img
+                class="meal-row__thumbnail"
+                [src]="recipe.recipe.imageUrl"
+                [alt]="recipe.recipe.title"
+              />
+
+              <div class="meal-row__text">
+                <span class="meal-row__label">{{ mealGroup.label }}</span>
+                <span class="meal-row__title">{{ recipe.recipe.title }}</span>
+              </div>
+
+              <button
+                type="button"
+                class="meal-row__remove"
+                aria-label="Remove scheduled recipe"
+                (click)="onRemoveClick($event, recipe)"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          }
+        } @else {
+          <button
+            type="button"
+            class="meal-row meal-row--placeholder"
+            (click)="onAddClick(mealGroup.mealType)"
+          >
+            <span class="meal-row__placeholder-icon">
+              <mat-icon>add</mat-icon>
+            </span>
+            <span class="meal-row__placeholder-label">
+              {{ mealGroup.actionLabel }} {{ mealGroup.label }}
+            </span>
+          </button>
+        }
       }
     </div>
-  </mat-card-content>
-</mat-card>
+  }
+</article>

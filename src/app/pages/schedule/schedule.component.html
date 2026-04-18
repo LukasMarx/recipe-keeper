@@ -1,10 +1,35 @@
-@for(day of (days$ | async); track day) {
+<section class="schedule-page">
+  <div class="schedule-page__glow schedule-page__glow--left"></div>
+  <div class="schedule-page__glow schedule-page__glow--right"></div>
+<!-- 
+  <header class="schedule-toolbar">
+    <button
+      type="button"
+      class="schedule-toolbar__icon"
+      aria-label="Open cookbook"
+      (click)="goToRecipes()"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
 
-<app-schedule-item
-  [title]="day.formatedDate"
-  (addClicked)="onAddClicked(day)"
-  (removeClicked)="onRemoveClicked($event)"
-  [scheduledRecipes]="day.recipes"
-></app-schedule-item>
+    <div class="schedule-toolbar__title">Culinary Editor</div>
+  </header> -->
 
-}
+  <section class="schedule-hero">
+    <p class="schedule-hero__eyebrow">Weekly planner</p>
+    <h1>This Week's Canvas</h1>
+    <p class="schedule-hero__subtitle">
+      Curating freshness from {{ weekRangeLabel }}
+    </p>
+  </section>
+
+  <section class="schedule-list">
+    @for (day of (days$ | async); track day.fullDateLabel) {
+      <app-schedule-item
+        [day]="day"
+        (addClicked)="onAddClicked(day, $event)"
+        (removeClicked)="onRemoveClicked($event)"
+      ></app-schedule-item>
+    }
+  </section>
+</section>

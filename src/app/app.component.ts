@@ -39,7 +39,7 @@ export class AppComponent {
       this.hideNavbar.set(true);
     } else if (currentUrl.includes('schedule')) {
       this.title.set('Schedule');
-      this.hideHeader.set(false);
+      this.hideHeader.set(true);
       this.hideNavbar.set(false);
     } else if (currentUrl.includes('grocery-list')) {
       this.title.set('Grocery list');

@@ -2,50 +2,58 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
   inject,
   input,
-  Input,
   output,
 } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { Recipe } from '../../../interfaces/recipe';
-import { ScheduledRecipe } from '../../../services/schedule.service';
+import { MealType, ScheduledRecipe } from '../../../services/schedule.service';
 import { Router } from '@angular/router';
+
+export interface ScheduleMealGroup {
+  mealType: MealType;
+  label: string;
+  actionLabel: string;
+  recipes: ScheduledRecipe[];
+}
+
+export interface ScheduleDayCard {
+  date: Date;
+  sectionLabel: string;
+  shortDateLabel: string;
+  fullDateLabel: string;
+  caloriesLabel: string | null;
+  mealGroups: ScheduleMealGroup[];
+  isToday: boolean;
+  isEmpty: boolean;
+}
 
 @Component({
   selector: 'app-schedule-item',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule],
+  imports: [CommonModule, MatIconModule],
   templateUrl: './schedule-item.component.html',
   styleUrl: './schedule-item.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScheduleItemComponent {
   private readonly router = inject(Router);
-  public title = input('');
-  public scheduledRecipes = input<ScheduledRecipe[]>();
+  public day = input.required<ScheduleDayCard>();
 
   public removeClicked = output<ScheduledRecipe>();
 
-  public addClicked = output();
+  public addClicked = output<MealType>();
 
-  public onAddClick() {
-    this.addClicked.emit();
+  public onAddClick(mealType: MealType) {
+    this.addClicked.emit(mealType);
   }
 
   public onRecipeClick(recipe: ScheduledRecipe) {
     this.router.navigate(['recipe', recipe.recipe.id]);
   }
 
-  onRemoveClick(event: MouseEvent, recipe: ScheduledRecipe) {
+  public onRemoveClick(event: MouseEvent, recipe: ScheduledRecipe) {
     event.stopPropagation();
     this.removeClicked.emit(recipe);
-  }
-
-  capitalize(str: string) {
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   }
 }
