@@ -165,6 +165,10 @@
   margin-right: 8px;
 }
 
+.schedule-button[disabled] {
+  box-shadow: none;
+}
+
 .stats-grid {
   display: flex;
   flex-wrap: wrap;
@@ -199,6 +203,113 @@
   background: rgba(236, 236, 228, 0.94);
   border-radius: 999px;
   box-sizing: border-box;
+}
+
+.status-panel {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  margin: 0 24px 22px;
+  padding: 20px 22px;
+  border-radius: 28px;
+  background: rgba(255, 249, 236, 0.96);
+  box-shadow: 0 18px 34px rgba(108, 92, 45, 0.12);
+}
+
+.status-panel.is-failed {
+  background: rgba(255, 243, 239, 0.98);
+  box-shadow: 0 18px 34px rgba(142, 63, 43, 0.12);
+}
+
+.status-panel.is-ready {
+  background: rgba(245, 251, 239, 0.97);
+  box-shadow: 0 18px 34px rgba(65, 110, 42, 0.1);
+}
+
+.status-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.status-panel h2,
+.status-panel p {
+  margin: 0;
+}
+
+.status-panel p {
+  color: #5f6258;
+  line-height: 1.6;
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: #226100;
+  color: #fffef8;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.status-chip.is-failed {
+  background: #8a3122;
+}
+
+.status-chip.is-ready {
+  background: #366f12;
+}
+
+.task-list {
+  display: grid;
+  gap: 10px;
+}
+
+.task-item {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.task-item.is-failed {
+  background: rgba(255, 236, 231, 0.88);
+}
+
+.task-item__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.task-item__title {
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.task-item__status {
+  color: #6a6e62;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.task-item__status.is-failed {
+  color: #8a3122;
+}
+
+.task-item__status.is-completed {
+  color: #2f6310;
+}
+
+.task-item__message {
+  color: #7a4033;
 }
 
 .panel-switch__button {
@@ -348,14 +459,22 @@
   }
 
   .panel-switch,
-  .panel-body {
+  .panel-body,
+  .status-panel {
     margin-left: 20px;
     margin-right: 20px;
-    padding-left: 0;
-    padding-right: 0;
   }
 
   .ingredient-card {
     grid-template-columns: 48px minmax(0, 1fr) auto;
+    &__image {
+      img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      }
+    }
   }
 }

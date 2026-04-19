@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { UrlModalComponent } from '../../components/modals/url-modal/url-modal.component';
-import { Recipe } from '../../interfaces/recipe';
+import { Recipe, RecipeImportTask } from '../../interfaces/recipe';
 
 @Component({
   selector: 'app-home',
@@ -41,12 +41,20 @@ export class HomeComponent {
   }
 
   getRecipeMeta(recipe: Recipe): string {
+    if (recipe.status === 'FAILED') {
+      return recipe.importFailureMessage ?? 'The import failed. Open the recipe for details.';
+    }
+
+    if (recipe.status !== 'READY') {
+      return this.getProgressDescription(recipe);
+    }
+
     const importedAuthor = this.getImportedAuthor(recipe.title);
     if (importedAuthor) {
       return `by ${importedAuthor}`;
     }
 
-    const sourceLabel = this.getSourceLabel(recipe.sourceUrl);
+    const sourceLabel = this.getSourceLabel(recipe.sourceUrl ?? undefined);
     if (sourceLabel) {
       return `by ${sourceLabel}`;
     }
@@ -57,6 +65,50 @@ export class HomeComponent {
     }
 
     return 'Saved in your collection';
+  }
+
+  getStatusLabel(recipe: Recipe): string {
+    switch (recipe.status) {
+      case 'IMPORTING':
+        return 'Importing';
+      case 'ENRICHING':
+        return 'Enriching';
+      case 'FAILED':
+        return 'Failed';
+      default:
+        return 'Ready';
+    }
+  }
+
+  isProcessing(recipe: Recipe): boolean {
+    return recipe.status === 'IMPORTING' || recipe.status === 'ENRICHING';
+  }
+
+  private getProgressDescription(recipe: Recipe): string {
+    const activeTask = this.getPrimaryTask(recipe);
+
+    if (activeTask) {
+      switch (activeTask.type) {
+        case 'PARSE_INGREDIENTS':
+          return 'Ingredients are being analyzed.';
+        case 'ENHANCE_INSTRUCTIONS':
+          return 'Instructions are being refined.';
+        case 'GENERATE_NUTRITION':
+          return 'Nutrition details are being generated.';
+        case 'GENERATE_INGREDIENT_IMAGE':
+          return 'Ingredient images are being prepared.';
+      }
+    }
+
+    return recipe.status === 'IMPORTING'
+      ? 'The recipe was created and is being imported now.'
+      : 'Additional recipe details are still being generated.';
+  }
+
+  private getPrimaryTask(recipe: Recipe): RecipeImportTask | undefined {
+    return (recipe.importTasks ?? []).find(
+      (task) => task.status === 'PROCESSING' || task.status === 'PENDING'
+    );
   }
 
   private normalizeTitle(title?: string): string {

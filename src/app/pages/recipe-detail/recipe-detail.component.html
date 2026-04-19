@@ -73,12 +73,69 @@
       </div>
       
       <div class="summary-card__actions">
-        <button class="schedule-button" mat-flat-button (click)="onSchedule()">
+        <button
+          class="schedule-button"
+          mat-flat-button
+          [disabled]="!isRecipeReady(currentRecipe)"
+          (click)="onSchedule()"
+        >
           <mat-icon>calendar_month</mat-icon>
           Schedule Meal
         </button>
       </div>
     </section>
+
+    @if (hasImportState(currentRecipe)) {
+      <section
+        class="status-panel"
+        [class.is-failed]="currentRecipe.status === 'FAILED'"
+        [class.is-ready]="currentRecipe.status === 'READY'"
+      >
+        <div class="status-panel__header">
+          <span
+            class="status-chip"
+            [class.is-failed]="currentRecipe.status === 'FAILED'"
+            [class.is-ready]="currentRecipe.status === 'READY'"
+          >
+            {{ recipeStatusLabel(currentRecipe) }}
+          </span>
+
+          @if (!isRecipeReady(currentRecipe)) {
+            <mat-progress-spinner
+              diameter="22"
+              mode="indeterminate"
+              strokeWidth="4"
+            ></mat-progress-spinner>
+          }
+        </div>
+
+        <h2>{{ recipeStatusHeadline(currentRecipe) }}</h2>
+        <p>{{ recipeStatusDescription(currentRecipe) }}</p>
+
+        @if (getVisibleTasks(currentRecipe).length) {
+          <div class="task-list">
+            @for (task of getVisibleTasks(currentRecipe); track task.taskId) {
+              <article class="task-item" [class.is-failed]="task.status === 'FAILED'">
+                <div class="task-item__topline">
+                  <span class="task-item__title">{{ taskLabel(task) }}</span>
+                  <span
+                    class="task-item__status"
+                    [class.is-failed]="task.status === 'FAILED'"
+                    [class.is-completed]="task.status === 'COMPLETED'"
+                  >
+                    {{ taskStatusLabel(task) }}
+                  </span>
+                </div>
+
+                @if (task.error) {
+                  <p class="task-item__message">{{ task.error }}</p>
+                }
+              </article>
+            }
+          </div>
+        }
+      </section>
+    }
 
     <section
       class="panel-switch"
@@ -105,9 +162,15 @@
       <div class="ingredient-stack">
         @for (ingredient of currentRecipe.detailIngredients; track ingredient.key) {
         <article class="ingredient-card">
+          @if( ingredient.imageUrl ) {
+          <div class="ingredient-card__image">
+            <img [src]="ingredient.imageUrl" [alt]="ingredient.title" />
+          </div>
+          } @else {
           <div class="ingredient-card__icon">
             <mat-icon>{{ ingredient.icon }}</mat-icon>
           </div>
+          }
 
           <div class="ingredient-card__content">
             <h2>{{ ingredient.title }}</h2>
@@ -123,7 +186,7 @@
       </div>
       } @else {
       <div class="instruction-stack">
-        @for (instruction of currentRecipe.instructions; track $index; let index = $index) {
+        @for (instruction of currentRecipe.resolvedInstructions; track $index; let index = $index) {
         <article class="instruction-card">
           <div class="instruction-card__index">{{ index + 1 }}</div>
 
@@ -134,7 +197,7 @@
 
             <p>{{ instruction.description }}</p>
 
-            @if (instruction.ingredients?.length) {
+            @if (instruction.ingredients.length) {
             <div class="instruction-card__chips">
               @for (ingredient of instruction.ingredients; track ingredient.id) {
               <span class="instruction-chip">

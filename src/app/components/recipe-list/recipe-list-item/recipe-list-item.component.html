@@ -1,8 +1,29 @@
-<mat-card [class.selected]="selected()">
-  <img class="image" [src]="recipe()?.imageUrl" />
+<mat-card
+  [class.selected]="selected()"
+  [class.is-processing]="recipe()?.status === 'IMPORTING' || recipe()?.status === 'ENRICHING'"
+  [class.is-failed]="recipe()?.status === 'FAILED'"
+>
+  @if (recipe()?.imageUrl) {
+    <img class="image" [src]="recipe()?.imageUrl" />
+  } @else {
+    <div class="image image--placeholder">
+      <mat-icon>restaurant_menu</mat-icon>
+    </div>
+  }
+
+  @if (recipe()?.status !== 'READY') {
+    <span class="status-badge" [class.is-failed]="recipe()?.status === 'FAILED'">
+      {{ recipe()?.status }}
+    </span>
+  }
+
   <mat-card-content>
     <div class="card-content">
       <span class="card-title">{{ recipe()?.title }}</span>
+
+      @if (getStatusText(recipe())) {
+        <span class="card-subtitle">{{ getStatusText(recipe()) }}</span>
+      }
     </div>
   </mat-card-content>
 </mat-card>

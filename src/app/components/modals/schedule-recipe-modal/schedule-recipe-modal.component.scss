@@ -5,3 +5,20 @@
 mat-dialog-content {
   padding-top: 8px !important;
 }
+
+.grocery-option__title,
+.grocery-option__details {
+  display: block;
+}
+
+.grocery-option__details {
+  color: rgba(0, 0, 0, 0.62);
+  font-size: 0.75rem;
+}
+
+.schedule-error {
+  margin: 0;
+  color: var(--mat-form-field-error-text-color, #b3261e);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}

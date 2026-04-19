@@ -59,10 +59,10 @@ export class NewRecipeComponent {
     title: new FormControl('', Validators.required),
     description: new FormControl(''),
     imageUrl: new FormControl(''),
-    keywords: new FormControl([]),
+    keywords: new FormControl<string[]>([]),
     recipeYield: new FormControl(1),
     calories: new FormControl(),
-    ingredients: new FormControl([]),
+    ingredients: new FormControl<string[]>([]),
     instructions: new FormControl<Instruction[]>([]),
     prepTime: new FormControl(),
     cookTime: new FormControl(),
@@ -70,7 +70,7 @@ export class NewRecipeComponent {
     videoThumbnailUrl: new FormControl(),
     videoUrl: new FormControl(),
     sourceUrl: new FormControl(),
-    ingredientsList: new FormControl(),
+    ingredientsList: new FormControl<any[]>([]),
   });
 
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
@@ -89,7 +89,7 @@ export class NewRecipeComponent {
       const id = params['id'];
       this.recipeService
         .getRecipe(id, true)
-        .subscribe((recipe) => this.form.patchValue(recipe));
+        .subscribe((recipe) => this.form.patchValue(this.resolveRecipe(recipe) as any));
     });
   }
 
@@ -98,18 +98,26 @@ export class NewRecipeComponent {
   }
 
   private resolveRecipe(recipe: Recipe) {
+    const ingredientsList = recipe.ingredientsList ?? [];
+
     return {
       ...recipe,
-      instructions: recipe.instructions.map((instruction: any) => {
+      instructions: (recipe.instructions ?? []).map((instruction: any) => {
         return {
           ...instruction,
-          ingredients: instruction.ingredients.map((ingredient: any) => {
+          ingredients: (instruction.ingredients ?? []).map((ingredient: any) => {
             const fullIngredient =
-              recipe.ingredientsList.find(
-                (i) => i.nameSingularEnglish === ingredient
+              ingredientsList.find(
+                (i: any) => i.originalName === ingredient
               ) ||
-              recipe.ingredientsList.find(
-                (i) => i.namePluralEnglish === ingredient
+              ingredientsList.find(
+                (i: any) => i.originalNamePlural === ingredient
+              ) ||
+              ingredientsList.find(
+                (i: any) => i.nameSingularEnglish === ingredient
+              ) ||
+              ingredientsList.find(
+                (i: any) => i.namePluralEnglish === ingredient
               );
             return {
               ...(fullIngredient as any),

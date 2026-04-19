@@ -36,6 +36,8 @@
         @for (recipe of recipes; track recipe.id; let recipeIndex = $index) {
           <button
             class="recipe-card"
+            [class.is-processing]="isProcessing(recipe)"
+            [class.is-failed]="recipe.status === 'FAILED'"
             type="button"
             (click)="onClick(recipe.id)"
             [attr.aria-label]="'Open ' + getDisplayTitle(recipe)"
@@ -57,11 +59,32 @@
               <span class="recipe-card__favorite" aria-hidden="true">
                 <mat-icon>favorite</mat-icon>
               </span>
+
+              @if (recipe.status !== 'READY') {
+                <span
+                  class="recipe-card__status"
+                  [class.is-enriching]="recipe.status === 'ENRICHING'"
+                  [class.is-failed]="recipe.status === 'FAILED'"
+                >
+                  {{ getStatusLabel(recipe) }}
+                </span>
+              }
             </div>
 
             <span class="recipe-card__body">
               <span class="recipe-card__title">{{ getDisplayTitle(recipe) }}</span>
-              <span class="recipe-card__meta">{{ getRecipeMeta(recipe) }}</span>
+              <span
+                class="recipe-card__meta"
+                [class.is-error]="recipe.status === 'FAILED'"
+              >
+                {{ getRecipeMeta(recipe) }}
+              </span>
+
+              @if (isProcessing(recipe)) {
+                <span class="recipe-card__progress" aria-hidden="true">
+                  <span></span>
+                </span>
+              }
             </span>
           </button>
         }

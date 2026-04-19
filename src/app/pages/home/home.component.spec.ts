@@ -41,6 +41,7 @@ describe('HomeComponent', () => {
       updateDate: new Date('2026-04-17T00:00:00.000Z'),
       keywords: [],
       ingredientsList: [],
+      status: 'READY',
       ...overrides,
     };
   }

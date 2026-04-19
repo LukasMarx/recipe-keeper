@@ -15,7 +15,8 @@ button {
 
 .modal-shell {
   min-height: 100%;
-  padding: 18px;
+  height: 100%;
+  padding: 14px;
   background:
     radial-gradient(circle at bottom left, var(--srm-card-glow), transparent 38%),
     linear-gradient(180deg, var(--srm-shell-bg), var(--srm-surface-soft));
@@ -26,56 +27,44 @@ button {
 }
 
 .modal-card {
-  width: min(100%, 620px);
-  min-height: min(100%, 840px);
+  width: min(100%, 560px);
+  min-height: min(100%, 760px);
+  height: min(100%, 760px);
   max-height: 100%;
   display: flex;
   flex-direction: column;
-  border-radius: 36px;
+  border-radius: 28px;
   background: var(--srm-card-bg);
   border: 1px solid var(--srm-card-border);
-  box-shadow: 0 18px 48px var(--srm-card-shadow), 0 6px 18px var(--srm-card-glow);
+  box-shadow: 0 12px 30px var(--srm-card-shadow), 0 3px 10px var(--srm-card-glow);
   overflow: hidden;
 }
 
 .modal-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 26px 28px 14px;
-}
-
-.modal-header--settings {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 38px;
   align-items: center;
-  gap: 10px;
-  padding: 18px 24px 10px;
+  gap: 12px;
+  padding: 20px 22px 10px;
 }
 
 .modal-header h2 {
   margin: 0;
   color: var(--srm-primary);
-  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-size: clamp(1.65rem, 2.5vw, 2.15rem);
   line-height: 0.98;
   letter-spacing: -0.06em;
   font-weight: 800;
 }
 
-.modal-header--settings h2 {
-  font-size: 1.1rem;
-  line-height: 1.1;
-  letter-spacing: -0.04em;
+.modal-header__title {
+  min-width: 0;
   text-align: center;
 }
 
-.modal-header__title {
-  flex: 1;
-  min-width: 0;
-}
-
 .icon-button {
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   border: 0;
   padding: 0;
   border-radius: 50%;
@@ -88,44 +77,41 @@ button {
 }
 
 .icon-button mat-icon {
-  transform: scale(1.2);
-}
-
-.icon-button--edge {
-  color: var(--srm-muted);
+  transform: scale(1.05);
 }
 
 .header-action {
-  min-width: 44px;
-  min-height: 36px;
+  min-width: 38px;
+  min-height: 32px;
   border: 0;
   padding: 0;
   background: transparent;
   color: var(--srm-primary);
-  font-size: 0.98rem;
+  font-size: 0.88rem;
   line-height: 1;
   font-weight: 800;
   text-align: right;
+  justify-self: end;
+}
+
+.header-action--hidden {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .modal-progress {
-  padding: 0 28px 14px;
+  padding: 0 22px 10px;
   display: flex;
   align-items: center;
-  gap: 14px;
-}
-
-.modal-progress--settings {
-  padding: 10px 40px 10px;
   justify-content: center;
-  gap: 18px;
+  gap: 12px;
 }
 
 .progress-divider {
   flex: 1;
   height: 1px;
   background: var(--srm-divider);
-  max-width: 60px;
+  max-width: 42px;
 }
 
 .progress-step {
@@ -134,7 +120,7 @@ button {
   background: transparent;
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   color: var(--srm-muted);
   text-align: left;
 }
@@ -144,15 +130,15 @@ button {
 }
 
 .progress-step__badge {
-  width: 46px;
-  height: 46px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background: var(--srm-surface-strong);
   color: var(--srm-muted);
-  font-size: 1.25rem;
+  font-size: 1rem;
   line-height: 1;
   font-weight: 800;
   flex-shrink: 0;
@@ -163,23 +149,9 @@ button {
 }
 
 .progress-step__label {
-  font-size: 0.92rem;
+  font-size: 0.82rem;
   line-height: 1.2;
   font-weight: 700;
-}
-
-.modal-progress--settings .progress-step {
-  gap: 10px;
-}
-
-.modal-progress--settings .progress-step__badge {
-  width: 42px;
-  height: 42px;
-  font-size: 1.08rem;
-}
-
-.modal-progress--settings .progress-step__label {
-  font-size: 0.86rem;
 }
 
 .progress-step--active {
@@ -189,7 +161,7 @@ button {
 .progress-step--active .progress-step__badge {
   background: var(--srm-primary);
   color: var(--srm-on-primary);
-  box-shadow: 0 8px 18px var(--srm-selection-shadow);
+  box-shadow: 0 6px 14px var(--srm-selection-shadow);
 }
 
 .progress-step--complete .progress-step__badge {
@@ -200,8 +172,9 @@ button {
 .modal-body {
   flex: 1;
   min-height: 0;
-  padding: 6px 28px 18px;
+  padding: 4px 22px 14px;
   display: flex;
+  overflow: auto;
 }
 
 .step-panel {
@@ -209,19 +182,20 @@ button {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
+  min-width: 0;
 }
 
 .search-field {
-  min-height: 60px;
-  padding: 0 18px;
+  min-height: 52px;
+  padding: 0 14px;
   border-radius: 999px;
   border: 1px solid var(--srm-control-border);
   background: var(--srm-card-bg);
   box-shadow: inset 0 1px 0 var(--srm-overlay), 0 6px 18px var(--srm-overlay);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .search-field mat-icon {
@@ -235,7 +209,7 @@ button {
   outline: 0;
   background: transparent;
   color: var(--srm-text);
-  font-size: 0.98rem;
+  font-size: 0.92rem;
 }
 
 .search-field input::placeholder {
@@ -255,18 +229,18 @@ button {
 .recipe-row {
   width: 100%;
   border: 0;
-  border-radius: 22px;
-  padding: 10px 6px;
+  border-radius: 18px;
+  padding: 8px 4px;
   background: transparent;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   color: inherit;
 }
 
 .recipe-row__image {
-  width: 70px;
-  height: 70px;
+  width: 58px;
+  height: 58px;
   object-fit: cover;
   border-radius: 50%;
   flex-shrink: 0;
@@ -291,7 +265,7 @@ button {
 
 .recipe-row__eyebrow {
   color: var(--srm-primary);
-  font-size: 0.74rem;
+  font-size: 0.68rem;
   line-height: 1;
   letter-spacing: 0.18em;
   font-weight: 800;
@@ -299,18 +273,19 @@ button {
 
 .recipe-row__title {
   color: var(--srm-text);
-  font-size: 1rem;
+  font-size: 0.92rem;
   line-height: 1.12;
   font-weight: 700;
   display: -webkit-box;
+  line-clamp: 2;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
 .recipe-row__selection {
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
   margin-left: auto;
   border-radius: 50%;
   border: 2px solid var(--srm-control-border);
@@ -329,14 +304,14 @@ button {
 .recipe-row--selected .recipe-row__selection::after {
   content: '';
   position: absolute;
-  inset: 5px;
+  inset: 4px;
   border-radius: 50%;
   background: var(--srm-primary);
 }
 
 .empty-state {
   flex: 1;
-  border-radius: 24px;
+  border-radius: 18px;
   background: var(--srm-surface-soft);
   display: flex;
   flex-direction: column;
@@ -345,7 +320,7 @@ button {
   gap: 10px;
   color: var(--srm-muted);
   text-align: center;
-  padding: 20px;
+  padding: 16px;
 }
 
 .empty-state p {
@@ -358,19 +333,19 @@ button {
 }
 
 .selected-recipe-card {
-  min-height: 96px;
-  padding: 12px;
-  border-radius: 18px;
+  min-height: 78px;
+  padding: 10px;
+  border-radius: 14px;
   background: var(--srm-surface-soft);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .selected-recipe-card__image {
-  width: 68px;
-  height: 68px;
-  border-radius: 14px;
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
   object-fit: cover;
   flex-shrink: 0;
   background: var(--srm-surface-strong);
@@ -384,32 +359,41 @@ button {
 .section-heading h3 {
   margin: 0;
   color: var(--srm-text);
-  font-size: 1.28rem;
+  font-size: 1.06rem;
   line-height: 1.08;
   letter-spacing: -0.04em;
   font-weight: 800;
 }
 
 .selected-recipe-card__content p {
-  margin: 8px 0 0;
+  margin: 4px 0 0;
   color: var(--srm-muted);
-  font-size: 0.92rem;
+  font-size: 0.82rem;
+}
+
+.section-heading p {
+  margin: 4px 0 0;
+  color: var(--srm-muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
 }
 
 .step-panel--settings {
-  gap: 16px;
+  gap: 12px;
 }
 
 .settings-form {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .settings-section {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .date-strip,
@@ -422,7 +406,7 @@ button {
 }
 
 .date-strip {
-  gap: 10px;
+  gap: 8px;
 }
 
 .date-pill,
@@ -439,36 +423,36 @@ button {
 }
 
 .date-pill {
-  min-width: 80px;
-  min-height: 92px;
+  min-width: 66px;
+  min-height: 76px;
   border: 0;
-  border-radius: 26px;
-  padding: 12px 14px;
+  border-radius: 20px;
+  padding: 10px;
   background: var(--srm-surface-strong);
   color: var(--srm-text);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
 }
 
 .date-pill--selected {
   background: var(--srm-primary);
   color: var(--srm-on-primary);
-  box-shadow: 0 10px 20px var(--srm-selection-shadow);
+  box-shadow: 0 8px 14px var(--srm-selection-shadow);
 }
 
 .date-pill__day {
-  font-size: 0.78rem;
+  font-size: 0.68rem;
   line-height: 1;
   letter-spacing: 0.12em;
   font-weight: 700;
 }
 
 .date-pill__date {
-  font-size: 1.6rem;
+  font-size: 1.3rem;
   line-height: 1;
   font-weight: 800;
 }
@@ -477,30 +461,30 @@ button {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   overflow: visible;
-  gap: 10px;
+  gap: 8px;
 }
 
 .meal-card {
-  min-height: 102px;
+  min-height: 82px;
   border: 0;
-  border-radius: 18px;
-  padding: 14px 10px;
+  border-radius: 14px;
+  padding: 10px 8px;
   background: var(--srm-surface-strong);
   color: var(--srm-muted);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 6px;
   text-align: center;
 }
 
 .meal-card mat-icon {
-  transform: scale(1.12);
+  transform: scale(0.98);
 }
 
 .meal-card span {
-  font-size: 0.88rem;
+  font-size: 0.8rem;
   line-height: 1.2;
   font-weight: 700;
 }
@@ -512,10 +496,10 @@ button {
 }
 
 .household-chip {
-  min-height: 44px;
+  min-height: 36px;
   border: 0;
   border-radius: 999px;
-  padding: 0 16px;
+  padding: 0 12px;
   background: var(--srm-surface-strong);
   color: var(--srm-muted);
   white-space: nowrap;
@@ -532,46 +516,107 @@ button {
   color: var(--srm-on-primary-container);
 }
 
+.strategy-grid,
+.grocery-list-picker {
+  display: grid;
+  gap: 10px;
+}
+
+.strategy-card,
+.grocery-list-card {
+  width: 100%;
+  border: 0;
+  border-radius: 16px;
+  padding: 14px;
+  background: var(--srm-surface-strong);
+  color: var(--srm-text);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.strategy-card__title,
+.grocery-list-card__title {
+  font-size: 0.9rem;
+  line-height: 1.25;
+  font-weight: 800;
+}
+
+.strategy-card__description,
+.grocery-list-card__details,
+.settings-empty,
+.field-error,
+.form-error {
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.strategy-card__description,
+.grocery-list-card__details,
+.settings-empty {
+  color: var(--srm-muted);
+}
+
+.strategy-card--selected,
+.grocery-list-card--selected {
+  background: var(--srm-primary-container);
+  color: var(--srm-on-primary-container);
+  box-shadow: inset 0 0 0 1px var(--srm-selection);
+}
+
+.strategy-card--selected .strategy-card__description,
+.grocery-list-card--selected .grocery-list-card__details {
+  color: color-mix(in srgb, var(--srm-on-primary-container) 72%, transparent);
+}
+
+.settings-empty {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--srm-surface-soft);
+}
+
+.field-error,
+.form-error {
+  margin: 0;
+  color: #b42318;
+}
+
 .modal-footer {
-  padding: 16px 28px 24px;
+  padding: 12px 22px 18px;
   border-top: 1px solid var(--srm-divider);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
-}
-
-.modal-footer--settings {
-  padding-top: 12px;
-  border-top: 0;
+  gap: 10px;
 }
 
 .footer-link {
-  min-height: 44px;
+  min-height: 36px;
   border: 0;
   padding: 0 8px;
   background: transparent;
   color: var(--srm-primary);
-  font-size: 0.96rem;
+  font-size: 0.88rem;
   line-height: 1;
   font-weight: 800;
 }
 
 .footer-cta {
-  min-height: 58px;
+  min-height: 48px;
   border: 0;
   border-radius: 999px;
-  padding: 0 22px;
+  padding: 0 18px;
   background: var(--srm-primary);
   color: var(--srm-on-primary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  font-size: 1rem;
+  gap: 8px;
+  font-size: 0.92rem;
   line-height: 1;
   font-weight: 800;
-  box-shadow: 0 12px 22px var(--srm-selection-shadow);
+  box-shadow: 0 8px 14px var(--srm-selection-shadow);
 }
 
 .footer-cta--full {
@@ -583,7 +628,8 @@ button {
 .meal-card:disabled,
 .date-pill:disabled,
 .household-chip:disabled,
-.footer-link:disabled {
+.footer-link:disabled,
+.header-action:disabled {
   opacity: 0.56;
 }
 
@@ -593,13 +639,14 @@ button {
 
 @media (max-width: 720px) {
   .modal-shell {
-    padding: 14px;
+    padding: 10px;
   }
 
   .modal-card {
-    width: min(100%, 560px);
-    min-height: min(100%, 760px);
-    border-radius: 30px;
+    width: min(100%, 520px);
+    min-height: min(100%, 700px);
+    height: min(100%, 700px);
+    border-radius: 24px;
   }
 
   .modal-header,
@@ -611,25 +658,7 @@ button {
   }
 
   .modal-header {
-    padding-top: 20px;
-  }
-
-  .modal-header--settings {
     padding-top: 16px;
-    padding-bottom: 8px;
-  }
-
-  .modal-header h2 {
-    font-size: 2.1rem;
-  }
-
-  .modal-header--settings h2 {
-    font-size: 1.02rem;
-  }
-
-  .modal-progress--settings {
-    padding-left: 24px;
-    padding-right: 24px;
   }
 
   .progress-step__label {
@@ -637,67 +666,53 @@ button {
   }
 
   .recipe-row__image {
-    width: 64px;
-    height: 64px;
+    width: 54px;
+    height: 54px;
   }
 
   .selected-recipe-card__image {
-    width: 70px;
-    height: 70px;
+    width: 56px;
+    height: 56px;
   }
 
   .meal-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .strategy-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 560px) {
   .modal-shell {
-    padding: 10px;
+    padding: 8px;
   }
 
   .modal-card {
     min-height: 100%;
-    border-radius: 24px;
+    height: 100%;
+    border-radius: 20px;
+  }
+
+  .modal-header,
+  .modal-progress,
+  .modal-body,
+  .modal-footer {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
   .modal-header h2 {
-    font-size: 1.9rem;
-  }
-
-  .modal-header--settings {
-    padding: 14px 18px 6px;
-  }
-
-  .modal-header--settings h2 {
-    font-size: 0.98rem;
+    font-size: 1.65rem;
   }
 
   .header-action {
-    font-size: 0.9rem;
+    font-size: 0.82rem;
   }
 
   .modal-progress {
     gap: 12px;
-  }
-
-  .modal-progress--settings {
-    gap: 12px;
-    padding: 8px 18px 8px;
-  }
-
-  .modal-progress--settings .progress-step {
-    gap: 8px;
-  }
-
-  .modal-progress--settings .progress-step__badge {
-    width: 38px;
-    height: 38px;
-    font-size: 1rem;
-  }
-
-  .modal-progress--settings .progress-step__label {
-    font-size: 0.8rem;
   }
 
   .progress-divider {
@@ -709,9 +724,9 @@ button {
   }
 
   .progress-step__badge {
-    width: 42px;
-    height: 42px;
-    font-size: 1.1rem;
+    width: 36px;
+    height: 36px;
+    font-size: 0.96rem;
   }
 
   .progress-step__label {
@@ -727,16 +742,21 @@ button {
   }
 
   .meal-card {
-    min-height: 96px;
+    min-height: 76px;
+  }
+
+  .strategy-card,
+  .grocery-list-card {
+    padding: 12px;
   }
 
   .modal-footer {
-    padding-top: 14px;
-    padding-bottom: 18px;
+    padding-top: 8px;
+    padding-bottom: 14px;
   }
 
   .footer-cta {
-    min-height: 54px;
-    padding: 0 20px;
+    min-height: 46px;
+    padding: 0 16px;
   }
 }

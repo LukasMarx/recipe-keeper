@@ -12,6 +12,7 @@ export interface RecipeIngredient {
 export interface Ingredient {
   id: string;
   plural: string;
+  imageUrl?: string;
   category:
     | 'fruit'
     | 'vegetable'

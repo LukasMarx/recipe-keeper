@@ -1,21 +1,25 @@
-<h2 mat-dialog-title>Recipe from URL</h2>
+<h2 mat-dialog-title>Import recipe from URL</h2>
 <mat-dialog-content>
-  @if(isLoading()) {
+  @if (isLoading()) {
   <div class="loading-container">
     <mat-progress-spinner
       color="primary"
       mode="indeterminate"
       diameter="50"
     ></mat-progress-spinner>
-    <p>Parsing recipe from URL...</p>
-    <p>This can take a moment</p>
+    <p>Creating recipe import...</p>
+    <p>The recipe will appear immediately and keep updating in the background.</p>
   </div>
   } @else {
-  <p>Enter the URL of a website with the recipe you want to import</p>
+  <p>Enter the URL of a website with the recipe you want to import.</p>
   <mat-form-field style="width: 100%">
     <mat-label>Recipe URL</mat-label>
-    <input matInput [(ngModel)]="url" />
+    <input matInput [(ngModel)]="url" placeholder="https://example.com/recipe" />
   </mat-form-field>
+  <p class="helper-text">
+    The recipe is created right away. Ingredients, instructions, nutrition, and
+    images continue to update live afterwards.
+  </p>
   }
 </mat-dialog-content>
 <mat-dialog-actions>
@@ -24,10 +28,10 @@
   </button>
   <button
     mat-button
-    [disabled]="isLoading()"
+    [disabled]="isLoading() || !url.trim()"
     (click)="onSubmit()"
     cdkFocusInitial
   >
-    Ok
+    Import
   </button>
 </mat-dialog-actions>

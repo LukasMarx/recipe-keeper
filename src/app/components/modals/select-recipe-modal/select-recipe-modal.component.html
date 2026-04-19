@@ -1,45 +1,21 @@
 <div class="modal-shell">
   <section class="modal-card" aria-label="Schedule a recipe">
-    <header class="modal-header" [class.modal-header--settings]="currentStep() === 2">
-      @if (currentStep() === 1) {
-        <div>
-          <h2>Schedule a recipe</h2>
-        </div>
+    <header class="modal-header">
+      <button
+        type="button"
+        class="icon-button"
+        aria-label="Close schedule recipe modal"
+        (click)="closeModal()"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
 
-        <button
-          type="button"
-          class="icon-button"
-          aria-label="Close schedule recipe modal"
-          (click)="closeModal()"
-        >
-          <mat-icon>close</mat-icon>
-        </button>
-      } @else {
-        <button
-          type="button"
-          class="icon-button icon-button--edge"
-          aria-label="Close schedule recipe modal"
-          (click)="closeModal()"
-        >
-          <mat-icon>close</mat-icon>
-        </button>
-
-        <div class="modal-header__title">
-          <h2>Schedule Recipe</h2>
-        </div>
-
-        <button
-          type="button"
-          class="header-action"
-          [disabled]="!form.valid || !selectedRecipe()"
-          (click)="onSubmit()"
-        >
-          Done
-        </button>
-      }
+      <div class="modal-header__title">
+        <h2>Schedule a recipe</h2>
+      </div>
     </header>
 
-    <div class="modal-progress" [class.modal-progress--settings]="currentStep() === 2" aria-label="Scheduling progress">
+    <div class="modal-progress" aria-label="Scheduling progress">
       <button
         type="button"
         class="progress-step"
@@ -184,6 +160,57 @@
               </div>
             </section>
 
+            <section class="settings-section">
+              <div class="section-heading">
+                <h3>Shopping list</h3>
+                <p>Choose how the recipe ingredients should be handled when this meal is scheduled.</p>
+              </div>
+
+              <div class="strategy-grid" role="list" aria-label="Shopping list strategy">
+                @for (mode of groceryListModeOptions; track mode.value) {
+                  <button
+                    type="button"
+                    class="strategy-card"
+                    [class.strategy-card--selected]="isGroceryListModeSelected(mode.value)"
+                    (click)="selectGroceryListMode(mode.value)"
+                  >
+                    <span class="strategy-card__title">{{ mode.title }}</span>
+                    <span class="strategy-card__description">{{ mode.description }}</span>
+                  </button>
+                }
+              </div>
+
+              @if (shouldShowGroceryListPicker()) {
+                @if (availableGroceryLists$ | async; as groceryLists) {
+                  @if (groceryLists.length) {
+                    <div class="grocery-list-picker" role="list" aria-label="Existing shopping lists">
+                      @for (groceryList of groceryLists; track groceryList.id) {
+                        <button
+                          type="button"
+                          class="grocery-list-card"
+                          [class.grocery-list-card--selected]="isGroceryListSelected(groceryList.id)"
+                          (click)="selectGroceryList(groceryList.id)"
+                        >
+                          <span class="grocery-list-card__title">{{ groceryList.name }}</span>
+                          @if (groceryList.details) {
+                            <span class="grocery-list-card__details">{{ groceryList.details }}</span>
+                          }
+                        </button>
+                      }
+                    </div>
+                  } @else {
+                    <div class="settings-empty" aria-live="polite">
+                      No accessible shopping lists exist for the selected planning context yet.
+                    </div>
+                  }
+                }
+              }
+
+              @if (hasGroceryListSelectionError()) {
+                <p class="field-error" aria-live="polite">Choose an existing shopping list.</p>
+              }
+            </section>
+
             @if (households$ | async; as households) {
               @if (households.length > 1) {
                 <section class="settings-section">
@@ -215,12 +242,16 @@
                 </section>
               }
             }
+
+            @if (submitError(); as errorMessage) {
+              <p class="form-error" aria-live="polite">{{ errorMessage }}</p>
+            }
           </form>
         </section>
       }
     </div>
 
-    <footer class="modal-footer" [class.modal-footer--settings]="currentStep() === 2">
+    <footer class="modal-footer">
       @if (currentStep() === 1) {
         <button type="button" class="footer-link" (click)="closeModal()">Cancel</button>
         <button
@@ -237,7 +268,7 @@
         <button
           type="button"
           class="footer-cta footer-cta--full"
-          [disabled]="!form.valid || !selectedRecipe()"
+          [disabled]="form.invalid || !selectedRecipe() || isSubmitting()"
           (click)="onSubmit()"
           cdkFocusInitial
         >

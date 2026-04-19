@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { HeaderComponent } from './components/header/header.component';
+import { RecipeService } from './services/recipe.service';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +13,10 @@ import { HeaderComponent } from './components/header/header.component';
 })
 export class AppComponent {
   private readonly router = inject(Router);
+
+  constructor() {
+    inject(RecipeService);
+  }
 
   hideHeader = signal(false);
   hideNavbar = signal(false);

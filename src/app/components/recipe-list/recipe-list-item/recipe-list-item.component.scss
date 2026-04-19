@@ -10,12 +10,27 @@
   height: 100px;
 }
 
+.image--placeholder {
+  display: grid;
+  place-items: center;
+  background: rgba(127, 255, 0, 0.12);
+  color: #226100;
+}
+
 mat-card {
   overflow: hidden;
   height: 100%;
   box-sizing: border-box;
   position: relative;
   cursor: pointer;
+
+  &.is-processing {
+    box-shadow: 0 12px 28px rgba(139, 114, 33, 0.14);
+  }
+
+  &.is-failed {
+    background: #fff7f4;
+  }
 
   &.selected::after {
     content: "";
@@ -30,12 +45,38 @@ mat-card {
   }
 }
 
+.status-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(34, 97, 0, 0.92);
+  color: #fffef8;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.status-badge.is-failed {
+  background: rgba(138, 49, 34, 0.94);
+}
+
 .card-content {
   padding: 16px 0 0 0;
   display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .card-title {
   font-size: 16px;
   line-height: 1.25;
+}
+
+.card-subtitle {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 13px;
 }

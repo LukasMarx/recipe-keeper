@@ -76,7 +76,7 @@
       <div class="tab-page">
         <app-ingredient-list
           [isInEditMode]="!!form.value.id"
-          [ingredients]="form.value.ingredientsList"
+          [ingredients]="form.value.ingredientsList ?? []"
         ></app-ingredient-list>
       </div>
     </mat-tab>

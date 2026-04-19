@@ -16,4 +16,19 @@ import { Recipe } from '../../../interfaces/recipe';
 export class RecipeListItemComponent {
   public recipe = input<Recipe>();
   public selected = input<boolean>(false);
+
+  getStatusText(recipe?: Recipe): string {
+    if (!recipe || recipe.status === 'READY') {
+      return '';
+    }
+
+    switch (recipe.status) {
+      case 'IMPORTING':
+        return 'Importing recipe';
+      case 'ENRICHING':
+        return 'Enriching recipe';
+      case 'FAILED':
+        return 'Import failed';
+    }
+  }
 }

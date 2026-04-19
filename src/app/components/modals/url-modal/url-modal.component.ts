@@ -11,6 +11,8 @@ import { DialogRef } from '@angular/cdk/dialog';
 import { RecipeService } from '../../../services/recipe.service';
 import { Router } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { finalize } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-url-modal',
@@ -30,21 +32,38 @@ export class UrlModalComponent {
   private dialogRef = inject(DialogRef);
   private readonly recipeService = inject(RecipeService);
   private readonly router = inject(Router);
+  private readonly snackBar = inject(MatSnackBar);
   public url = '';
   public isLoading = signal<boolean>(false);
 
   public onSubmit() {
-    if (this.url) {
+    const trimmedUrl = this.url.trim();
+
+    if (trimmedUrl) {
       this.isLoading.set(true);
-      this.recipeService.getRecipeFromUrl(this.url).subscribe((recipe) => {
-        this.dialogRef.close();
-        this.isLoading.set(false);
-        this.router.navigate(['new-recipe'], {
-          queryParams: {
-            recipe: JSON.stringify(recipe),
+      this.recipeService
+        .importRecipe(trimmedUrl)
+        .pipe(
+          finalize(() => {
+            this.isLoading.set(false);
+          })
+        )
+        .subscribe({
+          next: (recipe) => {
+            this.dialogRef.close();
+            this.router.navigate(['recipe', recipe.id]);
+          },
+          error: () => {
+            this.snackBar.open(
+              'The recipe import could not be started. Please try again.',
+              undefined,
+              {
+                verticalPosition: 'top',
+                duration: 4000,
+              }
+            );
           },
         });
-      });
     }
   }
 

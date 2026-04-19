@@ -9,22 +9,24 @@ import { NEVER, Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
 import { HttpInterceptorFn } from '@angular/common/http';
+import { AuthService } from './auth.service';
 
 export const intercept: HttpInterceptorFn = (
   req,
   next
 ): Observable<HttpEvent<any>> => {
   const router = inject(Router);
+  const authService = inject(AuthService);
   let apiReq = req.clone({
     url: `${environment.origin}/${req.url}`,
   });
-  const access_token = localStorage.getItem('access_token');
+  const access_token = authService.getAccessToken();
 
   if (access_token) {
     try {
       const jwtPayload = JSON.parse(window.atob(access_token.split('.')[1]));
       if (jwtPayload.exp * 1000 < new Date().getTime()) {
-        localStorage.removeItem('access_token');
+        authService.clearAccessToken();
         router.navigate(['login']);
         return NEVER;
       }
@@ -33,7 +35,7 @@ export const intercept: HttpInterceptorFn = (
         headers: req.headers.set('Authorization', `Bearer ${access_token}`),
       });
     } catch (e) {
-      localStorage.removeItem('access_token');
+      authService.clearAccessToken();
     }
   }
   return next(apiReq).pipe(
@@ -44,6 +46,7 @@ export const intercept: HttpInterceptorFn = (
           if (err.status !== 401) {
             return;
           }
+          authService.clearAccessToken();
           router.navigate(['login']);
         }
       }

@@ -34,6 +34,10 @@ export class GroceryListService {
 
   constructor() {}
 
+  public getAvailableLists() {
+    return this.http.get<GroceryList[]>('grocery-list');
+  }
+
   public getLists() {
     return this.http.get<any[]>('grocery-list').pipe(
       map((list) => {

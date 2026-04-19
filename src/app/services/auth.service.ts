@@ -1,14 +1,35 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { tap } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private readonly http = inject(HttpClient);
+  private readonly accessTokenSubject = new BehaviorSubject<string | null>(
+    localStorage.getItem('access_token')
+  );
+
+  public readonly accessToken$ = this.accessTokenSubject
+    .asObservable()
+    .pipe(distinctUntilChanged());
 
   constructor() {}
+
+  public getAccessToken(): string | null {
+    return this.accessTokenSubject.value;
+  }
+
+  public setAccessToken(accessToken: string) {
+    localStorage.setItem('access_token', accessToken);
+    this.accessTokenSubject.next(accessToken);
+  }
+
+  public clearAccessToken() {
+    localStorage.removeItem('access_token');
+    this.accessTokenSubject.next(null);
+  }
 
   public register(input: {
     displayName: string;
@@ -25,7 +46,7 @@ export class AuthService {
       })
       .pipe(
         tap((result: any) => {
-          localStorage.setItem('access_token', result.access_token);
+          this.setAccessToken(result.access_token);
         })
       );
   }
@@ -38,7 +59,7 @@ export class AuthService {
       })
       .pipe(
         tap((result: any) => {
-          localStorage.setItem('access_token', result.access_token);
+          this.setAccessToken(result.access_token);
         })
       );
   }
