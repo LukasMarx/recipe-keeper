@@ -1,115 +1,476 @@
 <div class="grocery-screen">
   <header class="topbar">
-    <button
-      type="button"
-      class="icon-button"
-      aria-label="Open shopping list settings"
-      (click)="onAddList()"
-    >
-      <mat-icon>menu</mat-icon>
-    </button>
-
-    <div class="topbar-title">
-      <h1>Shopping List</h1>
+    <div class="topbar-copy">
+      <span class="topbar-eyebrow">Household groceries</span>
+      <h1>{{ view() === 'active' ? 'Current Grocery List' : 'Archive' }}</h1>
+      @if (view() === 'active' && activeList(); as list) {
+        <p>{{ list.name }}</p>
+      } @else if (view() === 'archive') {
+        <p>Browse completed grocery runs for the active household.</p>
+      }
     </div>
+
+    @if (view() === 'active') {
+      <button
+        type="button"
+        class="topbar-action"
+        [disabled]="!activeList() || isCompletingList() || isLoadingActive()"
+        (click)="completeShopping()"
+      >
+        <mat-icon>inventory_2</mat-icon>
+        <span>{{ isCompletingList() ? 'Archiving...' : 'Complete shopping' }}</span>
+      </button>
+    }
   </header>
 
-  <section class="progress-block">
-    <div class="grocery-screen__inner">
-      <div class="progress-copy">
-        <span class="progress-label">List Progress</span>
-        <span class="progress-value"
-          >{{ checkedCount() }} / {{ totalCount() }} items</span
-        >
-      </div>
-
-      <div class="progress-track" aria-hidden="true">
-        <div
-          class="progress-bar"
-          [style.width.%]="progressPercent()"
-        ></div>
-      </div>
-    </div>
-  </section>
-
   <div class="grocery-screen__inner">
-    <section class="filters" aria-label="Category filters">
+    <section class="view-switcher" aria-label="Grocery list views">
       <button
         type="button"
-        class="filter-chip"
-        [class.active]="selectedFilter() === 'all'"
-        (click)="selectFilter('all')"
+        class="view-chip"
+        [class.active]="view() === 'active'"
+        (click)="selectView('active')"
       >
-        All
+        Current list
       </button>
-
-      @for (filter of availableFilters(); track filter) {
       <button
         type="button"
-        class="filter-chip"
-        [class.active]="selectedFilter() === filter"
-        (click)="selectFilter(filter)"
+        class="view-chip"
+        [class.active]="view() === 'archive'"
+        (click)="selectView('archive')"
       >
-        {{ groceryListService.getCatergoryLabel(filter) | async }}
+        Archive
       </button>
-      }
     </section>
 
-    <section class="sections">
-      @if (sections().length) { @for (section of sections(); track section.category) {
-      <div class="section">
-        <h2>{{ groceryListService.getCatergoryLabel(section.category) | async }}</h2>
+    @if (actionError(); as errorMessage) {
+      <p class="status-banner status-banner--error" aria-live="polite">{{ errorMessage }}</p>
+    }
 
-        <div class="section-items">
-          @for (item of section.items; track itemKey(item)) {
+    @if (view() === 'active') {
+      @if (!activeHouseholdId()) {
+        <div class="empty-state empty-state--panel">
+          <h2>No active household selected.</h2>
+          <p>Select an active household to manage the shared grocery list.</p>
+        </div>
+      } @else if (isLoadingActive()) {
+        <p class="status-banner" aria-live="polite">Loading the current grocery list...</p>
+      } @else {
+        @if (activeListError(); as errorMessage) {
+          <p class="status-banner status-banner--error" aria-live="polite">{{ errorMessage }}</p>
+        }
+
+        <section class="progress-block">
+          <div class="progress-copy">
+            <span class="progress-label">List progress</span>
+            <span class="progress-value">{{ checkedCount() }} / {{ totalCount() }} items</span>
+          </div>
+
+          <div class="progress-track" aria-hidden="true">
+            <div class="progress-bar" [style.width.%]="progressPercent()"></div>
+          </div>
+        </section>
+
+        <section class="filters" aria-label="Category filters">
           <button
             type="button"
-            class="item-row"
-            [class.checked]="isItemChecked(item)"
-            [attr.aria-pressed]="isItemChecked(item)"
-            (click)="toggleItem(item)"
+            class="filter-chip"
+            [class.active]="selectedFilter() === 'all'"
+            (click)="selectFilter('all')"
           >
-            <span class="item-checkmark">
-              <mat-icon>check</mat-icon>
-            </span>
-
-            <span class="item-copy">
-              <span class="item-name">{{ formatName(item) }}</span>
-              <span class="item-meta">{{ formatAmount(item) }}</span>
-            </span>
+            All
           </button>
+
+          @for (filter of availableFilters(); track filter) {
+            <button
+              type="button"
+              class="filter-chip"
+              [class.active]="selectedFilter() === filter"
+              (click)="selectFilter(filter)"
+            >
+              {{ groceryListService.getCatergoryLabel(filter) | async }}
+            </button>
           }
-        </div>
-      </div>
-      } } @else {
-      <div class="empty-state">
-        <h2>Your list is empty</h2>
-        <p>Add items with the quick add bar or create a new list from the menu.</p>
-      </div>
+        </section>
+
+        <section class="sections">
+          @if (sections().length) {
+            @for (section of sections(); track section.category) {
+              <div class="section">
+                <h2>{{ groceryListService.getCatergoryLabel(section.category) | async }}</h2>
+
+                <div class="section-items">
+                  @for (item of section.items; track trackByAggregatedItemId($index, item)) {
+                    <article class="item-group" [class.item-group--expanded]="isSourceListExpanded(item)">
+                      <div
+                        class="item-row"
+                        [class.checked]="item.checked"
+                        [class.partially-checked]="item.partiallyChecked"
+                      >
+                      <button
+                        type="button"
+                        class="item-toggle"
+                        role="checkbox"
+                        [disabled]="pendingAggregatedItemId() === item.id || isCompletingList()"
+                        [attr.aria-checked]="getAggregatedItemAriaChecked(item)"
+                        (click)="toggleAggregatedItem(item)"
+                      >
+                        <span class="item-checkmark">
+                          <mat-icon>{{ item.partiallyChecked ? 'remove' : 'check' }}</mat-icon>
+                        </span>
+                      </button>
+
+                      @if (getItemImageUrl(item); as imageUrl) {
+                        <img
+                          class="item-image"
+                          [src]="imageUrl"
+                          [alt]="item.name"
+                        />
+                      } @else {
+                        <span class="item-image item-image--placeholder" aria-hidden="true">
+                          <mat-icon>{{ groceryListService.getCategoryIcon(getItemCategory(item)) }}</mat-icon>
+                        </span>
+                      }
+
+                      @if (getSingleSourceItem(item); as sourceItem) {
+                        @if (isEditingItem(sourceItem)) {
+                          <form
+                            class="item-editor"
+                            [formGroup]="editItemForm"
+                            (submit)="$event.preventDefault(); saveItemEdits(sourceItem)"
+                          >
+                            <input type="text" formControlName="name" placeholder="Item name" />
+                            <input type="number" min="0.01" step="0.01" formControlName="amount" />
+                            <input type="text" formControlName="unit" placeholder="Unit" />
+
+                            <label class="item-editor__checked">
+                              <input type="checkbox" formControlName="checked" />
+                              <span>Checked</span>
+                            </label>
+
+                            <div class="item-editor__actions">
+                              <button
+                                type="submit"
+                                class="text-button text-button--primary"
+                                [disabled]="pendingRawItemId() === sourceItem.id"
+                              >
+                                Save
+                              </button>
+                              <button
+                                type="button"
+                                class="text-button"
+                                [disabled]="pendingRawItemId() === sourceItem.id"
+                                (click)="cancelEditingItem()"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </form>
+                        } @else {
+                          <div class="item-copy">
+                            <span class="item-name">{{ item.name }}</span>
+                            <span class="item-meta">{{ formatQuantity(item) }}</span>
+                          </div>
+
+                          <div class="item-actions">
+                            <button
+                              type="button"
+                              class="icon-button"
+                              aria-label="Edit grocery item"
+                              [disabled]="pendingRawItemId() === sourceItem.id || isCompletingList()"
+                              (click)="startEditingItem(sourceItem)"
+                            >
+                              <mat-icon>edit</mat-icon>
+                            </button>
+
+                            <button
+                              type="button"
+                              class="icon-button"
+                              aria-label="Delete grocery item"
+                              [disabled]="pendingRawItemId() === sourceItem.id || isCompletingList()"
+                              (click)="deleteRawItem(sourceItem)"
+                            >
+                              <mat-icon>delete</mat-icon>
+                            </button>
+                          </div>
+                        }
+                      } @else {
+                        <div class="item-copy">
+                          <span class="item-name">{{ item.name }}</span>
+                          <span class="item-meta">{{ formatQuantity(item) }}</span>
+                          <span class="item-submeta">{{ getAggregatedItemSourceLabel(item) }}</span>
+                        </div>
+
+                        <div class="item-actions">
+                          <button
+                            type="button"
+                            class="icon-button"
+                            aria-label="Show source items"
+                            [disabled]="isCompletingList()"
+                            (click)="toggleSourceList(item)"
+                          >
+                            <mat-icon>{{ isSourceListExpanded(item) ? 'expand_less' : 'expand_more' }}</mat-icon>
+                          </button>
+                        </div>
+                      }
+                      </div>
+
+                      @if (!isSingleSourceItem(item) && isSourceListExpanded(item)) {
+                        <div class="source-items">
+                          @for (sourceItem of getSourceItems(item); track trackByRawItemId($index, sourceItem)) {
+                            <div class="source-item" [class.checked]="sourceItem.checked">
+                              <button
+                                type="button"
+                                class="source-toggle"
+                                role="checkbox"
+                                [disabled]="pendingRawItemId() === sourceItem.id || isCompletingList()"
+                                [attr.aria-checked]="getRawItemAriaChecked(sourceItem)"
+                                (click)="toggleRawItem(sourceItem)"
+                              >
+                                <span class="source-checkmark">
+                                  <mat-icon>check</mat-icon>
+                                </span>
+                              </button>
+
+                              @if (isEditingItem(sourceItem)) {
+                                <form
+                                  class="source-editor"
+                                  [formGroup]="editItemForm"
+                                  (submit)="$event.preventDefault(); saveItemEdits(sourceItem)"
+                                >
+                                  <input type="text" formControlName="name" placeholder="Item name" />
+                                  <input type="number" min="0.01" step="0.01" formControlName="amount" />
+                                  <input type="text" formControlName="unit" placeholder="Unit" />
+
+                                  <label class="item-editor__checked">
+                                    <input type="checkbox" formControlName="checked" />
+                                    <span>Checked</span>
+                                  </label>
+
+                                  <div class="item-editor__actions">
+                                    <button
+                                      type="submit"
+                                      class="text-button text-button--primary"
+                                      [disabled]="pendingRawItemId() === sourceItem.id"
+                                    >
+                                      Save
+                                    </button>
+                                    <button
+                                      type="button"
+                                      class="text-button"
+                                      [disabled]="pendingRawItemId() === sourceItem.id"
+                                      (click)="cancelEditingItem()"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </form>
+                              } @else {
+                                <div class="source-copy">
+                                  <span class="source-name">{{ formatRawName(sourceItem) }}</span>
+                                  <span class="source-meta">{{ formatQuantity(sourceItem) }}</span>
+                                </div>
+
+                                <div class="item-actions">
+                                  <button
+                                    type="button"
+                                    class="icon-button"
+                                    aria-label="Edit source grocery item"
+                                    [disabled]="pendingRawItemId() === sourceItem.id || isCompletingList()"
+                                    (click)="startEditingItem(sourceItem)"
+                                  >
+                                    <mat-icon>edit</mat-icon>
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    class="icon-button"
+                                    aria-label="Delete source grocery item"
+                                    [disabled]="pendingRawItemId() === sourceItem.id || isCompletingList()"
+                                    (click)="deleteRawItem(sourceItem)"
+                                  >
+                                    <mat-icon>delete</mat-icon>
+                                  </button>
+                                </div>
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
+                    </article>
+                  }
+                </div>
+              </div>
+            }
+          } @else {
+            <div class="empty-state empty-state--panel">
+              <h2>Your current grocery list is empty.</h2>
+              <p>Add manual items below or schedule a recipe to populate the active list.</p>
+            </div>
+          }
+        </section>
       }
-    </section>
+    } @else {
+      @if (!activeHouseholdId()) {
+        <div class="empty-state empty-state--panel">
+          <h2>No active household selected.</h2>
+          <p>Select an active household to view archived grocery lists.</p>
+        </div>
+      } @else {
+        <section class="archive-toolbar">
+          <div>
+            <span class="progress-label">Archive page</span>
+            <strong class="archive-page">{{ archivePage() }}</strong>
+          </div>
+
+          <div class="archive-actions">
+            <button
+              type="button"
+              class="text-button"
+              [disabled]="archiveOffset() === 0 || isLoadingArchive()"
+              (click)="goToPreviousArchivePage()"
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              class="text-button text-button--primary"
+              [disabled]="!hasMoreArchiveResults() || isLoadingArchive()"
+              (click)="goToNextArchivePage()"
+            >
+              Next
+            </button>
+          </div>
+        </section>
+
+        @if (archiveError(); as errorMessage) {
+          <p class="status-banner status-banner--error" aria-live="polite">{{ errorMessage }}</p>
+        }
+
+        @if (isLoadingArchive()) {
+          <p class="status-banner" aria-live="polite">Loading archived grocery lists...</p>
+        } @else if (!archivedLists().length && archiveOffset() === 0) {
+          <div class="empty-state empty-state--panel">
+            <h2>No archived grocery lists yet.</h2>
+            <p>Completed grocery runs will appear here.</p>
+          </div>
+        } @else if (!archivedLists().length) {
+          <div class="empty-state empty-state--panel">
+            <h2>No archived grocery lists on this page.</h2>
+            <p>Try the previous page to keep browsing your history.</p>
+          </div>
+        } @else {
+          <div class="archive-grid">
+            @for (list of archivedLists(); track trackByListId($index, list)) {
+              <button
+                type="button"
+                class="archive-card"
+                [class.archive-card--selected]="selectedArchivedListId() === list.id"
+                (click)="openArchivedList(list.id)"
+              >
+                <span class="archive-card__title">{{ list.name }}</span>
+                <span class="archive-card__meta">{{ getArchiveDate(list) | date: 'mediumDate' }}</span>
+                <span class="archive-card__meta">{{ getArchiveItemCountLabel(list) }}</span>
+              </button>
+            }
+          </div>
+        }
+
+        @if (isLoadingArchivedList()) {
+          <p class="status-banner" aria-live="polite">Opening archived grocery list...</p>
+        } @else {
+          @if (selectedArchivedList(); as list) {
+            <section class="archive-detail">
+              <div class="archive-detail__header">
+                <div>
+                  <h2>{{ list.name }}</h2>
+                  <p>Completed {{ getArchiveDate(list) | date: 'medium' }}</p>
+                </div>
+
+                <button
+                  type="button"
+                  class="icon-button"
+                  aria-label="Delete archived grocery list"
+                  [disabled]="isDeletingArchivedList() === list.id"
+                  (click)="deleteArchivedList(list)"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+
+              @if (list.aggregatedItems.length) {
+                <div class="archive-detail__items">
+                  @for (item of list.aggregatedItems; track trackByAggregatedItemId($index, item)) {
+                    <div
+                      class="archive-detail__item"
+                      [class.checked]="item.checked"
+                      [class.partially-checked]="item.partiallyChecked"
+                    >
+                      @if (getItemImageUrl(item); as imageUrl) {
+                        <img
+                          class="archive-detail__image"
+                          [src]="imageUrl"
+                          [alt]="item.name"
+                        />
+                      } @else {
+                        <span class="archive-detail__image archive-detail__image--placeholder" aria-hidden="true">
+                          <mat-icon>{{ groceryListService.getCategoryIcon(getItemCategory(item)) }}</mat-icon>
+                        </span>
+                      }
+
+                      <span class="archive-detail__copy">
+                        <span class="archive-detail__copy-main">
+                          <span>{{ item.name }}</span>
+                          @if (item.itemCount > 1) {
+                            <span class="archive-detail__sources">
+                              {{ getAggregatedItemSourceLabel(item) }}
+                            </span>
+                          }
+                        </span>
+                        <span>{{ formatQuantity(item) }}</span>
+                      </span>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <div class="empty-state">
+                  <h2>This archived list is empty.</h2>
+                  <p>The grocery run was completed without any remaining items.</p>
+                </div>
+              }
+            </section>
+          }
+        }
+      }
+    }
   </div>
 </div>
 
-<form class="quick-add-shell grocery-list-footer" (submit)="$event.preventDefault(); onQuickAdd()">
-  <button
-    type="button"
-    class="quick-add-prefix"
-    aria-label="Create or edit shopping list"
-    (click)="onAddList()"
+@if (view() === 'active' && activeHouseholdId()) {
+  <form
+    class="quick-add-shell grocery-list-footer"
+    [formGroup]="addItemForm"
+    (submit)="$event.preventDefault(); addManualItem()"
   >
-    <mat-icon>add</mat-icon>
-  </button>
+    <span class="quick-add-prefix" aria-hidden="true">
+      <mat-icon>add</mat-icon>
+    </span>
 
-  <input
-    type="text"
-    [formControl]="quickAddControl"
-    class="quick-add-input"
-    placeholder="Quick add item..."
-    aria-label="Quick add item"
-  />
+    <input
+      type="text"
+      formControlName="name"
+      class="quick-add-input"
+      placeholder="Quick add item..."
+      aria-label="Manual grocery item name"
+    />
 
-  <button type="submit" class="quick-add-submit" aria-label="Add grocery item">
-    <mat-icon>north</mat-icon>
-  </button>
-</form>
+    <button
+      type="submit"
+      class="quick-add-submit"
+      aria-label="Add grocery item"
+      [disabled]="isAddingItem()"
+    >
+      <mat-icon>{{ isAddingItem() ? 'hourglass_top' : 'north' }}</mat-icon>
+    </button>
+  </form>
+}

@@ -10,9 +10,9 @@ describe('createScheduleRecipeDto', () => {
     return {
       recipeId: 42,
       scheduleDate: '2026-04-19T00:00:00.000Z',
-      householdId: 0,
+      householdId: 7,
       mealType: 'DINNER',
-      groceryListMode: 'AUTO',
+      groceryListMode: 'ACTIVE',
       ...overrides,
     };
   }
@@ -31,19 +31,9 @@ describe('createScheduleRecipeDto', () => {
     expect(payload.groceryListId).toBeNull();
   });
 
-  it('sends the selected shopping list id for explicit assignment', () => {
-    const payload = createScheduleRecipeDto(
-      createRequest({ groceryListMode: 'EXISTING', groceryListId: 77 })
-    );
+  it('allows scheduling without an explicit household id', () => {
+    const payload = createScheduleRecipeDto(createRequest({ householdId: undefined }));
 
-    expect(payload.groceryListId).toBe(77);
-  });
-
-  it('rejects invalid shopping list ids for explicit assignment', () => {
-    expect(() =>
-      createScheduleRecipeDto(
-        createRequest({ groceryListMode: 'EXISTING', groceryListId: 0 })
-      )
-    ).toThrowError('A valid shopping list must be selected.');
+    expect(Object.prototype.hasOwnProperty.call(payload, 'householdId')).toBeFalse();
   });
 });

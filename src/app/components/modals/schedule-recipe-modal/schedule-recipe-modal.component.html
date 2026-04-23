@@ -21,35 +21,17 @@
         <mat-option value="OTHER">Other</mat-option>
       </mat-select>
     </mat-form-field>
-    <mat-form-field class="full-width">
-      <mat-label>Shopping list</mat-label>
-      <mat-select formControlName="groceryListMode" (selectionChange)="clearSubmitError()">
-        @for (mode of groceryListModes; track mode.value) {
-          <mat-option [value]="mode.value">{{ mode.label }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-    @if (shouldShowGroceryListPicker()) {
-      <mat-form-field class="full-width">
-        <mat-label>Existing shopping list</mat-label>
-        <mat-select formControlName="groceryListId" (selectionChange)="clearSubmitError()">
-          @if (availableGroceryLists$ | async; as groceryLists) {
-            @for (groceryList of groceryLists; track groceryList.id) {
-              <mat-option [value]="groceryList.id">
-                <span class="grocery-option__title">{{ groceryList.name }}</span>
-                @if (groceryList.details) {
-                  <span class="grocery-option__details">{{ groceryList.details }}</span>
-                }
-              </mat-option>
-            }
-          }
-        </mat-select>
-
-        @if (hasGroceryListSelectionError()) {
-          <mat-error>Please choose an existing shopping list.</mat-error>
-        }
-      </mat-form-field>
-    }
+    <section class="grocery-assignment">
+      <mat-checkbox
+        [checked]="shouldAddIngredientsToGroceryList()"
+        (change)="setGroceryListAssignment($event.checked)"
+      >
+        Add ingredients to the current grocery list
+      </mat-checkbox>
+      <p>
+        When enabled, scheduled ingredients go to the active grocery list for the selected household.
+      </p>
+    </section>
     @if (households$ | async; as households) {
       @if (households.length > 1) {
         <mat-form-field class="full-width">

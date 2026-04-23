@@ -5,9 +5,9 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 
 import { ScheduleRecipeModalComponent } from './schedule-recipe-modal.component';
-import { GroceryListService } from '../../../services/grocery-list.service';
 import { HouseholdService } from '../../../services/household.service';
 import { ScheduleService } from '../../../services/schedule.service';
+import { UserService } from '../../../services/user.service';
 
 describe('ScheduleRecipeModalComponent', () => {
   const dialogRefMock = {
@@ -22,20 +22,9 @@ describe('ScheduleRecipeModalComponent', () => {
     getAll: jasmine.createSpy('getAll').and.returnValue(of([])),
   };
 
-  const groceryListServiceMock = {
-    getAvailableLists: jasmine.createSpy('getAvailableLists').and.returnValue(
-      of([
-        {
-          createDate: '2026-04-19T00:00:00.000Z',
-          householdId: 0,
-          id: 12,
-          name: 'Weekend Prep',
-          plannedDate: '2026-04-20T00:00:00.000Z',
-          updateDate: '2026-04-19T00:00:00.000Z',
-          userId: 1,
-          items: [],
-        },
-      ])
+  const userServiceMock = {
+    get: jasmine.createSpy('get').and.returnValue(
+      of({ id: 1, displayName: 'Taylor', activeHouseholdId: 14 })
     ),
   };
 
@@ -47,7 +36,7 @@ describe('ScheduleRecipeModalComponent', () => {
         { provide: MatDialogRef, useValue: dialogRefMock },
         { provide: ScheduleService, useValue: scheduleServiceMock },
         { provide: HouseholdService, useValue: householdServiceMock },
-        { provide: GroceryListService, useValue: groceryListServiceMock },
+        { provide: UserService, useValue: userServiceMock },
       ],
     }).compileComponents();
   });
@@ -56,7 +45,7 @@ describe('ScheduleRecipeModalComponent', () => {
     dialogRefMock.close.calls.reset();
     scheduleServiceMock.scheduleRecipe.calls.reset();
     householdServiceMock.getAll.calls.reset();
-    groceryListServiceMock.getAvailableLists.calls.reset();
+    userServiceMock.get.calls.reset();
     TestBed.resetTestingModule();
   });
 
@@ -68,16 +57,17 @@ describe('ScheduleRecipeModalComponent', () => {
     component.form.patchValue({
       date: new Date(2026, 3, 19),
       mealType: 'DINNER',
-      groceryListMode: 'AUTO',
+      groceryListMode: 'ACTIVE',
     });
     component.onSubmit();
 
     const payload = scheduleServiceMock.scheduleRecipe.calls.mostRecent().args[0];
-    expect(component.form.controls.groceryListMode.value).toBe('AUTO');
+    expect(component.form.controls.groceryListMode.value).toBe('ACTIVE');
+    expect(payload.householdId).toBe(14);
     expect(Object.prototype.hasOwnProperty.call(payload, 'groceryListId')).toBeFalse();
   });
 
-  it('blocks submit when a specific shopping list should be selected but none is chosen', () => {
+  it('sends groceryListId as null when the user opts out of grocery list updates', () => {
     const fixture = TestBed.createComponent(ScheduleRecipeModalComponent);
     const component = fixture.componentInstance;
     fixture.detectChanges();
@@ -85,12 +75,11 @@ describe('ScheduleRecipeModalComponent', () => {
     component.form.patchValue({
       date: new Date(2026, 3, 19),
       mealType: 'DINNER',
-      groceryListMode: 'EXISTING',
-      groceryListId: null,
+      groceryListMode: 'NONE',
     });
     component.onSubmit();
 
-    expect(component.form.hasError('groceryListRequired')).toBeTrue();
-    expect(scheduleServiceMock.scheduleRecipe).not.toHaveBeenCalled();
+    const payload = scheduleServiceMock.scheduleRecipe.calls.mostRecent().args[0];
+    expect(payload.groceryListId).toBeNull();
   });
 });

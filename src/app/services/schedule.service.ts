@@ -5,14 +5,14 @@ import { BehaviorSubject, map, tap } from 'rxjs';
 
 export type MealType = 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK' | 'OTHER';
 
-export type GroceryListAssignmentMode = 'AUTO' | 'NONE' | 'EXISTING';
+export type GroceryListAssignmentMode = 'ACTIVE' | 'NONE';
 
 export interface ScheduleRecipeDto {
   recipeId: number;
 
   scheduleDate: string;
 
-  householdId: number;
+  householdId?: number;
 
   mealType: MealType;
 
@@ -24,7 +24,7 @@ export interface ScheduleRecipeRequest {
 
   scheduleDate: string;
 
-  householdId: number;
+  householdId?: number;
 
   mealType: MealType;
 
@@ -34,23 +34,13 @@ export interface ScheduleRecipeRequest {
 }
 
 export function createScheduleRecipeDto({
-  groceryListMode = 'AUTO',
-  groceryListId,
+  groceryListMode = 'ACTIVE',
   ...scheduleRecipe
 }: ScheduleRecipeRequest): ScheduleRecipeDto {
   const dto: ScheduleRecipeDto = { ...scheduleRecipe };
 
   if (groceryListMode === 'NONE') {
     dto.groceryListId = null;
-    return dto;
-  }
-
-  if (groceryListMode === 'EXISTING') {
-    if (typeof groceryListId !== 'number' || groceryListId <= 0) {
-      throw new Error('A valid shopping list must be selected.');
-    }
-
-    dto.groceryListId = groceryListId;
   }
 
   return dto;

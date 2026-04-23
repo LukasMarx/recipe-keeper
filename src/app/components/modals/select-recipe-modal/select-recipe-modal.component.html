@@ -180,34 +180,14 @@
                 }
               </div>
 
-              @if (shouldShowGroceryListPicker()) {
-                @if (availableGroceryLists$ | async; as groceryLists) {
-                  @if (groceryLists.length) {
-                    <div class="grocery-list-picker" role="list" aria-label="Existing shopping lists">
-                      @for (groceryList of groceryLists; track groceryList.id) {
-                        <button
-                          type="button"
-                          class="grocery-list-card"
-                          [class.grocery-list-card--selected]="isGroceryListSelected(groceryList.id)"
-                          (click)="selectGroceryList(groceryList.id)"
-                        >
-                          <span class="grocery-list-card__title">{{ groceryList.name }}</span>
-                          @if (groceryList.details) {
-                            <span class="grocery-list-card__details">{{ groceryList.details }}</span>
-                          }
-                        </button>
-                      }
-                    </div>
-                  } @else {
-                    <div class="settings-empty" aria-live="polite">
-                      No accessible shopping lists exist for the selected planning context yet.
-                    </div>
-                  }
-                }
-              }
-
-              @if (hasGroceryListSelectionError()) {
-                <p class="field-error" aria-live="polite">Choose an existing shopping list.</p>
+              @if (isGroceryListModeSelected('ACTIVE')) {
+                <div class="settings-empty" aria-live="polite">
+                  Ingredients will be added to the current grocery list for the selected household.
+                </div>
+              } @else {
+                <div class="settings-empty" aria-live="polite">
+                  This recipe will be scheduled without creating grocery items.
+                </div>
               }
             </section>
 

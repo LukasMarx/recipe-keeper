@@ -1,19 +1,9 @@
-<h2 mat-dialog-title>Add grocery list</h2>
+<h2 mat-dialog-title>Update grocery list name</h2>
 <mat-dialog-content>
   <form [formGroup]="form">
     <mat-form-field class="full-width">
       <mat-label>Name</mat-label>
       <input matInput formControlName="name" />
-    </mat-form-field>
-    <mat-form-field class="full-width">
-      <mat-label>Planned date</mat-label>
-      <input matInput [matDatepicker]="picker" formControlName="date" />
-
-      <mat-datepicker-toggle
-        matIconSuffix
-        [for]="picker"
-      ></mat-datepicker-toggle>
-      <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
   </form>
 </mat-dialog-content>
