@@ -45,6 +45,7 @@ export interface Recipe {
   cookTime?: number | null;
   totalTime?: number | null;
   recipeYield: number;
+  portions?: number;
   sourceUrl?: string | null;
   createDate?: Date | string;
   updateDate?: Date | string;

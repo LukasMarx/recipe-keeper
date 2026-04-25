@@ -86,23 +86,6 @@ app-header {
   font-size: 48px;
 }
 
-.recipe-card__favorite {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--home-card-background);
-  color: var(--home-accent-strong);
-  box-shadow: 0 6px 16px var(--home-shadow);
-
-  mat-icon {
-    transform: scale(0.8);
-  }
-}
 
 .recipe-card__status {
   position: absolute;

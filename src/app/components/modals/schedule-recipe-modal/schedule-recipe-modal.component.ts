@@ -21,6 +21,12 @@ import {
 } from '../../../services/schedule.service';
 import { UserService } from '../../../services/user.service';
 
+type ScheduleRecipeModalData = {
+  recipeId: number;
+  portionCount?: number;
+  recipeYield?: number;
+};
+
 function normalizeHouseholdId(householdId: number | null | undefined) {
   return householdId && householdId > 0 ? householdId : undefined;
 }
@@ -73,15 +79,20 @@ export class ScheduleRecipeModalComponent {
   private readonly householdService = inject(HouseholdService);
   private readonly userService = inject(UserService);
   private readonly dialogRef = inject(MatDialogRef);
-  private readonly data = inject(DIALOG_DATA);
+  private readonly data = inject(DIALOG_DATA) as ScheduleRecipeModalData;
 
   public households$ = this.householdService.getAll();
   public readonly submitError = signal<string | null>(null);
   public readonly isSubmitting = signal(false);
+  public readonly recipeYield = this.data.recipeYield ?? null;
 
   public form = new FormGroup({
     date: new FormControl(new Date(), Validators.required),
     mealType: new FormControl<MealType>('DINNER', Validators.required),
+    portionCount: new FormControl<number | null>(this.getInitialPortionCount(), [
+      Validators.required,
+      Validators.min(1),
+    ]),
     householdId: new FormControl<number | null>(null),
     addToGroceryList: new FormControl(true, Validators.required),
   });
@@ -123,6 +134,7 @@ export class ScheduleRecipeModalComponent {
     const payload = createScheduleRecipeDto({
       recipeId: this.data.recipeId,
       scheduleDate: addMinutes(new Date(dt), timezoneOffset * -1).toISOString(),
+      portionCount: this.form.controls.portionCount.value ?? undefined,
       householdId: normalizeHouseholdId(this.form.value.householdId),
       mealType: this.form.value.mealType as MealType,
       addToGroceryList: this.form.controls.addToGroceryList.value ?? true,
@@ -143,4 +155,18 @@ export class ScheduleRecipeModalComponent {
         },
       });
   }
+
+  private getInitialPortionCount() {
+    return normalizePositiveInteger(this.data.portionCount ?? this.data.recipeYield ?? 1);
+  }
+}
+
+function normalizePositiveInteger(value: number | null | undefined) {
+  const nextValue = Number(value);
+
+  if (!Number.isFinite(nextValue) || nextValue < 1) {
+    return 1;
+  }
+
+  return Math.round(nextValue);
 }

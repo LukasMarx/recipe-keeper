@@ -32,7 +32,7 @@ describe('ScheduleRecipeModalComponent', () => {
     await TestBed.configureTestingModule({
       imports: [NoopAnimationsModule, ScheduleRecipeModalComponent],
       providers: [
-        { provide: DIALOG_DATA, useValue: { recipeId: 9 } },
+        { provide: DIALOG_DATA, useValue: { recipeId: 9, portionCount: 3, recipeYield: 4 } },
         { provide: MatDialogRef, useValue: dialogRefMock },
         { provide: ScheduleService, useValue: scheduleServiceMock },
         { provide: HouseholdService, useValue: householdServiceMock },
@@ -65,6 +65,7 @@ describe('ScheduleRecipeModalComponent', () => {
     expect(component.form.controls.addToGroceryList.value).toBeTrue();
     expect(payload.householdId).toBe(14);
     expect(payload.addToGroceryList).toBeTrue();
+    expect(payload.portionCount).toBe(3);
   });
 
   it('sends addToGroceryList as false when the user opts out of grocery list updates', () => {

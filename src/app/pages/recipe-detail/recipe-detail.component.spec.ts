@@ -7,6 +7,7 @@ import { By } from '@angular/platform-browser';
 import { RecipeDetailComponent } from './recipe-detail.component';
 import { Recipe, RecipeImportTask } from '../../interfaces/recipe';
 import { RecipeService } from '../../services/recipe.service';
+import { ScheduleRecipeModalComponent } from '../../components/modals/schedule-recipe-modal/schedule-recipe-modal.component';
 
 describe('RecipeDetailComponent', () => {
   const dialogMock = {
@@ -147,5 +148,30 @@ describe('RecipeDetailComponent', () => {
     fixture.componentInstance.onDelete();
 
     expect(recipeServiceMock.deleteRecipe).toHaveBeenCalledWith(1);
+  });
+
+  it('passes the active portion count into the scheduling dialog', async () => {
+    await configureTestingModule(
+      createRecipe({
+        recipeYield: 2,
+        portions: 4,
+      })
+    );
+
+    const fixture = TestBed.createComponent(RecipeDetailComponent);
+    fixture.detectChanges();
+
+    fixture.componentInstance.onSchedule();
+
+    expect(dialogMock.open).toHaveBeenCalledWith(
+      ScheduleRecipeModalComponent,
+      jasmine.objectContaining({
+        data: jasmine.objectContaining({
+          recipeId: 1,
+          portionCount: 4,
+          recipeYield: 2,
+        }),
+      })
+    );
   });
 });

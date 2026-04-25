@@ -117,6 +117,10 @@ export class SelectRecipeModalComponent {
         this.data.mealType || 'DINNER',
         Validators.required
       ),
+      portionCount: new FormControl<number | null>(1, [
+        Validators.required,
+        Validators.min(1),
+      ]),
       householdId: new FormControl<number | null>(null),
       addToGroceryList: new FormControl(true, Validators.required),
     }
@@ -158,6 +162,10 @@ export class SelectRecipeModalComponent {
 
   public closeModal() {
     this.dialogRef.close();
+  }
+
+  public clearSubmitError() {
+    this.submitError.set(null);
   }
 
   public selectDate(date: Date) {
@@ -249,6 +257,7 @@ export class SelectRecipeModalComponent {
     const recipe = this.recipes.find(r => r.id === recipeId);
     if (recipe) {
       this.selectedRecipe.set(recipe);
+      this.form.controls.portionCount.setValue(this.getDefaultPortionCount(recipe));
     }
   }
 
@@ -265,6 +274,7 @@ export class SelectRecipeModalComponent {
     const payload = createScheduleRecipeDto({
       recipeId: this.selectedRecipe()!.id,
       scheduleDate: addMinutes(new Date(dt), timezoneOffset * -1).toISOString(),
+      portionCount: this.form.controls.portionCount.value ?? undefined,
       householdId: normalizeHouseholdId(this.form.value.householdId),
       mealType: this.form.value.mealType as MealType,
       addToGroceryList: this.form.controls.addToGroceryList.value ?? true,
@@ -285,5 +295,15 @@ export class SelectRecipeModalComponent {
           );
         },
       });
+  }
+
+  private getDefaultPortionCount(recipe: Recipe) {
+    const portionCount = Number(recipe.portions ?? recipe.recipeYield);
+
+    if (!Number.isFinite(portionCount) || portionCount < 1) {
+      return 1;
+    }
+
+    return Math.round(portionCount);
   }
 }

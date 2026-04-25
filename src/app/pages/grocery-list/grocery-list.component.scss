@@ -616,9 +616,6 @@
     padding-left: 0;
   }
 
-  .source-item {
-    grid-template-columns: 24px minmax(0, 1fr);
-  }
 
   .source-editor {
     grid-column: 1 / -1;

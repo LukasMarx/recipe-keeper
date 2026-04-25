@@ -18,6 +18,7 @@ describe('createScheduleRecipeDto', () => {
     return {
       recipeId: 42,
       scheduleDate: '2026-04-19T00:00:00.000Z',
+      portionCount: 3,
       householdId: 7,
       mealType: 'DINNER',
       addToGroceryList: true,
@@ -49,6 +50,12 @@ describe('createScheduleRecipeDto', () => {
     const payload = createScheduleRecipeDto(createRequest({ householdId: undefined }));
 
     expect(Object.prototype.hasOwnProperty.call(payload, 'householdId')).toBeFalse();
+  });
+
+  it('includes a positive portion count when provided', () => {
+    const payload = createScheduleRecipeDto(createRequest({ portionCount: 4 }));
+
+    expect(payload.portionCount).toBe(4);
   });
 });
 

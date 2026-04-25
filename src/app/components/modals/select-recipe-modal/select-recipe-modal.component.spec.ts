@@ -79,7 +79,7 @@ describe('SelectRecipeModalComponent', () => {
     const component = fixture.componentInstance;
     fixture.detectChanges();
 
-    component.selectedRecipe.set(createRecipe());
+    component.onRecipeClick(3);
     component.form.patchValue({
       addToGroceryList: false,
     });
@@ -87,6 +87,7 @@ describe('SelectRecipeModalComponent', () => {
 
     const payload = scheduleServiceMock.scheduleRecipe.calls.mostRecent().args[0];
     expect(payload.addToGroceryList).toBeFalse();
+    expect(payload.portionCount).toBe(2);
   });
 
   it('defaults addToGroceryList to true when ingredients should be added', () => {
@@ -94,7 +95,7 @@ describe('SelectRecipeModalComponent', () => {
     const component = fixture.componentInstance;
     fixture.detectChanges();
 
-    component.selectedRecipe.set(createRecipe());
+    component.onRecipeClick(3);
     component.form.patchValue({
       addToGroceryList: true,
     });
@@ -103,5 +104,6 @@ describe('SelectRecipeModalComponent', () => {
     const payload = scheduleServiceMock.scheduleRecipe.calls.mostRecent().args[0];
     expect(payload.householdId).toBe(14);
     expect(payload.addToGroceryList).toBeTrue();
+    expect(payload.portionCount).toBe(2);
   });
 });

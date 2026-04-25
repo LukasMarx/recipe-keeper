@@ -11,13 +11,12 @@ import { ScheduleRecipeModalComponent } from '../../components/modals/schedule-r
 import {
   getIngredientDisplayName,
   getIngredientDisplayPlural,
-  Ingredient,
   RecipeIngredient,
 } from '../../interfaces/ingredient';
 import { Instruction } from '../../interfaces/instruction';
 import { Recipe, RecipeImportTask } from '../../interfaces/recipe';
 import { Location } from '@angular/common';
-import { distinctUntilChanged, map, switchMap } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, filter, map, switchMap } from 'rxjs';
 
 type RecipeSection = 'ingredients' | 'instructions';
 type DetailIngredient = {
@@ -31,6 +30,11 @@ type DetailIngredient = {
 type ResolvedRecipe = Recipe & {
   detailIngredients: DetailIngredient[];
   resolvedInstructions: Instruction[];
+};
+type RecipeRequest = {
+  id: number;
+  portions?: number;
+  syncSelectedPortions?: boolean;
 };
 
 @Component({
@@ -73,18 +77,47 @@ export class RecipeDetailComponent {
   private readonly recipeService = inject(RecipeService);
   private readonly route = inject(ActivatedRoute);
   private readonly dialogService = inject(MatDialog);
+  private readonly recipeRequest$ = new BehaviorSubject<RecipeRequest | null>(null);
 
   recipe = signal<ResolvedRecipe | undefined>(undefined);
+  selectedPortions = signal<number | null>(null);
 
   constructor() {
     this.route.params
       .pipe(
         map((params) => Number(params['id'])),
         distinctUntilChanged(),
-        switchMap((id) => this.recipeService.getRecipe(id, true)),
         takeUntilDestroyed()
       )
-      .subscribe((recipe) => this.recipe.set(this.resolveRecipe(recipe)));
+      .subscribe((id) => {
+        this.recipe.set(undefined);
+        this.selectedPortions.set(null);
+        this.recipeRequest$.next({
+          id,
+          syncSelectedPortions: true,
+        });
+      });
+
+    this.recipeRequest$
+      .pipe(
+        filter((request): request is RecipeRequest => !!request),
+        switchMap((request) =>
+          this.recipeService.getRecipe(request.id, true, request.portions).pipe(
+            map((recipe) => ({
+              recipe,
+              syncSelectedPortions: request.syncSelectedPortions ?? false,
+            }))
+          )
+        ),
+        takeUntilDestroyed()
+      )
+      .subscribe(({ recipe, syncSelectedPortions }) => {
+        this.recipe.set(this.resolveRecipe(recipe));
+
+        if (syncSelectedPortions || this.selectedPortions() === null) {
+          this.selectedPortions.set(this.getRecipePortions(recipe));
+        }
+      });
   }
 
   onBack() {
@@ -105,8 +138,31 @@ export class RecipeDetailComponent {
     this.dialogService.open(ScheduleRecipeModalComponent, {
       data: {
         recipeId: currentRecipe.id,
+        portionCount: this.getRecipePortions(currentRecipe),
+        recipeYield: currentRecipe.recipeYield,
       },
     });
+  }
+
+  displayedPortions() {
+    return this.selectedPortions() ?? this.getRecipePortions(this.recipe());
+  }
+
+  onPortionsInput(event: Event) {
+    const target = event.target as HTMLInputElement | null;
+    const nextPortions = this.normalizePortions(target?.value);
+
+    if (nextPortions === null) {
+      this.selectedPortions.set(this.getRecipePortions(this.recipe()));
+      return;
+    }
+
+    this.loadRecipeForPortions(nextPortions);
+  }
+
+  adjustPortions(delta: number) {
+    const nextPortions = Math.max(1, this.displayedPortions() + delta);
+    this.loadRecipeForPortions(nextPortions);
   }
 
   ingredientIcon(ingredient: RecipeIngredient): string {
@@ -476,5 +532,58 @@ export class RecipeDetailComponent {
       case 'COMPLETED':
         return 3;
     }
+  }
+
+  private loadRecipeForPortions(portions: number) {
+    const currentRecipe = this.recipe();
+
+    if (!currentRecipe) {
+      return;
+    }
+
+    const nextPortions = this.normalizePortions(portions);
+
+    if (nextPortions === null) {
+      return;
+    }
+
+    this.selectedPortions.set(nextPortions);
+
+    if (this.getRecipePortions(currentRecipe) === nextPortions) {
+      return;
+    }
+
+    this.recipeRequest$.next({
+      id: currentRecipe.id,
+      portions: nextPortions,
+    });
+  }
+
+  private getRecipePortions(
+    recipe: Pick<Recipe, 'portions' | 'recipeYield'> | undefined
+  ) {
+    const portions = Number(recipe?.portions);
+
+    if (Number.isFinite(portions) && portions > 0) {
+      return Math.round(portions);
+    }
+
+    const recipeYield = Number(recipe?.recipeYield);
+
+    if (Number.isFinite(recipeYield) && recipeYield > 0) {
+      return Math.round(recipeYield);
+    }
+
+    return 1;
+  }
+
+  private normalizePortions(portions: number | string | null | undefined) {
+    const value = Number(portions);
+
+    if (!Number.isFinite(value) || value < 1) {
+      return null;
+    }
+
+    return Math.round(value);
   }
 }

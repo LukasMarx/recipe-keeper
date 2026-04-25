@@ -11,10 +11,7 @@
   min-height: 100%;
   padding: 0 0 32px;
   box-sizing: border-box;
-  background:
-    radial-gradient(circle at top left, rgba(170, 255, 75, 0.14), transparent 34%),
-    radial-gradient(circle at 90% 38%, rgba(125, 214, 72, 0.08), transparent 28%),
-    linear-gradient(180deg, #f7f6ef 0%, #f2f1ea 52%, #ededE6 100%);
+  background: var(--gl-c);
   overflow: hidden;
 }
 

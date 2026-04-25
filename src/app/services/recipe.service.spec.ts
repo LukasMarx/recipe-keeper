@@ -72,4 +72,38 @@ describe('RecipeService', () => {
 
     expect(result.id).toBe(7);
   });
+
+  it('requests recipe details with the selected portions and locale', () => {
+    let result: any;
+
+    service.getRecipe(7, true, 4).subscribe((recipe) => {
+      result = recipe;
+    });
+
+    const request = httpTestingController.expectOne(
+      (req) =>
+        req.url === 'recipe/7' &&
+        req.params.get('locale') === 'de' &&
+        req.params.get('portions') === '4'
+    );
+
+    request.flush({
+      id: 7,
+      title: 'Kartoffelsuppe',
+      description: '',
+      userId: 1,
+      imageUrl: '',
+      ingredients: [],
+      instructions: [],
+      recipeYield: 2,
+      portions: 4,
+      createDate: '2026-04-17T00:00:00.000Z',
+      updateDate: '2026-04-17T00:00:00.000Z',
+      keywords: [],
+      ingredientsList: [],
+      status: 'READY',
+    });
+
+    expect(result.portions).toBe(4);
+  });
 });

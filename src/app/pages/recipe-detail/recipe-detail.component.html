@@ -61,12 +61,48 @@
           <span>{{ currentRecipe.calories }} kcal</span>
         </div>
         }
-
-        <div class="stat-pill">
-          <mat-icon>restaurant</mat-icon>
-          <span>{{ currentRecipe.recipeYield }} Portions</span>
-        </div>
       </div>
+
+      <section class="portion-panel" aria-label="Portion controls">
+        <div class="portion-panel__copy">
+          <span class="portion-panel__label">Portions</span>
+          <span class="portion-panel__hint">Original recipe yield: {{ currentRecipe.recipeYield }}</span>
+        </div>
+
+        <div class="portion-stepper">
+          <button
+            type="button"
+            class="portion-stepper__button"
+            aria-label="Reduce portions"
+            [disabled]="!isRecipeReady(currentRecipe) || displayedPortions() <= 1"
+            (click)="adjustPortions(-1)"
+          >
+            -
+          </button>
+
+          <input
+            class="portion-stepper__input"
+            type="number"
+            min="1"
+            step="1"
+            inputmode="numeric"
+            aria-label="Number of portions"
+            [disabled]="!isRecipeReady(currentRecipe)"
+            [value]="displayedPortions()"
+            (change)="onPortionsInput($event)"
+          />
+
+          <button
+            type="button"
+            class="portion-stepper__button"
+            aria-label="Increase portions"
+            [disabled]="!isRecipeReady(currentRecipe)"
+            (click)="adjustPortions(1)"
+          >
+            +
+          </button>
+        </div>
+      </section>
       
       <div class="summary-card__actions">
         <button

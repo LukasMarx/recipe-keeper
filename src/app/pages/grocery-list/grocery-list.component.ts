@@ -217,7 +217,7 @@ export class GroceryListComponent {
   }
 
   public handleQuickAddAdded() {
-    this.loadActiveList();
+    this.loadActiveList({ showLoading: false });
   }
 
   public formatQuantity(item: {
@@ -348,7 +348,7 @@ export class GroceryListComponent {
       .subscribe({
         next: () => {
           this.cancelEditingItem();
-          this.loadActiveList();
+          this.loadActiveList({ showLoading: false });
         },
         error: (error) => {
           this.actionError.set(
@@ -376,7 +376,7 @@ export class GroceryListComponent {
     )
       .pipe(finalize(() => this.pendingAggregatedItemId.set(null)))
       .subscribe({
-        next: () => this.loadActiveList(),
+        next: () => this.loadActiveList({ showLoading: false }),
         error: (error) => {
           this.actionError.set(
             extractErrorMessage(error) ?? 'The grocery item could not be updated.'
@@ -393,7 +393,7 @@ export class GroceryListComponent {
       .updateItem(item.id, { checked: !item.checked })
       .pipe(finalize(() => this.pendingRawItemId.set(null)))
       .subscribe({
-        next: () => this.loadActiveList(),
+        next: () => this.loadActiveList({ showLoading: false }),
         error: (error) => {
           this.actionError.set(
             extractErrorMessage(error) ?? 'The grocery item could not be updated.'
@@ -419,7 +419,7 @@ export class GroceryListComponent {
             this.cancelEditingItem();
           }
 
-          this.loadActiveList();
+          this.loadActiveList({ showLoading: false });
         },
         error: (error) => {
           this.actionError.set(
@@ -582,18 +582,29 @@ export class GroceryListComponent {
     });
   }
 
-  private loadActiveList() {
+  private loadActiveList(options?: { showLoading?: boolean }) {
     const householdId = this.activeHouseholdId();
     if (!householdId) {
       return;
     }
 
-    this.isLoadingActive.set(true);
+    const showLoading = options?.showLoading ?? true;
+
+    if (showLoading) {
+      this.isLoadingActive.set(true);
+    }
+
     this.activeListError.set(null);
 
     this.groceryListService
       .getActiveList(householdId)
-      .pipe(finalize(() => this.isLoadingActive.set(false)))
+      .pipe(
+        finalize(() => {
+          if (showLoading) {
+            this.isLoadingActive.set(false);
+          }
+        })
+      )
       .subscribe({
         next: (list) => {
           this.activeList.set(list);
@@ -615,7 +626,10 @@ export class GroceryListComponent {
           }
         },
         error: (error) => {
-          this.activeList.set(null);
+          if (showLoading) {
+            this.activeList.set(null);
+          }
+
           this.activeListError.set(
             extractErrorMessage(error) ?? 'The current grocery list could not be loaded.'
           );

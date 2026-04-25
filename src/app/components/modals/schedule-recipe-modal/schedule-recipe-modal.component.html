@@ -21,6 +21,21 @@
         <mat-option value="OTHER">Other</mat-option>
       </mat-select>
     </mat-form-field>
+    <mat-form-field class="full-width">
+      <mat-label>Portions</mat-label>
+      <input
+        matInput
+        type="number"
+        min="1"
+        step="1"
+        formControlName="portionCount"
+        (input)="clearSubmitError()"
+      />
+
+      @if (recipeYield) {
+        <mat-hint>Original recipe yield: {{ recipeYield }}</mat-hint>
+      }
+    </mat-form-field>
     <section class="grocery-assignment">
       <mat-checkbox
         [checked]="shouldAddIngredientsToGroceryList()"

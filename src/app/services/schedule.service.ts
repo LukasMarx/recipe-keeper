@@ -11,6 +11,8 @@ export interface ScheduleRecipeDto {
 
   scheduleDate: string;
 
+  portionCount?: number;
+
   householdId?: number;
 
   mealType: MealType;
@@ -23,6 +25,8 @@ export interface ScheduleRecipeRequest {
 
   scheduleDate: string;
 
+  portionCount?: number;
+
   householdId?: number;
 
   mealType: MealType;
@@ -33,12 +37,19 @@ export interface ScheduleRecipeRequest {
 export function createScheduleRecipeDto({
   householdId,
   addToGroceryList = true,
+  portionCount,
   ...scheduleRecipe
 }: ScheduleRecipeRequest): ScheduleRecipeDto {
   const dto: ScheduleRecipeDto = {
     ...scheduleRecipe,
     addToGroceryList,
   };
+
+  const normalizedPortionCount = normalizePortionCount(portionCount);
+
+  if (normalizedPortionCount !== undefined) {
+    dto.portionCount = normalizedPortionCount;
+  }
 
   if (householdId !== undefined) {
     dto.householdId = householdId;
@@ -52,6 +63,17 @@ export interface ScheduledRecipe {
   scheduledDate: Date;
   recipe: Recipe;
   mealType: MealType;
+  portionCount?: number;
+}
+
+function normalizePortionCount(portionCount: number | null | undefined) {
+  const value = Number(portionCount);
+
+  if (!Number.isFinite(value) || value < 1) {
+    return undefined;
+  }
+
+  return Math.round(value);
 }
 
 @Injectable({

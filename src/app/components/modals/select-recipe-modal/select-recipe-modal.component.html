@@ -122,6 +122,27 @@
           <form class="settings-form" [formGroup]="form">
             <section class="settings-section">
               <div class="section-heading">
+                <h3>Portions</h3>
+                @if (selectedRecipe(); as recipe) {
+                  <p>Original recipe yield: {{ recipe.recipeYield }}</p>
+                }
+              </div>
+
+              <label class="portion-field" for="schedule-portion-count">
+                <span class="portion-field__label">How many portions should be scheduled?</span>
+                <input
+                  id="schedule-portion-count"
+                  type="number"
+                  min="1"
+                  step="1"
+                  formControlName="portionCount"
+                  (input)="clearSubmitError()"
+                />
+              </label>
+            </section>
+
+            <section class="settings-section">
+              <div class="section-heading">
                 <h3>Select date</h3>
               </div>
 

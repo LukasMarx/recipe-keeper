@@ -33,7 +33,7 @@ export class RecipeService {
   private readonly recipeEntities = new BehaviorSubject<Map<number, Recipe>>(
     new Map<number, Recipe>()
   );
-  private readonly pendingRecipeRequests = new Set<number>();
+  private readonly pendingRecipeRequests = new Set<string>();
   private readonly refreshTimers = new Map<number, ReturnType<typeof setTimeout>>();
   private socket?: Socket;
   private activeSocketToken: string | null = null;
@@ -104,20 +104,24 @@ export class RecipeService {
     return this.myRecipes.asObservable();
   }
 
-  public getRecipe(id: number, force = false) {
+  public getRecipe(id: number, force = false, portions?: number) {
     const recipeId = Number(id);
+    const requestedPortions = this.normalizeRequestedPortions(portions);
 
     if (!Number.isFinite(recipeId)) {
       return EMPTY as Observable<Recipe>;
     }
 
-    if (force || !this.cache.has(recipeId)) {
-      this.requestRecipe(recipeId, true);
+    if (force || !this.matchesRequestedPortions(this.cache.get(recipeId), requestedPortions)) {
+      this.requestRecipe(recipeId, true, requestedPortions);
     }
 
     return this.recipeEntities.asObservable().pipe(
       map((recipes) => recipes.get(recipeId)),
-      filter((recipe): recipe is Recipe => !!recipe)
+      filter(
+        (recipe): recipe is Recipe =>
+          this.matchesRequestedPortions(recipe, requestedPortions)
+      )
     );
   }
 
@@ -210,34 +214,46 @@ export class RecipeService {
       .subscribe();
   }
 
-  private requestRecipe(recipeId: number, force = false) {
+  private requestRecipe(recipeId: number, force = false, portions?: number) {
     if (!Number.isFinite(recipeId)) {
       return;
     }
 
-    if (this.pendingRecipeRequests.has(recipeId)) {
+    const requestKey = this.getRecipeRequestKey(recipeId, portions);
+
+    if (this.pendingRecipeRequests.has(requestKey)) {
       return;
     }
 
-    if (!force && this.cache.has(recipeId)) {
+    if (!force && this.matchesRequestedPortions(this.cache.get(recipeId), portions)) {
       return;
     }
 
-    this.pendingRecipeRequests.add(recipeId);
+    this.pendingRecipeRequests.add(requestKey);
     this.http
       .get<Recipe>(`recipe/${recipeId}`, {
-        params: this.buildLocaleParams(),
+        params: this.buildRecipeParams(portions),
       })
       .pipe(
         tap((recipe) => {
-          this.upsertRecipe(this.normalizeRecipe(recipe));
+          this.upsertRecipe(this.normalizeRecipe(recipe), false, portions === undefined);
         }),
         catchError(() => EMPTY),
         finalize(() => {
-          this.pendingRecipeRequests.delete(recipeId);
+          this.pendingRecipeRequests.delete(requestKey);
         })
       )
       .subscribe();
+  }
+
+  private buildRecipeParams(portions?: number) {
+    let params = this.buildLocaleParams();
+
+    if (portions !== undefined) {
+      params = params.set('portions', `${portions}`);
+    }
+
+    return params;
   }
 
   private buildLocaleParams() {
@@ -311,11 +327,11 @@ export class RecipeService {
     return originUrl.origin;
   }
 
-  private upsertRecipe(recipe: Recipe, prepend = false) {
+  private upsertRecipe(recipe: Recipe, prepend = false, syncMyRecipes = true) {
     const storedRecipe = this.storeRecipe(recipe);
     const currentRecipes = this.myRecipes.value;
 
-    if (!currentRecipes) {
+    if (!syncMyRecipes || !currentRecipes) {
       return storedRecipe;
     }
 
@@ -401,6 +417,7 @@ export class RecipeService {
       cookTime: recipe.cookTime ?? currentRecipe?.cookTime ?? null,
       totalTime: recipe.totalTime ?? currentRecipe?.totalTime ?? null,
       recipeYield: recipe.recipeYield ?? currentRecipe?.recipeYield ?? 1,
+      portions: this.resolveRecipePortions(recipe, currentRecipe),
       sourceUrl: recipe.sourceUrl ?? currentRecipe?.sourceUrl ?? null,
       createDate: recipe.createDate ?? currentRecipe?.createDate,
       updateDate: recipe.updateDate ?? currentRecipe?.updateDate,
@@ -456,5 +473,59 @@ export class RecipeService {
 
   private isRecipePayload(payload: unknown): payload is Recipe {
     return !!payload && typeof payload === 'object' && 'id' in payload;
+  }
+
+  private normalizeRequestedPortions(portions?: number | null): number | undefined {
+    const value = Number(portions);
+
+    if (!Number.isFinite(value) || value < 1) {
+      return undefined;
+    }
+
+    return Math.round(value);
+  }
+
+  private matchesRequestedPortions(recipe: Recipe | undefined, portions?: number): boolean {
+    if (!recipe) {
+      return false;
+    }
+
+    const effectiveRequestedPortions = portions ?? this.resolveDefaultRecipePortions(recipe);
+
+    return this.resolveRecipePortions(recipe) === effectiveRequestedPortions;
+  }
+
+  private resolveRecipePortions(recipe: Partial<Recipe>, currentRecipe?: Recipe): number {
+    const recipePortions = Number(recipe.portions);
+
+    if (Number.isFinite(recipePortions) && recipePortions > 0) {
+      return Math.round(recipePortions);
+    }
+
+    const recipeYield = Number(recipe.recipeYield);
+
+    if (Number.isFinite(recipeYield) && recipeYield > 0) {
+      return Math.round(recipeYield);
+    }
+
+    if (currentRecipe) {
+      return this.resolveRecipePortions(currentRecipe);
+    }
+
+    return 1;
+  }
+
+  private resolveDefaultRecipePortions(recipe: Partial<Recipe>): number {
+    const recipeYield = Number(recipe.recipeYield);
+
+    if (Number.isFinite(recipeYield) && recipeYield > 0) {
+      return Math.round(recipeYield);
+    }
+
+    return 1;
+  }
+
+  private getRecipeRequestKey(recipeId: number, portions?: number): string {
+    return `${recipeId}:${portions ?? 'default'}`;
   }
 }
