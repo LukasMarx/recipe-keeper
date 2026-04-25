@@ -7,16 +7,14 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { catchError, debounceTime, distinctUntilChanged, finalize, forkJoin, map, of, startWith, switchMap } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 import {
   getIngredientDisplayName,
   getIngredientDisplayPlural,
 } from '../../interfaces/ingredient';
-import { IngredientService, IngredientSearchResult } from '../../services/ingredient.service';
 import { UserService } from '../../services/user.service';
 import {
   AggregatedGroceryListEntry,
@@ -24,38 +22,14 @@ import {
   GroceryListEntry,
   GroceryListService,
 } from '../../services/grocery-list.service';
+import { GroceryQuickAddComponent } from './components/grocery-quick-add/grocery-quick-add.component';
+import { GroceryCategory } from './components/grocery-quick-add/grocery-quick-add.models';
 
 type GroceryView = 'active' | 'archive';
-
-type GroceryCategory =
-  | 'dairy'
-  | 'fruit'
-  | 'vegetable'
-  | 'pastry'
-  | 'meat'
-  | 'fish'
-  | 'finishedProduct'
-  | 'seasoning'
-  | 'candy'
-  | 'beverages'
-  | 'other';
 
 interface GrocerySection {
   category: GroceryCategory;
   items: AggregatedGroceryListEntry[];
-}
-
-interface QuickAddSuggestion {
-  key: string;
-  name: string;
-  id: string;
-  category: GroceryCategory;
-  imageUrl: string | null;
-}
-
-interface SuggestionPart {
-  text: string;
-  match: boolean;
 }
 
 function extractErrorMessage(error: unknown) {
@@ -89,7 +63,13 @@ function normalizeHouseholdId(householdId: number | null | undefined) {
 @Component({
   selector: 'app-grocery-list',
   standalone: true,
-  imports: [CommonModule, MatIconModule, ReactiveFormsModule, MatSnackBarModule],
+  imports: [
+    CommonModule,
+    MatIconModule,
+    ReactiveFormsModule,
+    MatSnackBarModule,
+    GroceryQuickAddComponent,
+  ],
   templateUrl: './grocery-list.component.html',
   styleUrl: './grocery-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -98,7 +78,6 @@ export class GroceryListComponent {
   public readonly groceryListService = inject(GroceryListService);
 
   private readonly userService = inject(UserService);
-  private readonly ingredientService = inject(IngredientService);
   private readonly snackBar = inject(MatSnackBar);
 
   private readonly categoryOrder: GroceryCategory[] = [
@@ -137,25 +116,10 @@ export class GroceryListComponent {
   public readonly isCompletingList = signal(false);
   public readonly isDeletingArchivedList = signal<number | null>(null);
   public readonly expandedAggregatedItemIds = signal<number[]>([]);
-  public readonly isQuickAddFocused = signal(false);
-  public readonly activeSuggestionIndex = signal(-1);
-  public readonly selectedQuickAddSuggestion = signal<QuickAddSuggestion | null>(null);
 
   public readonly activeListError = signal<string | null>(null);
   public readonly archiveError = signal<string | null>(null);
   public readonly actionError = signal<string | null>(null);
-
-  public readonly addItemForm = new FormGroup({
-    amount: new FormControl(1, {
-      nonNullable: true,
-      validators: [Validators.required, Validators.min(0.01)],
-    }),
-    name: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    unit: new FormControl('', { nonNullable: true }),
-  });
 
   public readonly editItemForm = new FormGroup({
     amount: new FormControl(1, {
@@ -226,38 +190,6 @@ export class GroceryListComponent {
     return (this.checkedCount() / totalCount) * 100;
   });
 
-  public readonly quickAddSuggestions = toSignal(
-    this.addItemForm.controls.name.valueChanges.pipe(
-      startWith(this.addItemForm.controls.name.value),
-      map((value) => value.trim()),
-      distinctUntilChanged(),
-      debounceTime(250),
-      switchMap((query) => {
-        if (!this.isQuickAddFocused() || !query.length) {
-          return of<QuickAddSuggestion[]>([]);
-        }
-
-        return this.ingredientService.search(query, 8).pipe(
-          map((ingredients) => ingredients.map((ingredient) => this.mapQuickAddSuggestion(ingredient))),
-          catchError(() => of<QuickAddSuggestion[]>([]))
-        );
-      })
-    ),
-    { initialValue: [] }
-  );
-
-  public readonly isQuickAddSuggestionListVisible = computed(
-    () => !this.selectedQuickAddSuggestion() && this.quickAddSuggestions().length > 0
-  );
-
-  public readonly isQuickAddDetailVisible = computed(
-    () => this.selectedQuickAddSuggestion() !== null
-  );
-
-  public readonly isQuickAddOverlayVisible = computed(
-    () => this.isQuickAddSuggestionListVisible() || this.isQuickAddDetailVisible()
-  );
-
   public readonly archivePage = computed(
     () => Math.floor(this.archiveOffset() / this.archiveLimit) + 1
   );
@@ -278,151 +210,12 @@ export class GroceryListComponent {
     this.selectedFilter.set(filter);
   }
 
-  public handleQuickAddFocus() {
-    if (this.selectedQuickAddSuggestion()) {
-      return;
-    }
-
-    this.isQuickAddFocused.set(true);
+  public setActionError(message: string | null) {
+    this.actionError.set(message);
   }
 
-  public handleQuickAddInput() {
-    if (this.selectedQuickAddSuggestion()) {
-      this.selectedQuickAddSuggestion.set(null);
-      this.addItemForm.controls.amount.setValue(1);
-      this.addItemForm.controls.unit.setValue('');
-    }
-
-    this.isQuickAddFocused.set(true);
-    this.activeSuggestionIndex.set(-1);
-  }
-
-  public handleQuickAddFocusOut(event: FocusEvent) {
-    const currentTarget = event.currentTarget;
-    const nextTarget = event.relatedTarget;
-
-    if (
-      currentTarget instanceof HTMLElement &&
-      nextTarget instanceof Node &&
-      currentTarget.contains(nextTarget)
-    ) {
-      return;
-    }
-
-    this.isQuickAddFocused.set(false);
-    this.activeSuggestionIndex.set(-1);
-  }
-
-  public handleQuickAddKeydown(event: KeyboardEvent) {
-    const suggestions = this.quickAddSuggestions();
-    if (!suggestions.length) {
-      if (event.key === 'Escape') {
-        this.isQuickAddFocused.set(false);
-        this.activeSuggestionIndex.set(-1);
-      }
-
-      return;
-    }
-
-    if (event.key === 'ArrowDown') {
-      event.preventDefault();
-      this.activeSuggestionIndex.update((currentIndex) =>
-        Math.min(currentIndex + 1, suggestions.length - 1)
-      );
-      return;
-    }
-
-    if (event.key === 'ArrowUp') {
-      event.preventDefault();
-      this.activeSuggestionIndex.update((currentIndex) =>
-        currentIndex <= 0 ? suggestions.length - 1 : currentIndex - 1
-      );
-      return;
-    }
-
-    if (event.key === 'Enter' && this.activeSuggestionIndex() > -1) {
-      event.preventDefault();
-      this.applyQuickAddSuggestion(suggestions[this.activeSuggestionIndex()]);
-      return;
-    }
-
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      this.isQuickAddFocused.set(false);
-      this.activeSuggestionIndex.set(-1);
-    }
-  }
-
-  public setActiveSuggestionIndex(index: number) {
-    this.activeSuggestionIndex.set(index);
-  }
-
-  public dismissQuickAddSuggestions() {
-    this.isQuickAddFocused.set(false);
-    this.activeSuggestionIndex.set(-1);
-    this.selectedQuickAddSuggestion.set(null);
-  }
-
-  public applyQuickAddSuggestion(suggestion: QuickAddSuggestion) {
-    this.addItemForm.controls.name.setValue(suggestion.name);
-    this.selectedQuickAddSuggestion.set(suggestion);
-    this.addItemForm.controls.amount.setValue(1);
-    this.addItemForm.controls.unit.setValue('');
-    this.isQuickAddFocused.set(false);
-    this.activeSuggestionIndex.set(-1);
-  }
-
-  public returnToQuickAddSuggestions() {
-    if (!this.selectedQuickAddSuggestion()) {
-      return;
-    }
-
-    this.selectedQuickAddSuggestion.set(null);
-    this.isQuickAddFocused.set(true);
-    this.activeSuggestionIndex.set(-1);
-  }
-
-  public increaseQuickAddAmount() {
-    this.addItemForm.controls.amount.setValue(this.addItemForm.controls.amount.value + 1);
-  }
-
-  public decreaseQuickAddAmount() {
-    const nextAmount = Math.max(1, this.addItemForm.controls.amount.value - 1);
-    this.addItemForm.controls.amount.setValue(nextAmount);
-  }
-
-  public getQuickAddSuggestionOptionId(index: number) {
-    return `quick-add-suggestion-${index}`;
-  }
-
-  public getQuickAddSuggestionParts(name: string): SuggestionPart[] {
-    const query = this.normalizeSearchValue(this.addItemForm.controls.name.value);
-    if (!query) {
-      return [{ text: name, match: false }];
-    }
-
-    const normalizedName = this.normalizeSearchValue(name);
-    const matchIndex = normalizedName.indexOf(query);
-
-    if (matchIndex < 0) {
-      return [{ text: name, match: false }];
-    }
-
-    const parts: SuggestionPart[] = [];
-    if (matchIndex > 0) {
-      parts.push({ text: name.slice(0, matchIndex), match: false });
-    }
-
-    parts.push({
-      text: name.slice(matchIndex, matchIndex + query.length),
-      match: true,
-    });
-
-    if (matchIndex + query.length < name.length) {
-      parts.push({ text: name.slice(matchIndex + query.length), match: false });
-    }
-
-    return parts;
+  public handleQuickAddAdded() {
+    this.loadActiveList();
   }
 
   public formatQuantity(item: {
@@ -629,47 +422,6 @@ export class GroceryListComponent {
         error: (error) => {
           this.actionError.set(
             extractErrorMessage(error) ?? 'The grocery item could not be removed.'
-          );
-        },
-      });
-  }
-
-  public addManualItem() {
-    if (this.addItemForm.invalid) {
-      this.addItemForm.markAllAsTouched();
-      return;
-    }
-
-    const householdId = this.activeHouseholdId();
-    if (!householdId) {
-      this.actionError.set('Select an active household before adding grocery items.');
-      return;
-    }
-
-    this.actionError.set(null);
-    this.isAddingItem.set(true);
-
-    const value = this.addItemForm.getRawValue();
-    const selectedSuggestion = this.selectedQuickAddSuggestion();
-
-    this.groceryListService
-      .addManualItem({
-        amount: value.amount,
-        householdId,
-        ingredientId: selectedSuggestion?.id,
-        name: value.name.trim(),
-        unit: value.unit.trim() || undefined,
-      })
-      .pipe(finalize(() => this.isAddingItem.set(false)))
-      .subscribe({
-        next: () => {
-          this.addItemForm.reset({ amount: 1, name: '', unit: '' });
-          this.dismissQuickAddSuggestions();
-          this.loadActiveList();
-        },
-        error: (error) => {
-          this.actionError.set(
-            extractErrorMessage(error) ?? 'The grocery item could not be added.'
           );
         },
       });
@@ -931,32 +683,4 @@ export class GroceryListComponent {
     return 'itemIds' in item;
   }
 
-  private mapQuickAddSuggestion(ingredient: IngredientSearchResult): QuickAddSuggestion {
-    return {
-      key: ingredient.id,
-      id: ingredient.id,
-      name:
-        getIngredientDisplayName(ingredient) ||
-        getIngredientDisplayPlural(ingredient) ||
-        ingredient.id,
-      category: this.normalizeIngredientCategory(ingredient.category),
-      imageUrl: ingredient.imageUrl ?? null,
-    };
-  }
-
-  private normalizeIngredientCategory(category: string | null | undefined): GroceryCategory {
-    if (category === 'fisch') {
-      return 'fish';
-    }
-
-    if (this.categoryOrder.includes(category as GroceryCategory)) {
-      return category as GroceryCategory;
-    }
-
-    return 'other';
-  }
-
-  private normalizeSearchValue(value: string | null | undefined) {
-    return (value ?? '').trim().replace(/\s+/g, ' ').toLocaleLowerCase();
-  }
 }

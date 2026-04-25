@@ -1,0 +1,72 @@
+<div
+  class="quick-add-layer"
+  [class.quick-add-layer--active]="isQuickAddOverlayVisible()"
+  (focusout)="handleQuickAddFocusOut($event)"
+>
+  @if (isQuickAddOverlayVisible()) {
+    <button
+      type="button"
+      class="quick-add-backdrop"
+      aria-label="Close quick add"
+      (click)="dismissQuickAddSuggestions()"
+    ></button>
+  }
+
+  <form
+    class="quick-add-dock"
+    [formGroup]="addItemForm"
+    (submit)="$event.preventDefault(); addManualItem()"
+  >
+    @if (isQuickAddDetailVisible() && selectedQuickAddSuggestion(); as selectedSuggestion) {
+      <app-quick-add-detail
+        [suggestion]="selectedSuggestion"
+        [form]="addItemForm"
+        [isAddingItem]="isAddingItem()"
+        (backRequested)="returnToQuickAddSuggestions()"
+        (increaseAmountRequested)="increaseQuickAddAmount()"
+        (decreaseAmountRequested)="decreaseQuickAddAmount()"
+      />
+    } @else if (isQuickAddSuggestionListVisible()) {
+      <app-quick-add-suggestions
+        [suggestions]="quickAddSuggestions()"
+        [activeSuggestionIndex]="activeSuggestionIndex()"
+        [query]="addItemForm.controls.name.value"
+        (suggestionSelected)="applyQuickAddSuggestion($event)"
+        (activeSuggestionIndexChange)="setActiveSuggestionIndex($event)"
+      />
+    }
+
+    @if (!isQuickAddDetailVisible()) {
+      <div class="quick-add-shell grocery-list-footer">
+        <span class="quick-add-prefix" aria-hidden="true">
+          <mat-icon>add</mat-icon>
+        </span>
+
+        <input
+          type="text"
+          formControlName="name"
+          class="quick-add-input"
+          placeholder="Quick add item..."
+          aria-label="Manual grocery item name"
+          autocomplete="off"
+          role="combobox"
+          [attr.aria-expanded]="isQuickAddSuggestionListVisible()"
+          [attr.aria-controls]="isQuickAddSuggestionListVisible() ? 'quick-add-suggestions' : null"
+          [attr.aria-activedescendant]="activeSuggestionIndex() > -1 ? getQuickAddSuggestionOptionId(activeSuggestionIndex()) : null"
+          (focus)="handleQuickAddFocus()"
+          (input)="handleQuickAddInput()"
+          (keydown)="handleQuickAddKeydown($event)"
+        />
+
+        <button
+          type="submit"
+          class="quick-add-submit"
+          aria-label="Add grocery item"
+          [disabled]="isAddingItem()"
+        >
+          <mat-icon>{{ isAddingItem() ? 'hourglass_top' : 'north' }}</mat-icon>
+        </button>
+      </div>
+    }
+  </form>
+</div>

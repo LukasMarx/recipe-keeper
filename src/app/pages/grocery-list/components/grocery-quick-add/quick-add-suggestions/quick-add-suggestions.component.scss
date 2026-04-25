@@ -1,0 +1,104 @@
+.quick-add-suggestions {
+  display: grid;
+  max-height: min(58vh, 460px);
+  overflow: hidden;
+  overflow-y: auto;
+  border-radius: 30px;
+  background: color-mix(in srgb, var(--gl-c) 88%, white);
+  border: 1px solid color-mix(in srgb, var(--gl-o) 92%, white);
+  box-shadow: 0 16px 36px color-mix(in srgb, var(--gl-sh) 64%, transparent);
+  backdrop-filter: blur(16px);
+}
+
+.quick-add-suggestion {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 18px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.quick-add-suggestion + .quick-add-suggestion {
+  border-top: 1px solid var(--gl-o);
+}
+
+.quick-add-suggestion.active,
+.quick-add-suggestion:hover,
+.quick-add-suggestion:focus-visible {
+  background: color-mix(in srgb, var(--gl-pt) 32%, transparent);
+  outline: 0;
+}
+
+.quick-add-suggestion__thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  object-fit: cover;
+}
+
+.quick-add-suggestion__thumb--placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gl-m);
+  border: 1px solid var(--gl-o);
+  background: color-mix(in srgb, var(--gl-s) 80%, white);
+}
+
+.quick-add-suggestion__thumb--placeholder mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.quick-add-suggestion__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.quick-add-suggestion__name {
+  display: block;
+  min-width: 0;
+  font-size: 1.02rem;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--gl-t);
+}
+
+.quick-add-suggestion__match {
+  color: var(--gl-pd);
+  font-weight: 700;
+}
+
+.quick-add-suggestion__meta {
+  color: var(--gl-m);
+  font-size: 0.84rem;
+}
+
+.quick-add-suggestion__icon {
+  color: var(--gl-m);
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 480px) {
+  .quick-add-suggestion {
+    grid-template-columns: 44px minmax(0, 1fr) 18px;
+    gap: 12px;
+    padding: 12px 14px;
+  }
+
+  .quick-add-suggestion__thumb {
+    width: 44px;
+    height: 44px;
+  }
+}

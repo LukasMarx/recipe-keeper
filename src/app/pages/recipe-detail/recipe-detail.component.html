@@ -18,14 +18,10 @@
       aria-label="Recipe actions"
       [matMenuTriggerFor]="menu"
     >
-      <mat-icon>favorite</mat-icon>
+      <mat-icon>more_vert</mat-icon>
     </button>
 
     <mat-menu #menu="matMenu">
-      <button mat-menu-item (click)="onEdit()">
-        <mat-icon>edit</mat-icon>
-        <span>Edit</span>
-      </button>
       <button mat-menu-item (click)="onDelete()">
         <mat-icon>delete</mat-icon>
         <span>Delete</span>

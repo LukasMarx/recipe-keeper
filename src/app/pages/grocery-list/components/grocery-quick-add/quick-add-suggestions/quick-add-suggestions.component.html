@@ -1,0 +1,45 @@
+<div
+  id="quick-add-suggestions"
+  class="quick-add-suggestions"
+  role="listbox"
+  aria-label="Suggested grocery items"
+>
+  @for (suggestion of suggestions(); track suggestion.key; let index = $index) {
+    <button
+      type="button"
+      class="quick-add-suggestion"
+      role="option"
+      [id]="getSuggestionOptionId(index)"
+      [class.active]="activeSuggestionIndex() === index"
+      [attr.aria-selected]="activeSuggestionIndex() === index"
+      (click)="selectSuggestion(suggestion)"
+      (focus)="setActiveSuggestionIndex(index)"
+      (pointerenter)="setActiveSuggestionIndex(index)"
+    >
+      @if (suggestion.imageUrl; as imageUrl) {
+        <img
+          class="quick-add-suggestion__thumb"
+          [src]="imageUrl"
+          [alt]="suggestion.name"
+        />
+      } @else {
+        <span class="quick-add-suggestion__thumb quick-add-suggestion__thumb--placeholder" aria-hidden="true">
+          <mat-icon>{{ groceryListService.getCategoryIcon(suggestion.category) }}</mat-icon>
+        </span>
+      }
+
+      <span class="quick-add-suggestion__copy">
+        <span class="quick-add-suggestion__name">
+          @for (part of getSuggestionParts(suggestion.name); track $index) {
+            <span [class.quick-add-suggestion__match]="part.match">{{ part.text }}</span>
+          }
+        </span>
+        <span class="quick-add-suggestion__meta">
+          {{ groceryListService.getCatergoryLabel(suggestion.category) | async }}
+        </span>
+      </span>
+
+      <mat-icon class="quick-add-suggestion__icon">north_west</mat-icon>
+    </button>
+  }
+</div>

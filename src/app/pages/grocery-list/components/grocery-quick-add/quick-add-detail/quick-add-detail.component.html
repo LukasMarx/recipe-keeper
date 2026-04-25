@@ -1,0 +1,86 @@
+<section class="quick-add-detail" aria-label="Configure grocery item" [formGroup]="form()">
+  <div class="quick-add-detail__header">
+    @if (suggestion().imageUrl; as imageUrl) {
+      <img
+        class="quick-add-detail__image"
+        [src]="imageUrl"
+        [alt]="suggestion().name"
+      />
+    } @else {
+      <span class="quick-add-detail__image quick-add-detail__image--placeholder" aria-hidden="true">
+        <mat-icon>{{ groceryListService.getCategoryIcon(suggestion().category) }}</mat-icon>
+      </span>
+    }
+
+    <div class="quick-add-detail__copy">
+      <span class="quick-add-detail__title">{{ suggestion().name }}</span>
+      <span class="quick-add-detail__meta">
+        {{ groceryListService.getCatergoryLabel(suggestion().category) | async }}
+      </span>
+    </div>
+
+    <button
+      type="button"
+      class="icon-button quick-add-detail__close"
+      aria-label="Back to ingredient suggestions"
+      (click)="requestBack()"
+    >
+      <mat-icon>west</mat-icon>
+    </button>
+  </div>
+
+  <div class="quick-add-detail__controls">
+    <div class="quick-add-amount">
+      <span class="quick-add-detail__label">Menge</span>
+
+      <div class="quick-add-amount__controls">
+        <button
+          type="button"
+          class="quick-add-amount__button"
+          aria-label="Menge reduzieren"
+          (click)="requestDecreaseAmount()"
+        >
+          <mat-icon>remove</mat-icon>
+        </button>
+
+        <input
+          type="number"
+          min="1"
+          step="1"
+          formControlName="amount"
+          class="quick-add-amount__input"
+          aria-label="Menge"
+        />
+
+        <button
+          type="button"
+          class="quick-add-amount__button"
+          aria-label="Menge erhöhen"
+          (click)="requestIncreaseAmount()"
+        >
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <label class="quick-add-unit">
+      <span class="quick-add-detail__label">Einheit</span>
+      <input
+        type="text"
+        formControlName="unit"
+        class="quick-add-unit__input"
+        placeholder="z. B. Liter, Packung, Stk"
+        aria-label="Einheit"
+      />
+    </label>
+  </div>
+
+  <button
+    type="submit"
+    class="quick-add-detail__submit"
+    [disabled]="isAddingItem()"
+  >
+    <mat-icon>{{ isAddingItem() ? 'hourglass_top' : 'add_shopping_cart' }}</mat-icon>
+    <span>{{ isAddingItem() ? 'Wird hinzugefugt...' : 'Zur Liste hinzufugen' }}</span>
+  </button>
+</section>

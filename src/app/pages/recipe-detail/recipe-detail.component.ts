@@ -3,7 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { RecipeService } from '../../services/recipe.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
@@ -69,7 +69,6 @@ export class RecipeDetailComponent {
       this.location.back();
     });
   }
-  private readonly router = inject(Router);
   private readonly location = inject(Location);
   private readonly recipeService = inject(RecipeService);
   private readonly route = inject(ActivatedRoute);
@@ -90,16 +89,6 @@ export class RecipeDetailComponent {
 
   onBack() {
     this.location.back();
-  }
-
-  onEdit() {
-    const currentRecipe = this.recipe();
-
-    if (!currentRecipe) {
-      return;
-    }
-
-    this.router.navigate(['edit-recipe', currentRecipe.id]);
   }
 
   selectSection(section: RecipeSection) {

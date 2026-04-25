@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
+import { By } from '@angular/platform-browser';
 
 import { RecipeDetailComponent } from './recipe-detail.component';
 import { Recipe, RecipeImportTask } from '../../interfaces/recipe';
@@ -12,7 +13,7 @@ describe('RecipeDetailComponent', () => {
     open: jasmine.createSpy(),
   };
 
-  function createRecipe(overrides: Partial<Recipe>): Recipe {
+  function createRecipe(overrides: Partial<Recipe> = {}): Recipe {
     return {
       id: 1,
       title: 'Paprika-Sahne-Haehnchen von Sister',
@@ -58,6 +59,8 @@ describe('RecipeDetailComponent', () => {
         { provide: MatDialog, useValue: dialogMock },
       ],
     }).compileComponents();
+
+    return recipeServiceMock;
   }
 
   afterEach(() => {
@@ -127,5 +130,22 @@ describe('RecipeDetailComponent', () => {
         amount: 1,
       })
     ).toBe('1 Kartoffel lokalisiert');
+  });
+
+  it('shows a three-dot actions trigger and deletes the current recipe', async () => {
+    const recipeServiceMock = await configureTestingModule(createRecipe());
+
+    const fixture = TestBed.createComponent(RecipeDetailComponent);
+    fixture.detectChanges();
+
+    const icons = fixture.debugElement
+      .queryAll(By.css('.detail-header mat-icon'))
+      .map((icon) => (icon.nativeElement.textContent ?? '').trim());
+
+    expect(icons).toContain('more_vert');
+
+    fixture.componentInstance.onDelete();
+
+    expect(recipeServiceMock.deleteRecipe).toHaveBeenCalledWith(1);
   });
 });
