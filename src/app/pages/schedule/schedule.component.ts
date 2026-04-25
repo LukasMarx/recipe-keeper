@@ -21,6 +21,7 @@ import {
 } from '../../services/schedule.service';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
+import { HeaderComponent } from '../../components/header/header.component';
 
 const DAYS_TO_SHOW = 7;
 const PRIMARY_MEAL_TYPES: MealType[] = ['BREAKFAST', 'LUNCH', 'DINNER'];
@@ -36,7 +37,7 @@ const MEAL_LABELS: Record<MealType, string> = {
 @Component({
   selector: 'app-schedule',
   standalone: true,
-  imports: [CommonModule, ScheduleItemComponent, MatDialogModule, MatIconModule],
+  imports: [CommonModule, ScheduleItemComponent, MatDialogModule, MatIconModule, HeaderComponent],
   templateUrl: './schedule.component.html',
   styleUrl: './schedule.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

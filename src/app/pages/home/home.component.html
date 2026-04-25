@@ -1,34 +1,13 @@
 <section class="home-page">
-  <header class="topbar">
-    <button
-      class="icon-button"
-      mat-icon-button
-      type="button"
-      aria-label="Search saved recipes"
-    >
-      <mat-icon>search</mat-icon>
-    </button>
-
-    <div class="brand" aria-label="RecipeKeeper home">
-      <img class="brand-logo" src="logo_small.png" alt="" />
-      <span class="brand-name">RecipeKeeper</span>
-    </div>
-
-    <button
-      class="icon-button"
-      mat-icon-button
-      type="button"
-      aria-label="Add recipe"
-      (click)="addRecipe()"
-    >
-      <mat-icon>add</mat-icon>
-    </button>
-  </header>
-
-  <section class="hero">
-    <h1 class="hero-title">My Cookbook</h1>
-    <p class="hero-subtitle">Your saved culinary inspirations.</p>
-  </section>
+  <app-header
+    eyebrow="RecipeKeeper"
+    title="My Cookbook"
+    subtitle="Your saved culinary inspirations."
+    actionLabel="Add recipe"
+    actionIcon="add"
+    actionAriaLabel="Add recipe"
+    (actionTriggered)="addRecipe()"
+  ></app-header>
 
   <section class="recipe-grid" aria-label="Saved recipes">
     @if (recipes$ | async; as recipes) {

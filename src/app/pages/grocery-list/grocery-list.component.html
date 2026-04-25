@@ -1,27 +1,15 @@
 <div class="grocery-screen">
-  <header class="topbar">
-    <div class="topbar-copy">
-      <span class="topbar-eyebrow">Household groceries</span>
-      <h1>{{ view() === 'active' ? 'Current Grocery List' : 'Archive' }}</h1>
-      @if (view() === 'active' && activeList(); as list) {
-        <p>{{ list.name }}</p>
-      } @else if (view() === 'archive') {
-        <p>Browse completed grocery runs for the active household.</p>
-      }
-    </div>
-
-    @if (view() === 'active') {
-      <button
-        type="button"
-        class="topbar-action"
-        [disabled]="!activeList() || isCompletingList() || isLoadingActive()"
-        (click)="completeShopping()"
-      >
-        <mat-icon>inventory_2</mat-icon>
-        <span>{{ isCompletingList() ? 'Archiving...' : 'Complete shopping' }}</span>
-      </button>
-    }
-  </header>
+  <app-header
+    eyebrow="Household groceries"
+    [title]="view() === 'active' ? 'Current Grocery List' : 'Archive'"
+    [subtitle]="view() === 'active' ? activeList()?.name ?? null : 'Browse completed grocery runs for the active household.'"
+    [sticky]="true"
+    [actionLabel]="view() === 'active' ? (isCompletingList() ? 'Archiving...' : 'Complete shopping') : null"
+    actionIcon="inventory_2"
+    actionAriaLabel="Complete shopping"
+    [actionDisabled]="!activeList() || isCompletingList() || isLoadingActive()"
+    (actionTriggered)="completeShopping()"
+  ></app-header>
 
   <div class="grocery-screen__inner">
     <section class="view-switcher" aria-label="Grocery list views">

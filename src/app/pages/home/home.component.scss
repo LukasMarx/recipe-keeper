@@ -6,68 +6,16 @@
 .home-page {
   min-height: 100%;
   box-sizing: border-box;
-  padding: 20px 24px 32px;
+  padding: 0 0 32px;
   background:
     radial-gradient(circle at top left, var(--home-background-glow) 0, transparent 36%),
     linear-gradient(180deg, var(--home-background) 0%, var(--home-background-soft) 100%);
   color: var(--home-text);
 }
 
-.topbar {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 12px;
-}
-
-.icon-button {
-  color: var(--home-accent);
-}
-
-.brand {
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.brand-logo {
-  width: 44px;
-  height: 44px;
-  border-radius: 16px;
-  background: var(--home-brand-chip);
-  padding: 4px;
-  box-sizing: border-box;
-}
-
-.brand-name {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: clamp(1.5rem, 5vw, 2.3rem);
-  font-weight: 800;
-  letter-spacing: -0.05em;
-  color: var(--home-brand);
-}
-
-.hero {
-  padding: 36px 0 28px;
-}
-
-.hero-title {
-  margin: 0;
-  font-size: clamp(3rem, 9vw, 4.6rem);
-  line-height: 0.92;
-  letter-spacing: -0.07em;
-  font-weight: 800;
-}
-
-.hero-subtitle {
-  margin: 16px 0 0;
-  font-size: clamp(1.2rem, 3.8vw, 1.8rem);
-  line-height: 1.2;
-  color: var(--home-text-muted);
+app-header {
+  display: block;
+  margin-bottom: 28px;
 }
 
 .recipe-grid {
@@ -75,6 +23,7 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px 14px;
   align-items: stretch;
+  padding: 0 24px;
 }
 
 .recipe-card {
@@ -273,12 +222,9 @@
 }
 
 @media (max-width: 420px) {
-  .home-page {
-    padding-inline: 18px;
-  }
-
   .recipe-grid {
     gap: 16px 12px;
+    padding-inline: 18px;
   }
 
   .recipe-card__body {

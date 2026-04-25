@@ -1,8 +1,17 @@
-@use 'sass:map';
 @use '@angular/material' as mat;
 
 @mixin theme($theme) {
-  .header {
-    color:  mat.get-theme-color($theme, primary)
+  app-header {
+    --page-header-background: #{mat.get-theme-color($theme, surface)};
+    --page-header-border: #{mat.get-theme-color($theme, outline-variant)};
+    --page-header-title: #{mat.get-theme-color($theme, primary)};
+    --page-header-text: #{mat.get-theme-color($theme, on-surface-variant)};
+    --page-header-action-background: color-mix(
+      in srgb,
+      #{mat.get-theme-color($theme, primary)} 12%,
+      #{mat.get-theme-color($theme, surface)}
+    );
+    --page-header-action-text: #{mat.get-theme-color($theme, primary)};
+    --page-header-logo-background: #{mat.get-theme-color($theme, primary-container)};
   }
 }

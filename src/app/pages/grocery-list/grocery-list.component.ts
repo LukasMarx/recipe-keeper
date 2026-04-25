@@ -22,6 +22,7 @@ import {
   GroceryListEntry,
   GroceryListService,
 } from '../../services/grocery-list.service';
+import { HeaderComponent } from '../../components/header/header.component';
 import { GroceryQuickAddComponent } from './components/grocery-quick-add/grocery-quick-add.component';
 import { GroceryCategory } from './components/grocery-quick-add/grocery-quick-add.models';
 
@@ -68,6 +69,7 @@ function normalizeHouseholdId(householdId: number | null | undefined) {
     MatIconModule,
     ReactiveFormsModule,
     MatSnackBarModule,
+    HeaderComponent,
     GroceryQuickAddComponent,
   ],
   templateUrl: './grocery-list.component.html',
