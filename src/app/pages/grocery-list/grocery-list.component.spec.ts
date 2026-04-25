@@ -1,9 +1,10 @@
-import { TestBed } from '@angular/core/testing';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { fakeAsync, tick, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 
 import { GroceryListComponent } from './grocery-list.component';
 import { GroceryListService } from '../../services/grocery-list.service';
+import { IngredientService } from '../../services/ingredient.service';
 import { UserService } from '../../services/user.service';
 
 describe('GroceryListComponent', () => {
@@ -24,6 +25,9 @@ describe('GroceryListComponent', () => {
   );
   const userServiceMock = {
     get: jasmine.createSpy(),
+  };
+  const ingredientServiceMock = {
+    search: jasmine.createSpy(),
   };
   const snackBarMock = {
     open: jasmine.createSpy(),
@@ -52,6 +56,8 @@ describe('GroceryListComponent', () => {
             ingredient: {
               id: 'potato',
               plural: 'Kartoffeln',
+              displayName: 'Kartoffel lokalisiert',
+              displayPlural: 'Kartoffeln lokalisiert',
               category: 'vegetable',
               imageUrl: 'https://example.com/potato.jpg',
             },
@@ -73,6 +79,8 @@ describe('GroceryListComponent', () => {
             ingredient: {
               id: 'potato',
               plural: 'Kartoffeln',
+              displayName: 'Kartoffel lokalisiert',
+              displayPlural: 'Kartoffeln lokalisiert',
               category: 'vegetable',
               imageUrl: 'https://example.com/potato.jpg',
             },
@@ -94,6 +102,8 @@ describe('GroceryListComponent', () => {
             ingredient: {
               id: 'potato',
               plural: 'Kartoffeln',
+              displayName: 'Kartoffel lokalisiert',
+              displayPlural: 'Kartoffeln lokalisiert',
               category: 'vegetable',
               imageUrl: 'https://example.com/potato.jpg',
             },
@@ -154,12 +164,26 @@ describe('GroceryListComponent', () => {
     groceryListServiceMock.deleteArchivedList.and.returnValue(of(undefined));
     groceryListServiceMock.getCatergoryLabel.and.returnValue(of('Vegetables'));
     groceryListServiceMock.getCategoryIcon.and.returnValue('eco');
+    ingredientServiceMock.search.and.returnValue(
+      of([
+        {
+          id: 'potato',
+          originalName: 'Kartoffel',
+          plural: 'Kartoffeln',
+          displayName: 'Kartoffel lokalisiert',
+          displayPlural: 'Kartoffeln lokalisiert',
+          category: 'vegetable',
+          imageUrl: 'https://example.com/potato.jpg',
+        },
+      ])
+    );
     userServiceMock.get.and.returnValue(of({ activeHouseholdId: 5 }));
 
     await TestBed.configureTestingModule({
       imports: [GroceryListComponent],
       providers: [
         { provide: GroceryListService, useValue: groceryListServiceMock },
+        { provide: IngredientService, useValue: ingredientServiceMock },
         { provide: UserService, useValue: userServiceMock },
         { provide: MatSnackBar, useValue: snackBarMock },
       ],
@@ -177,6 +201,7 @@ describe('GroceryListComponent', () => {
     groceryListServiceMock.deleteArchivedList.calls.reset();
     groceryListServiceMock.getCatergoryLabel.calls.reset();
     groceryListServiceMock.getCategoryIcon.calls.reset();
+    ingredientServiceMock.search.calls.reset();
     userServiceMock.get.calls.reset();
     snackBarMock.open.calls.reset();
   });
@@ -221,7 +246,7 @@ describe('GroceryListComponent', () => {
     );
 
     expect(sourceNames).toHaveSize(3);
-    expect(sourceNames.every((name) => name === 'Kartoffel')).toBeTrue();
+    expect(sourceNames.every((name) => name === 'Kartoffel lokalisiert')).toBeTrue();
   });
 
   it('updates every raw source item when an aggregated checkbox is toggled', async () => {
@@ -244,4 +269,88 @@ describe('GroceryListComponent', () => {
       [12, { checked: true }],
     ]);
   });
+
+  it('opens the quick add detail view after selecting an ingredient suggestion', fakeAsync(() => {
+    const fixture = TestBed.createComponent(GroceryListComponent);
+
+    fixture.detectChanges();
+    tick();
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const input = compiled.querySelector('.quick-add-input') as HTMLInputElement;
+
+    input.dispatchEvent(new FocusEvent('focus'));
+    input.value = 'Kart';
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    tick(250);
+    fixture.detectChanges();
+
+    const suggestion = compiled.querySelector('.quick-add-suggestion') as HTMLButtonElement;
+
+    expect(ingredientServiceMock.search).toHaveBeenCalledWith('Kart', 8);
+    expect(suggestion.textContent).toContain('Kartoffel lokalisiert');
+
+    suggestion.click();
+    fixture.detectChanges();
+
+    const amountInput = compiled.querySelector(
+      '.quick-add-amount__input'
+    ) as HTMLInputElement;
+    const unitInput = compiled.querySelector(
+      '.quick-add-unit__input'
+    ) as HTMLInputElement;
+
+    expect(input.value).toBe('Kartoffel lokalisiert');
+    expect(compiled.querySelector('.quick-add-detail')?.textContent).toContain(
+      'Kartoffel lokalisiert'
+    );
+    expect(amountInput.value).toBe('1');
+    expect(unitInput.value).toBe('');
+    expect(compiled.querySelector('.quick-add-suggestions')).toBeNull();
+  }));
+
+  it('sends ingredientId when adding a selected autocomplete ingredient', fakeAsync(() => {
+    const fixture = TestBed.createComponent(GroceryListComponent);
+
+    fixture.detectChanges();
+    tick();
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const input = compiled.querySelector('.quick-add-input') as HTMLInputElement;
+
+    input.dispatchEvent(new FocusEvent('focus'));
+    input.value = 'Kart';
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    tick(250);
+    fixture.detectChanges();
+
+    const suggestion = compiled.querySelector('.quick-add-suggestion') as HTMLButtonElement;
+    suggestion.click();
+    fixture.detectChanges();
+
+    const form = compiled.querySelector('.quick-add-dock') as HTMLFormElement;
+    const amountInput = compiled.querySelector('.quick-add-amount__input') as HTMLInputElement;
+    const unitInput = compiled.querySelector('.quick-add-unit__input') as HTMLInputElement;
+
+    amountInput.value = '2';
+    amountInput.dispatchEvent(new Event('input'));
+    unitInput.value = 'L';
+    unitInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    form.dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+
+    expect(groceryListServiceMock.addManualItem).toHaveBeenCalledWith({
+      amount: 2,
+      householdId: 5,
+      ingredientId: 'potato',
+      name: 'Kartoffel lokalisiert',
+      unit: 'L',
+    });
+  }));
 });

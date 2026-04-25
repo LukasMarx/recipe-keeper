@@ -23,11 +23,7 @@
     </svg>
   </div>
   <div class="text">
-    <span class="title">{{
-      (ingredient.amount > 1 && !ingredient.unit)
-        ? ingredient.originalNamePlural
-        : ingredient.originalName
-    }}</span>
+    <span class="title">{{ ingredientTitle(ingredient) }}</span>
     <div class="amount">
       <span>{{ ingredient.amount }}</span>
       <span>{{ ingredient.unit }}</span>

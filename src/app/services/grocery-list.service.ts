@@ -64,6 +64,7 @@ export interface CompleteGroceryListResponse {
 export interface CreateManualGroceryListItemDto {
   householdId?: number | null;
   name: string;
+  ingredientId?: Ingredient['id'];
   unit?: string;
   amount: number;
 }
@@ -80,13 +81,16 @@ export interface UpdateGroceryListItemDto {
 })
 export class GroceryListService {
   private readonly http = inject(HttpClient);
-  private translocoService = inject(TranslocoService);
+  private readonly translocoService = inject(TranslocoService);
 
   constructor() {}
 
   public getActiveList(householdId?: number | null) {
     return this.http.get<GroceryList>('grocery-list', {
-      params: this.buildParams({ householdId }),
+      params: this.buildParams({
+        householdId,
+        locale: this.translocoService.getActiveLang(),
+      }),
     }).pipe(map((list) => this.normalizeList(list)));
   }
 
@@ -101,6 +105,7 @@ export class GroceryListService {
       params: this.buildParams({
         householdId: query.householdId,
         limit: query.limit,
+        locale: this.translocoService.getActiveLang(),
         offset: query.offset,
       }),
     }).pipe(map((lists) => lists.map((list) => this.normalizeList(list))));
@@ -108,7 +113,9 @@ export class GroceryListService {
 
   public getListById(id: number) {
     return this.http
-      .get<GroceryList>(`grocery-list/${id}`)
+      .get<GroceryList>(`grocery-list/${id}`, {
+        params: this.buildParams({ locale: this.translocoService.getActiveLang() }),
+      })
       .pipe(map((list) => this.normalizeList(list)));
   }
 

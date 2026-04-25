@@ -163,24 +163,17 @@
             <section class="settings-section">
               <div class="section-heading">
                 <h3>Shopping list</h3>
-                <p>Choose how the recipe ingredients should be handled when this meal is scheduled.</p>
+                <p>Choose whether this recipe should also add ingredients to the active grocery list.</p>
               </div>
 
-              <div class="strategy-grid" role="list" aria-label="Shopping list strategy">
-                @for (mode of groceryListModeOptions; track mode.value) {
-                  <button
-                    type="button"
-                    class="strategy-card"
-                    [class.strategy-card--selected]="isGroceryListModeSelected(mode.value)"
-                    (click)="selectGroceryListMode(mode.value)"
-                  >
-                    <span class="strategy-card__title">{{ mode.title }}</span>
-                    <span class="strategy-card__description">{{ mode.description }}</span>
-                  </button>
-                }
-              </div>
+              <mat-checkbox
+                [checked]="shouldAddIngredientsToGroceryList()"
+                (change)="setAddToGroceryList($event.checked)"
+              >
+                Add ingredients to the grocery list
+              </mat-checkbox>
 
-              @if (isGroceryListModeSelected('ACTIVE')) {
+              @if (shouldAddIngredientsToGroceryList()) {
                 <div class="settings-empty" aria-live="polite">
                   Ingredients will be added to the current grocery list for the selected household.
                 </div>

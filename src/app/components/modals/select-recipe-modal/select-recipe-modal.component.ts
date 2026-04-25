@@ -9,6 +9,7 @@ import {
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Recipe } from '../../../interfaces/recipe';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import {
   FormControl,
@@ -18,7 +19,6 @@ import {
 } from '@angular/forms';
 import {
   createScheduleRecipeDto,
-  GroceryListAssignmentMode,
   MealType,
   ScheduleService,
 } from '../../../services/schedule.service';
@@ -42,12 +42,6 @@ type MealOption = {
   icon: string;
 };
 
-type GroceryListModeOption = {
-  value: GroceryListAssignmentMode;
-  title: string;
-  description: string;
-};
-
 const DATE_OPTION_COUNT = 7;
 const MEAL_OPTIONS: MealOption[] = [
   { type: 'BREAKFAST', label: 'Breakfast', icon: 'bakery_dining' },
@@ -55,18 +49,6 @@ const MEAL_OPTIONS: MealOption[] = [
   { type: 'DINNER', label: 'Dinner', icon: 'dinner_dining' },
   { type: 'SNACK', label: 'Snack', icon: 'icecream' },
   { type: 'OTHER', label: 'Other', icon: 'restaurant' },
-];
-const GROCERY_LIST_MODE_OPTIONS: GroceryListModeOption[] = [
-  {
-    value: 'ACTIVE',
-    title: 'Add ingredients to the current grocery list',
-    description: 'Scheduled ingredients go to the active grocery list for the selected household.',
-  },
-  {
-    value: 'NONE',
-    title: 'Do not add ingredients to the grocery list',
-    description: 'Schedules the recipe without creating or updating any grocery list.',
-  },
 ];
 
 function normalizeHouseholdId(householdId: number | null | undefined) {
@@ -102,6 +84,7 @@ function extractErrorMessage(error: unknown) {
   standalone: true,
   imports: [
     CommonModule,
+    MatCheckboxModule,
     MatIconModule,
     ReactiveFormsModule,
   ],
@@ -122,7 +105,6 @@ export class SelectRecipeModalComponent {
   public searchQuery = signal('');
   public currentStep = signal<ModalStep>(1);
   public readonly mealOptions = MEAL_OPTIONS;
-  public readonly groceryListModeOptions = GROCERY_LIST_MODE_OPTIONS;
   public readonly submitError = signal<string | null>(null);
   public readonly isSubmitting = signal(false);
 
@@ -136,10 +118,7 @@ export class SelectRecipeModalComponent {
         Validators.required
       ),
       householdId: new FormControl<number | null>(null),
-      groceryListMode: new FormControl<GroceryListAssignmentMode>(
-        'ACTIVE',
-        Validators.required
-      ),
+      addToGroceryList: new FormControl(true, Validators.required),
     }
   );
 
@@ -202,11 +181,11 @@ export class SelectRecipeModalComponent {
     this.form.controls.householdId.markAsTouched();
   }
 
-  public selectGroceryListMode(mode: GroceryListAssignmentMode) {
+  public setAddToGroceryList(shouldAdd: boolean) {
     this.submitError.set(null);
-    this.form.controls.groceryListMode.setValue(mode);
-    this.form.controls.groceryListMode.markAsDirty();
-    this.form.controls.groceryListMode.markAsTouched();
+    this.form.controls.addToGroceryList.setValue(shouldAdd);
+    this.form.controls.addToGroceryList.markAsDirty();
+    this.form.controls.addToGroceryList.markAsTouched();
     this.form.updateValueAndValidity();
   }
 
@@ -230,8 +209,8 @@ export class SelectRecipeModalComponent {
     return this.form.controls.mealType.value === mealType;
   }
 
-  public isGroceryListModeSelected(mode: GroceryListAssignmentMode) {
-    return this.form.controls.groceryListMode.value === mode;
+  public shouldAddIngredientsToGroceryList() {
+    return this.form.controls.addToGroceryList.value ?? true;
   }
 
   public getMealOptionIcon(mealType: MealType) {
@@ -283,13 +262,12 @@ export class SelectRecipeModalComponent {
 
     const dt = this.form.value.date as Date;
     const timezoneOffset = dt.getTimezoneOffset();
-    const groceryListMode = this.form.value.groceryListMode as GroceryListAssignmentMode;
     const payload = createScheduleRecipeDto({
       recipeId: this.selectedRecipe()!.id,
       scheduleDate: addMinutes(new Date(dt), timezoneOffset * -1).toISOString(),
       householdId: normalizeHouseholdId(this.form.value.householdId),
       mealType: this.form.value.mealType as MealType,
-      groceryListMode,
+      addToGroceryList: this.form.controls.addToGroceryList.value ?? true,
     });
 
     this.isSubmitting.set(true);

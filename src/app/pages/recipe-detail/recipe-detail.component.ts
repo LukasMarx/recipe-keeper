@@ -8,7 +8,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { ScheduleRecipeModalComponent } from '../../components/modals/schedule-recipe-modal/schedule-recipe-modal.component';
-import { Ingredient, RecipeIngredient } from '../../interfaces/ingredient';
+import {
+  getIngredientDisplayName,
+  getIngredientDisplayPlural,
+  Ingredient,
+  RecipeIngredient,
+} from '../../interfaces/ingredient';
 import { Instruction } from '../../interfaces/instruction';
 import { Recipe, RecipeImportTask } from '../../interfaces/recipe';
 import { Location } from '@angular/common';
@@ -143,16 +148,13 @@ export class RecipeDetailComponent {
   }
 
   ingredientName(ingredient: RecipeIngredient): string {
-    if (
-      typeof ingredient.amount === 'number' &&
-      ingredient.amount > 1 &&
-      !ingredient.unit &&
-      ingredient.originalNamePlural
-    ) {
-      return ingredient.originalNamePlural;
+    const pluralName = getIngredientDisplayPlural(ingredient);
+
+    if (typeof ingredient.amount === 'number' && ingredient.amount > 1 && !ingredient.unit) {
+      return pluralName ?? getIngredientDisplayName(ingredient) ?? 'Ingredient';
     }
 
-    return ingredient.originalName || ingredient.ingredient?.plural || 'Ingredient';
+    return getIngredientDisplayName(ingredient) ?? pluralName ?? 'Ingredient';
   }
 
   ingredientAmount(ingredient: RecipeIngredient): string {
@@ -167,7 +169,7 @@ export class RecipeDetailComponent {
   }
 
   instructionIngredientLabel(ingredient: RecipeIngredient): string {
-    return [this.ingredientAmount(ingredient), ingredient.originalName]
+    return [this.ingredientAmount(ingredient), getIngredientDisplayName(ingredient)]
       .filter(Boolean)
       .join(' ');
   }
@@ -306,7 +308,7 @@ export class RecipeDetailComponent {
       ...recipe,
       detailIngredients: ingredientsList.length
         ? ingredientsList.map((ingredient, index) => ({
-            key: `${ingredient.id ?? index}-${ingredient.originalName ?? index}`,
+            key: `${ingredient.id ?? index}-${getIngredientDisplayName(ingredient) ?? index}`,
             title: this.ingredientName(ingredient),
             amount: this.ingredientAmount(ingredient),
             usage: ingredient.usage,
@@ -370,7 +372,9 @@ export class RecipeDetailComponent {
         ingredientsList.find(
           (ingredient) =>
             ingredient.originalName === ingredientReference ||
-            ingredient.originalNamePlural === ingredientReference
+            ingredient.originalNamePlural === ingredientReference ||
+            getIngredientDisplayName(ingredient) === ingredientReference ||
+            getIngredientDisplayPlural(ingredient) === ingredientReference
         ) ?? null
       );
     }

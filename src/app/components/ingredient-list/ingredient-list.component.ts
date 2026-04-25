@@ -3,9 +3,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   input,
-  Input,
 } from '@angular/core';
-import { RecipeIngredient } from '../../interfaces/ingredient';
+import {
+  getIngredientDisplayName,
+  getIngredientDisplayPlural,
+  RecipeIngredient,
+} from '../../interfaces/ingredient';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
@@ -18,6 +21,17 @@ import { MatButtonModule } from '@angular/material/button';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IngredientListComponent {
+  public ingredientTitle(ingredient: RecipeIngredient) {
+    const pluralName = getIngredientDisplayPlural(ingredient);
+    const singularName = getIngredientDisplayName(ingredient);
+
+    if (ingredient.amount > 1 && !ingredient.unit && pluralName) {
+      return pluralName;
+    }
+
+    return singularName ?? pluralName ?? 'Ingredient';
+  }
+
   onAddClick() {
     throw new Error('Method not implemented.');
   }

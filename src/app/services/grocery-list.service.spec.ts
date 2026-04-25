@@ -22,6 +22,7 @@ describe('GroceryListService', () => {
         {
           provide: TranslocoService,
           useValue: {
+            getActiveLang: () => 'de',
             selectTranslate: () => of(''),
           },
         },
@@ -92,7 +93,10 @@ describe('GroceryListService', () => {
     });
 
     const request = httpTestingController.expectOne(
-      (req) => req.url === 'grocery-list' && req.params.get('householdId') === '3'
+      (req) =>
+        req.url === 'grocery-list' &&
+        req.params.get('householdId') === '3' &&
+        req.params.get('locale') === 'de'
     );
 
     request.flush(
@@ -105,6 +109,8 @@ describe('GroceryListService', () => {
             ingredient: {
               id: 'potato',
               plural: 'Kartoffeln',
+              displayName: 'Kartoffel lokalisiert',
+              displayPlural: 'Kartoffeln lokalisiert',
               category: 'vegetable',
               imageUrl: 'https://example.com/potato.jpg',
             },
@@ -144,7 +150,10 @@ describe('GroceryListService', () => {
     });
 
     const request = httpTestingController.expectOne(
-      (req) => req.url === 'grocery-list' && req.params.get('householdId') === '3'
+      (req) =>
+        req.url === 'grocery-list' &&
+        req.params.get('householdId') === '3' &&
+        req.params.get('locale') === 'de'
     );
 
     request.flush(createListResponse() as any);
@@ -159,5 +168,20 @@ describe('GroceryListService', () => {
         partiallyChecked: false,
       })
     );
+  });
+
+  it('sends locale when loading archived grocery lists', () => {
+    service.getArchivedLists({ householdId: 3, limit: 5, offset: 10 }).subscribe();
+
+    const request = httpTestingController.expectOne(
+      (req) =>
+        req.url === 'grocery-list/archive' &&
+        req.params.get('householdId') === '3' &&
+        req.params.get('limit') === '5' &&
+        req.params.get('offset') === '10' &&
+        req.params.get('locale') === 'de'
+    );
+
+    request.flush([]);
   });
 });

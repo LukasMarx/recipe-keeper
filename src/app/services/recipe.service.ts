@@ -1,5 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import {
   BehaviorSubject,
   EMPTY,
@@ -27,6 +28,7 @@ import { environment } from '../../environments/environment';
 export class RecipeService {
   private readonly http = inject(HttpClient);
   private readonly authService = inject(AuthService);
+  private readonly translocoService = inject(TranslocoService);
   private readonly cache = new Map<number, Recipe>();
   private readonly recipeEntities = new BehaviorSubject<Map<number, Recipe>>(
     new Map<number, Recipe>()
@@ -223,7 +225,9 @@ export class RecipeService {
 
     this.pendingRecipeRequests.add(recipeId);
     this.http
-      .get<Recipe>(`recipe/${recipeId}`)
+      .get<Recipe>(`recipe/${recipeId}`, {
+        params: this.buildLocaleParams(),
+      })
       .pipe(
         tap((recipe) => {
           this.upsertRecipe(this.normalizeRecipe(recipe));
@@ -234,6 +238,17 @@ export class RecipeService {
         })
       )
       .subscribe();
+  }
+
+  private buildLocaleParams() {
+    let params = new HttpParams();
+    const locale = this.translocoService.getActiveLang()?.trim();
+
+    if (locale) {
+      params = params.set('locale', locale);
+    }
+
+    return params;
   }
 
   private scheduleRecipeRefresh(recipeId: number, delay = 200) {

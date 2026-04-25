@@ -16,7 +16,6 @@ import { finalize } from 'rxjs';
 import { HouseholdService } from '../../../services/household.service';
 import {
   createScheduleRecipeDto,
-  GroceryListAssignmentMode,
   MealType,
   ScheduleService,
 } from '../../../services/schedule.service';
@@ -84,10 +83,7 @@ export class ScheduleRecipeModalComponent {
     date: new FormControl(new Date(), Validators.required),
     mealType: new FormControl<MealType>('DINNER', Validators.required),
     householdId: new FormControl<number | null>(null),
-    groceryListMode: new FormControl<GroceryListAssignmentMode>(
-      'ACTIVE',
-      Validators.required
-    ),
+    addToGroceryList: new FormControl(true, Validators.required),
   });
 
   constructor() {
@@ -101,7 +97,7 @@ export class ScheduleRecipeModalComponent {
   }
 
   public shouldAddIngredientsToGroceryList() {
-    return this.form.controls.groceryListMode.value === 'ACTIVE';
+    return this.form.controls.addToGroceryList.value ?? true;
   }
 
   public clearSubmitError() {
@@ -110,7 +106,7 @@ export class ScheduleRecipeModalComponent {
 
   public setGroceryListAssignment(shouldAdd: boolean) {
     this.clearSubmitError();
-    this.form.controls.groceryListMode.setValue(shouldAdd ? 'ACTIVE' : 'NONE');
+    this.form.controls.addToGroceryList.setValue(shouldAdd);
   }
 
   public onSubmit() {
@@ -123,14 +119,13 @@ export class ScheduleRecipeModalComponent {
 
     const dt = this.form.value.date as Date;
     const timezoneOffset = dt.getTimezoneOffset();
-    const groceryListMode = this.form.value.groceryListMode as GroceryListAssignmentMode;
 
     const payload = createScheduleRecipeDto({
       recipeId: this.data.recipeId,
       scheduleDate: addMinutes(new Date(dt), timezoneOffset * -1).toISOString(),
       householdId: normalizeHouseholdId(this.form.value.householdId),
       mealType: this.form.value.mealType as MealType,
-      groceryListMode,
+      addToGroceryList: this.form.controls.addToGroceryList.value ?? true,
     });
 
     this.isSubmitting.set(true);

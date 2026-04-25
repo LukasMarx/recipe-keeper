@@ -95,4 +95,37 @@ describe('RecipeDetailComponent', () => {
 
     expect(fixture.nativeElement.querySelector('.status-panel')).not.toBeNull();
   });
+
+  it('prefers localized ingredient display names and plurals', async () => {
+    await configureTestingModule(createRecipe());
+
+    const fixture = TestBed.createComponent(RecipeDetailComponent);
+    fixture.detectChanges();
+
+    const localizedIngredient = {
+      id: 7,
+      originalName: 'Potato',
+      originalNamePlural: 'Potatoes',
+      amount: 2,
+      ingredient: {
+        id: 'potato',
+        plural: 'Potatoes',
+        displayName: 'Kartoffel lokalisiert',
+        displayPlural: 'Kartoffeln lokalisiert',
+        category: 'vegetable',
+      },
+      createdDate: new Date('2026-04-17T00:00:00.000Z'),
+    } as any;
+
+    expect(fixture.componentInstance.ingredientName(localizedIngredient)).toBe(
+      'Kartoffeln lokalisiert'
+    );
+
+    expect(
+      fixture.componentInstance.instructionIngredientLabel({
+        ...localizedIngredient,
+        amount: 1,
+      })
+    ).toBe('1 Kartoffel lokalisiert');
+  });
 });

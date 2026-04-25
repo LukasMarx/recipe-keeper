@@ -1,5 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import {
+  getIngredientDisplayName,
+  RecipeIngredient,
+} from '../../../interfaces/ingredient';
 import { Instruction } from '../../../interfaces/instruction';
 import { MatChipsModule } from '@angular/material/chips';
 
@@ -14,4 +18,8 @@ import { MatChipsModule } from '@angular/material/chips';
 export class InstructionListItemComponent {
   public stepIndex = input<number>();
   public instruction = input<Instruction>();
+
+  public ingredientName(ingredient: RecipeIngredient) {
+    return getIngredientDisplayName(ingredient) ?? 'Ingredient';
+  }
 }

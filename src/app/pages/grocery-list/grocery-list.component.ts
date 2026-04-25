@@ -7,10 +7,16 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { finalize, forkJoin } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, finalize, forkJoin, map, of, startWith, switchMap } from 'rxjs';
+import {
+  getIngredientDisplayName,
+  getIngredientDisplayPlural,
+} from '../../interfaces/ingredient';
+import { IngredientService, IngredientSearchResult } from '../../services/ingredient.service';
 import { UserService } from '../../services/user.service';
 import {
   AggregatedGroceryListEntry,
@@ -37,6 +43,19 @@ type GroceryCategory =
 interface GrocerySection {
   category: GroceryCategory;
   items: AggregatedGroceryListEntry[];
+}
+
+interface QuickAddSuggestion {
+  key: string;
+  name: string;
+  id: string;
+  category: GroceryCategory;
+  imageUrl: string | null;
+}
+
+interface SuggestionPart {
+  text: string;
+  match: boolean;
 }
 
 function extractErrorMessage(error: unknown) {
@@ -79,6 +98,7 @@ export class GroceryListComponent {
   public readonly groceryListService = inject(GroceryListService);
 
   private readonly userService = inject(UserService);
+  private readonly ingredientService = inject(IngredientService);
   private readonly snackBar = inject(MatSnackBar);
 
   private readonly categoryOrder: GroceryCategory[] = [
@@ -117,6 +137,9 @@ export class GroceryListComponent {
   public readonly isCompletingList = signal(false);
   public readonly isDeletingArchivedList = signal<number | null>(null);
   public readonly expandedAggregatedItemIds = signal<number[]>([]);
+  public readonly isQuickAddFocused = signal(false);
+  public readonly activeSuggestionIndex = signal(-1);
+  public readonly selectedQuickAddSuggestion = signal<QuickAddSuggestion | null>(null);
 
   public readonly activeListError = signal<string | null>(null);
   public readonly archiveError = signal<string | null>(null);
@@ -203,6 +226,38 @@ export class GroceryListComponent {
     return (this.checkedCount() / totalCount) * 100;
   });
 
+  public readonly quickAddSuggestions = toSignal(
+    this.addItemForm.controls.name.valueChanges.pipe(
+      startWith(this.addItemForm.controls.name.value),
+      map((value) => value.trim()),
+      distinctUntilChanged(),
+      debounceTime(250),
+      switchMap((query) => {
+        if (!this.isQuickAddFocused() || !query.length) {
+          return of<QuickAddSuggestion[]>([]);
+        }
+
+        return this.ingredientService.search(query, 8).pipe(
+          map((ingredients) => ingredients.map((ingredient) => this.mapQuickAddSuggestion(ingredient))),
+          catchError(() => of<QuickAddSuggestion[]>([]))
+        );
+      })
+    ),
+    { initialValue: [] }
+  );
+
+  public readonly isQuickAddSuggestionListVisible = computed(
+    () => !this.selectedQuickAddSuggestion() && this.quickAddSuggestions().length > 0
+  );
+
+  public readonly isQuickAddDetailVisible = computed(
+    () => this.selectedQuickAddSuggestion() !== null
+  );
+
+  public readonly isQuickAddOverlayVisible = computed(
+    () => this.isQuickAddSuggestionListVisible() || this.isQuickAddDetailVisible()
+  );
+
   public readonly archivePage = computed(
     () => Math.floor(this.archiveOffset() / this.archiveLimit) + 1
   );
@@ -221,6 +276,153 @@ export class GroceryListComponent {
 
   public selectFilter(filter: 'all' | GroceryCategory) {
     this.selectedFilter.set(filter);
+  }
+
+  public handleQuickAddFocus() {
+    if (this.selectedQuickAddSuggestion()) {
+      return;
+    }
+
+    this.isQuickAddFocused.set(true);
+  }
+
+  public handleQuickAddInput() {
+    if (this.selectedQuickAddSuggestion()) {
+      this.selectedQuickAddSuggestion.set(null);
+      this.addItemForm.controls.amount.setValue(1);
+      this.addItemForm.controls.unit.setValue('');
+    }
+
+    this.isQuickAddFocused.set(true);
+    this.activeSuggestionIndex.set(-1);
+  }
+
+  public handleQuickAddFocusOut(event: FocusEvent) {
+    const currentTarget = event.currentTarget;
+    const nextTarget = event.relatedTarget;
+
+    if (
+      currentTarget instanceof HTMLElement &&
+      nextTarget instanceof Node &&
+      currentTarget.contains(nextTarget)
+    ) {
+      return;
+    }
+
+    this.isQuickAddFocused.set(false);
+    this.activeSuggestionIndex.set(-1);
+  }
+
+  public handleQuickAddKeydown(event: KeyboardEvent) {
+    const suggestions = this.quickAddSuggestions();
+    if (!suggestions.length) {
+      if (event.key === 'Escape') {
+        this.isQuickAddFocused.set(false);
+        this.activeSuggestionIndex.set(-1);
+      }
+
+      return;
+    }
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      this.activeSuggestionIndex.update((currentIndex) =>
+        Math.min(currentIndex + 1, suggestions.length - 1)
+      );
+      return;
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.activeSuggestionIndex.update((currentIndex) =>
+        currentIndex <= 0 ? suggestions.length - 1 : currentIndex - 1
+      );
+      return;
+    }
+
+    if (event.key === 'Enter' && this.activeSuggestionIndex() > -1) {
+      event.preventDefault();
+      this.applyQuickAddSuggestion(suggestions[this.activeSuggestionIndex()]);
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.isQuickAddFocused.set(false);
+      this.activeSuggestionIndex.set(-1);
+    }
+  }
+
+  public setActiveSuggestionIndex(index: number) {
+    this.activeSuggestionIndex.set(index);
+  }
+
+  public dismissQuickAddSuggestions() {
+    this.isQuickAddFocused.set(false);
+    this.activeSuggestionIndex.set(-1);
+    this.selectedQuickAddSuggestion.set(null);
+  }
+
+  public applyQuickAddSuggestion(suggestion: QuickAddSuggestion) {
+    this.addItemForm.controls.name.setValue(suggestion.name);
+    this.selectedQuickAddSuggestion.set(suggestion);
+    this.addItemForm.controls.amount.setValue(1);
+    this.addItemForm.controls.unit.setValue('');
+    this.isQuickAddFocused.set(false);
+    this.activeSuggestionIndex.set(-1);
+  }
+
+  public returnToQuickAddSuggestions() {
+    if (!this.selectedQuickAddSuggestion()) {
+      return;
+    }
+
+    this.selectedQuickAddSuggestion.set(null);
+    this.isQuickAddFocused.set(true);
+    this.activeSuggestionIndex.set(-1);
+  }
+
+  public increaseQuickAddAmount() {
+    this.addItemForm.controls.amount.setValue(this.addItemForm.controls.amount.value + 1);
+  }
+
+  public decreaseQuickAddAmount() {
+    const nextAmount = Math.max(1, this.addItemForm.controls.amount.value - 1);
+    this.addItemForm.controls.amount.setValue(nextAmount);
+  }
+
+  public getQuickAddSuggestionOptionId(index: number) {
+    return `quick-add-suggestion-${index}`;
+  }
+
+  public getQuickAddSuggestionParts(name: string): SuggestionPart[] {
+    const query = this.normalizeSearchValue(this.addItemForm.controls.name.value);
+    if (!query) {
+      return [{ text: name, match: false }];
+    }
+
+    const normalizedName = this.normalizeSearchValue(name);
+    const matchIndex = normalizedName.indexOf(query);
+
+    if (matchIndex < 0) {
+      return [{ text: name, match: false }];
+    }
+
+    const parts: SuggestionPart[] = [];
+    if (matchIndex > 0) {
+      parts.push({ text: name.slice(0, matchIndex), match: false });
+    }
+
+    parts.push({
+      text: name.slice(matchIndex, matchIndex + query.length),
+      match: true,
+    });
+
+    if (matchIndex + query.length < name.length) {
+      parts.push({ text: name.slice(matchIndex + query.length), match: false });
+    }
+
+    return parts;
   }
 
   public formatQuantity(item: {
@@ -242,13 +444,13 @@ export class GroceryListComponent {
   public formatRawName(item: GroceryListEntry) {
     if (!item.unit) {
       return (
-        item.recipeIngredient?.originalNamePlural ||
-        item.recipeIngredient?.ingredient.plural ||
+        getIngredientDisplayPlural(item.recipeIngredient) ||
+        getIngredientDisplayName(item.recipeIngredient) ||
         item.name
       );
     }
 
-    return item.recipeIngredient?.originalName || item.name;
+    return getIngredientDisplayName(item.recipeIngredient) || item.name;
   }
 
   public getAggregatedItemSourceLabel(item: AggregatedGroceryListEntry) {
@@ -448,11 +650,13 @@ export class GroceryListComponent {
     this.isAddingItem.set(true);
 
     const value = this.addItemForm.getRawValue();
+    const selectedSuggestion = this.selectedQuickAddSuggestion();
 
     this.groceryListService
       .addManualItem({
         amount: value.amount,
         householdId,
+        ingredientId: selectedSuggestion?.id,
         name: value.name.trim(),
         unit: value.unit.trim() || undefined,
       })
@@ -460,6 +664,7 @@ export class GroceryListComponent {
       .subscribe({
         next: () => {
           this.addItemForm.reset({ amount: 1, name: '', unit: '' });
+          this.dismissQuickAddSuggestions();
           this.loadActiveList();
         },
         error: (error) => {
@@ -724,5 +929,34 @@ export class GroceryListComponent {
     item: AggregatedGroceryListEntry | GroceryListEntry
   ): item is AggregatedGroceryListEntry {
     return 'itemIds' in item;
+  }
+
+  private mapQuickAddSuggestion(ingredient: IngredientSearchResult): QuickAddSuggestion {
+    return {
+      key: ingredient.id,
+      id: ingredient.id,
+      name:
+        getIngredientDisplayName(ingredient) ||
+        getIngredientDisplayPlural(ingredient) ||
+        ingredient.id,
+      category: this.normalizeIngredientCategory(ingredient.category),
+      imageUrl: ingredient.imageUrl ?? null,
+    };
+  }
+
+  private normalizeIngredientCategory(category: string | null | undefined): GroceryCategory {
+    if (category === 'fisch') {
+      return 'fish';
+    }
+
+    if (this.categoryOrder.includes(category as GroceryCategory)) {
+      return category as GroceryCategory;
+    }
+
+    return 'other';
+  }
+
+  private normalizeSearchValue(value: string | null | undefined) {
+    return (value ?? '').trim().replace(/\s+/g, ' ').toLocaleLowerCase();
   }
 }

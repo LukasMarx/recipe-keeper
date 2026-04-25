@@ -3,7 +3,7 @@
   @for(ingredient of instruction()?.ingredients; track ingredient) {
   <mat-chip
     >{{ ingredient.amount }}{{ ingredient.unit }}
-    {{ ingredient.originalName }}</mat-chip
+    {{ ingredientName(ingredient) }}</mat-chip
   >
 
   }

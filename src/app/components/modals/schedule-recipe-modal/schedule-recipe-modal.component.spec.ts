@@ -49,7 +49,7 @@ describe('ScheduleRecipeModalComponent', () => {
     TestBed.resetTestingModule();
   });
 
-  it('defaults to automatic shopping list assignment and omits groceryListId', () => {
+  it('defaults addToGroceryList to true', () => {
     const fixture = TestBed.createComponent(ScheduleRecipeModalComponent);
     const component = fixture.componentInstance;
     fixture.detectChanges();
@@ -57,17 +57,17 @@ describe('ScheduleRecipeModalComponent', () => {
     component.form.patchValue({
       date: new Date(2026, 3, 19),
       mealType: 'DINNER',
-      groceryListMode: 'ACTIVE',
+      addToGroceryList: true,
     });
     component.onSubmit();
 
     const payload = scheduleServiceMock.scheduleRecipe.calls.mostRecent().args[0];
-    expect(component.form.controls.groceryListMode.value).toBe('ACTIVE');
+    expect(component.form.controls.addToGroceryList.value).toBeTrue();
     expect(payload.householdId).toBe(14);
-    expect(Object.prototype.hasOwnProperty.call(payload, 'groceryListId')).toBeFalse();
+    expect(payload.addToGroceryList).toBeTrue();
   });
 
-  it('sends groceryListId as null when the user opts out of grocery list updates', () => {
+  it('sends addToGroceryList as false when the user opts out of grocery list updates', () => {
     const fixture = TestBed.createComponent(ScheduleRecipeModalComponent);
     const component = fixture.componentInstance;
     fixture.detectChanges();
@@ -75,11 +75,11 @@ describe('ScheduleRecipeModalComponent', () => {
     component.form.patchValue({
       date: new Date(2026, 3, 19),
       mealType: 'DINNER',
-      groceryListMode: 'NONE',
+      addToGroceryList: false,
     });
     component.onSubmit();
 
     const payload = scheduleServiceMock.scheduleRecipe.calls.mostRecent().args[0];
-    expect(payload.groceryListId).toBeNull();
+    expect(payload.addToGroceryList).toBeFalse();
   });
 });

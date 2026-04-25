@@ -1,11 +1,10 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import { Recipe } from '../interfaces/recipe';
 import { BehaviorSubject, map, tap } from 'rxjs';
 
 export type MealType = 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK' | 'OTHER';
-
-export type GroceryListAssignmentMode = 'ACTIVE' | 'NONE';
 
 export interface ScheduleRecipeDto {
   recipeId: number;
@@ -16,7 +15,7 @@ export interface ScheduleRecipeDto {
 
   mealType: MealType;
 
-  groceryListId?: number | null;
+  addToGroceryList?: boolean;
 }
 
 export interface ScheduleRecipeRequest {
@@ -28,19 +27,21 @@ export interface ScheduleRecipeRequest {
 
   mealType: MealType;
 
-  groceryListMode?: GroceryListAssignmentMode;
-
-  groceryListId?: number | null;
+  addToGroceryList?: boolean;
 }
 
 export function createScheduleRecipeDto({
-  groceryListMode = 'ACTIVE',
+  householdId,
+  addToGroceryList = true,
   ...scheduleRecipe
 }: ScheduleRecipeRequest): ScheduleRecipeDto {
-  const dto: ScheduleRecipeDto = { ...scheduleRecipe };
+  const dto: ScheduleRecipeDto = {
+    ...scheduleRecipe,
+    addToGroceryList,
+  };
 
-  if (groceryListMode === 'NONE') {
-    dto.groceryListId = null;
+  if (householdId !== undefined) {
+    dto.householdId = householdId;
   }
 
   return dto;
@@ -57,7 +58,8 @@ export interface ScheduledRecipe {
   providedIn: 'root',
 })
 export class ScheduleService {
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
+  private readonly translocoService = inject(TranslocoService);
   private readonly scheduledRecipes = new BehaviorSubject<ScheduledRecipe[]>(
     []
   );
@@ -65,7 +67,9 @@ export class ScheduleService {
   constructor() {}
 
   public scheduleRecipe(scheduleRecipeDto: ScheduleRecipeDto) {
-    return this.http.post('schedule', { ...scheduleRecipeDto });
+    return this.http.post('schedule', { ...scheduleRecipeDto }, {
+      params: this.buildLocaleParams(),
+    });
   }
 
   public getScheduledRecipes() {
@@ -89,5 +93,16 @@ export class ScheduleService {
     return this.http
       .delete(`schedule/${id}`)
       .pipe(tap(() => this.getScheduledRecipes()));
+  }
+
+  private buildLocaleParams() {
+    let params = new HttpParams();
+    const locale = this.translocoService.getActiveLang()?.trim();
+
+    if (locale) {
+      params = params.set('locale', locale);
+    }
+
+    return params;
   }
 }
