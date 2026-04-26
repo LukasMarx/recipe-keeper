@@ -98,9 +98,9 @@ app-header {
   border-radius: 999px;
   background: rgba(34, 97, 0, 0.9);
   color: #fffdf7;
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-size: var(--type-size-caption);
+  font-weight: var(--type-weight-bold);
+  letter-spacing: var(--type-tracking-wide);
   text-transform: uppercase;
 }
 
@@ -123,26 +123,26 @@ app-header {
 .recipe-card__title {
   display: -webkit-box;
   overflow: hidden;
-  font-size: clamp(1.08rem, 3vw, 1.48rem);
-  line-height: 1.06;
-  font-weight: 700;
-  letter-spacing: -0.05em;
+  font-size: var(--type-size-title);
+  line-height: var(--type-leading-heading);
+  font-weight: var(--type-weight-bold);
+  letter-spacing: var(--type-tracking-tighter);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   line-clamp: 2;
-  min-height: calc(1.06em * 2);
+  min-height: calc(var(--type-leading-heading) * 2em);
 }
 
 .recipe-card__meta {
   display: -webkit-box;
   overflow: hidden;
-  font-size: 0.86rem;
-  line-height: 1.2;
+  font-size: var(--type-size-chip);
+  line-height: var(--type-leading-compact);
   color: var(--home-text-muted);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
   line-clamp: 1;
-  min-height: calc(1.2em * 1);
+  min-height: calc(var(--type-leading-compact) * 1em);
 }
 
 .recipe-card__meta.is-error {

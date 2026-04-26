@@ -1,0 +1,53 @@
+// App-wide typography scale
+// Derived from the grocery-list component and unified across all areas.
+// Include this mixin inside :root in custom-theme.scss.
+//
+// Usage in component SCSS:
+//   font-size:      var(--type-size-body);
+//   line-height:    var(--type-leading-normal);
+//   letter-spacing: var(--type-tracking-tight);
+//   font-weight:    var(--type-weight-bold);
+
+@mixin typography() {
+
+  // ── Type Scale ──────────────────────────────────────────────────────────────
+  // display  → page-level h1 (app-header)
+  // heading  → section h2 (grocery sections, recipe detail)
+  // title    → card / compact detail titles (home recipe cards)
+  // body-lg  → prominent list item names (grocery item name)
+  // body     → standard body text / header subtitle
+  // chip     → filter chips, view switchers, progress labels
+  // meta     → secondary metadata (quantity, date)
+  // eyebrow  → short uppercase descriptors (header eyebrow)
+  // caption  → smallest text, status badges, sub-meta
+
+  --type-size-display:  clamp(1.4rem, 5vw, 2.6rem);
+  --type-size-heading:  1.35rem;
+  --type-size-title:    clamp(1.08rem, 3vw, 1.48rem);
+  --type-size-body-lg:  1.1rem;
+  --type-size-body:     0.95rem;
+  --type-size-chip:     0.875rem;
+  --type-size-meta:     0.82rem;
+  --type-size-eyebrow:  0.78rem;
+  --type-size-caption:  0.76rem;
+
+  // ── Line Heights ─────────────────────────────────────────────────────────────
+  --type-leading-display:  1.02;
+  --type-leading-heading:  1.08;
+  --type-leading-tight:    1.1;
+  --type-leading-compact:  1.2;
+  --type-leading-normal:   1.35;
+
+  // ── Letter Spacing ───────────────────────────────────────────────────────────
+  --type-tracking-tighter: -0.05em;  // display / card titles
+  --type-tracking-tight:   -0.04em;  // section headings / body-lg
+  --type-tracking-normal:   0em;
+  --type-tracking-wide:     0.02em;  // badge / status labels
+  --type-tracking-wider:    0.08em;  // eyebrow / uppercase
+
+  // ── Font Weights ─────────────────────────────────────────────────────────────
+  --type-weight-regular:   400;
+  --type-weight-medium:    500;
+  --type-weight-semibold:  600;
+  --type-weight-bold:      700;
+}

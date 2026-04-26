@@ -13,12 +13,12 @@ mat-dialog-content {
 
 .grocery-option__details {
   color: rgba(0, 0, 0, 0.62);
-  font-size: 0.75rem;
+  font-size: var(--type-size-caption);
 }
 
 .schedule-error {
   margin: 0;
   color: var(--mat-form-field-error-text-color, #b3261e);
-  font-size: 0.875rem;
+  font-size: var(--type-size-chip);
   line-height: 1.4;
 }

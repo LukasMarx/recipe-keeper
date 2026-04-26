@@ -67,7 +67,7 @@
 .quick-add-suggestion__name {
   display: block;
   min-width: 0;
-  font-size: 1.02rem;
+  font-size: var(--type-size-body-lg);
   line-height: 1.15;
   letter-spacing: -0.03em;
   color: var(--gl-t);
@@ -75,12 +75,12 @@
 
 .quick-add-suggestion__match {
   color: var(--gl-pd);
-  font-weight: 700;
+  font-weight: var(--type-weight-bold);
 }
 
 .quick-add-suggestion__meta {
   color: var(--gl-m);
-  font-size: 0.84rem;
+  font-size: var(--type-size-meta);
 }
 
 .quick-add-suggestion__icon {

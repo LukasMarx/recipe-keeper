@@ -28,10 +28,10 @@
 
 .detail-header__title {
   text-align: center;
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: var(--type-size-heading);
+  font-weight: var(--type-weight-bold);
   color: #226100;
-  letter-spacing: -0.04em;
+  letter-spacing: var(--type-tracking-tight);
 }
 
 .detail-scroll {
@@ -130,7 +130,7 @@
   margin: 18px 0 0;
   max-width: 84%;
   color: #64655d;
-  font-size: 0.88rem;
+  font-size: var(--type-size-chip);
   line-height: 1.6;
   line-clamp: 5;
   display: -webkit-box;
@@ -156,7 +156,7 @@
   padding: 0 24px;
   border-radius: 999px;
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: var(--type-weight-bold);
   letter-spacing: -0.02em;
   box-shadow: 0 12px 24px rgba(127, 255, 0, 0.28);
 }
@@ -195,15 +195,15 @@
 }
 
 .portion-panel__label {
-  font-size: 0.9rem;
+  font-size: var(--type-size-chip);
   font-weight: 800;
   letter-spacing: -0.03em;
 }
 
 .portion-panel__hint {
   color: #62655d;
-  font-size: 0.78rem;
-  line-height: 1.35;
+  font-size: var(--type-size-eyebrow);
+  line-height: var(--type-leading-normal);
 }
 
 .portion-stepper {
@@ -225,8 +225,8 @@
 
 .portion-stepper__button {
   width: 44px;
-  font-size: 1.35rem;
-  font-weight: 700;
+  font-size: var(--type-size-heading);
+  font-weight: var(--type-weight-bold);
 }
 
 .portion-stepper__button:disabled,
@@ -239,8 +239,8 @@
   width: 76px;
   padding: 0 12px;
   text-align: center;
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: var(--type-size-body-lg);
+  font-weight: var(--type-weight-bold);
   appearance: textfield;
   -moz-appearance: textfield;
 }
@@ -261,7 +261,7 @@
   background: #eff1eb;
   color: #253120;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: var(--type-weight-semibold);
 }
 
 .stat-pill mat-icon {
@@ -325,9 +325,9 @@
   border-radius: 999px;
   background: #226100;
   color: #fffef8;
-  font-size: 0.78rem;
+  font-size: var(--type-size-eyebrow);
   font-weight: 800;
-  letter-spacing: 0.03em;
+  letter-spacing: var(--type-tracking-wide);
   text-transform: uppercase;
 }
 
@@ -364,14 +364,14 @@
 }
 
 .task-item__title {
-  font-weight: 700;
+  font-weight: var(--type-weight-bold);
   letter-spacing: -0.03em;
 }
 
 .task-item__status {
   color: #6a6e62;
-  font-size: 0.88rem;
-  font-weight: 700;
+  font-size: var(--type-size-chip);
+  font-weight: var(--type-weight-bold);
 }
 
 .task-item__status.is-failed {
@@ -393,7 +393,7 @@
   background: transparent;
   color: #575a51;
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: var(--type-weight-bold);
   letter-spacing: -0.03em;
   transition:
     background-color 160ms ease,
@@ -452,9 +452,9 @@
 .ingredient-card__content h2,
 .instruction-card__content h2 {
   margin: 0;
-  font-size: 0.98rem;
-  font-weight: 600;
-  letter-spacing: -0.04em;
+  font-size: var(--type-size-body);
+  font-weight: var(--type-weight-semibold);
+  letter-spacing: var(--type-tracking-tight);
 }
 
 .ingredient-card__content p,
@@ -466,8 +466,8 @@
 
 .ingredient-card__amount {
   color: #656960;
-  font-size: 0.98rem;
-  font-weight: 500;
+  font-size: var(--type-size-body);
+  font-weight: var(--type-weight-medium);
   white-space: nowrap;
   align-self: center;
 }
@@ -485,7 +485,7 @@
   border-radius: 16px;
   background: #7fff00;
   color: #163000;
-  font-size: 1.05rem;
+  font-size: var(--type-size-body-lg);
   font-weight: 800;
 }
 
@@ -504,8 +504,8 @@
   border-radius: 999px;
   background: #fff;
   color: #3f433b;
-  font-size: 0.92rem;
-  font-weight: 500;
+  font-size: var(--type-size-body);
+  font-weight: var(--type-weight-medium);
 }
 
 .empty-state {

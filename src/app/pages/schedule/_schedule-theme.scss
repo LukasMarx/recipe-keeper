@@ -1,0 +1,31 @@
+@use "sass:color";
+@use "@angular/material" as mat;
+
+@mixin theme($theme) {
+  app-schedule {
+    --gl-c: #{mat.get-theme-color($theme, surface-container)};
+  }
+
+  app-schedule-item {
+    --schedule-card-background: #{color.mix(mat.get-theme-color($theme, surface), mat.get-theme-color($theme, surface-container), 90%)};
+    --schedule-card-border: #{color.change(mat.get-theme-color($theme, outline), $alpha: 0.12)};
+    --schedule-card-eyebrow: #{color.change(mat.get-theme-color($theme, on-surface), $alpha: 0.76)};
+    --schedule-card-heading: #{mat.get-theme-color($theme, on-surface)};
+    --schedule-card-calories-background: #{mat.get-theme-color($theme, primary)};
+    --schedule-card-calories-text: #{mat.get-theme-color($theme, on-primary)};
+    --schedule-card-calories-muted-background: #{color.change(mat.get-theme-color($theme, primary), $alpha: 0.1)};
+    --schedule-card-calories-muted-text: #{color.change(mat.get-theme-color($theme, on-surface), $alpha: 0.88)};
+    --schedule-card-thumbnail-start: #{color.mix(mat.get-theme-color($theme, surface-container-high), mat.get-theme-color($theme, surface-container), 62%)};
+    --schedule-card-thumbnail-end: #{mat.get-theme-color($theme, surface-container)};
+    --schedule-card-label: #{color.change(mat.get-theme-color($theme, on-surface), $alpha: 0.58)};
+    --schedule-card-title: #{mat.get-theme-color($theme, on-surface)};
+    --schedule-card-remove-background: #{color.change(mat.get-theme-color($theme, on-surface), $alpha: 0.06)};
+    --schedule-card-remove-foreground: #{color.change(mat.get-theme-color($theme, on-surface), $alpha: 0.74)};
+    --schedule-card-placeholder-text: #{mat.get-theme-color($theme, on-surface-variant)};
+    --schedule-card-placeholder-border: #{color.change(mat.get-theme-color($theme, outline), $alpha: 0.18)};
+    --schedule-card-empty-background-start: #{color.change(mat.get-theme-color($theme, surface-container-low), $alpha: 0.9)};
+    --schedule-card-empty-background-end: #{color.change(mat.get-theme-color($theme, surface-container), $alpha: 0.96)};
+    --schedule-card-empty-text: #{color.change(mat.get-theme-color($theme, on-surface), $alpha: 0.52)};
+    --schedule-card-empty-icon-background: #{color.change(mat.get-theme-color($theme, on-surface), $alpha: 0.06)};
+  }
+}

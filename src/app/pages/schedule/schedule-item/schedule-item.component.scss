@@ -8,8 +8,8 @@
   gap: 18px;
   padding: 22px 18px 18px;
   border-radius: 34px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(23, 48, 9, 0.05);
+  background: var(--schedule-card-background);
+  border: 1px solid var(--schedule-card-border);
 }
 
 
@@ -28,10 +28,10 @@
 .day-card__eyebrow {
   margin: 0 0 8px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.72rem;
+  letter-spacing: var(--type-tracking-wider);
+  font-size: var(--type-size-caption);
   font-weight: 800;
-  color: rgba(31, 39, 30, 0.76);
+  color: var(--schedule-card-eyebrow);
 }
 
 .day-card__header h2 {
@@ -40,23 +40,23 @@
   line-height: 1;
   letter-spacing: -0.06em;
   font-weight: 800;
-  color: #20231e;
+  color: var(--schedule-card-heading);
 }
 
 .day-card__calories {
   flex-shrink: 0;
   padding: 10px 14px;
   border-radius: 999px;
-  background: #83ff00;
-  color: #1d3010;
-  font-size: 0.98rem;
+  background: var(--schedule-card-calories-background);
+  color: var(--schedule-card-calories-text);
+  font-size: 12px;
   line-height: 1;
-  font-weight: 800;
+  font-weight: var(--type-weight-medium);
 }
 
 .day-card:not(.day-card--today) .day-card__calories {
-  background: rgba(39, 56, 34, 0.08);
-  color: rgba(31, 39, 30, 0.88);
+  background: var(--schedule-card-calories-muted-background);
+  color: var(--schedule-card-calories-muted-text);
 }
 
 .meal-groups {
@@ -78,7 +78,7 @@
   border-radius: 50%;
   flex-shrink: 0;
   object-fit: cover;
-  background: linear-gradient(180deg, #dde2d8 0%, #cdd4c8 100%);
+  background: linear-gradient(180deg, var(--schedule-card-thumbnail-start) 0%, var(--schedule-card-thumbnail-end) 100%);
 }
 
 .meal-row__text {
@@ -89,15 +89,15 @@
 }
 
 .meal-row__label {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: rgba(48, 51, 48, 0.58);
+  font-size: var(--type-size-chip);
+  font-weight: var(--type-weight-medium);
+  color: var(--schedule-card-label);
 }
 
 .meal-row__title {
   font-size: 1rem;
-  line-height: 1.2;
-  color: #1b1f1a;
+  line-height: var(--type-leading-compact);
+  color: var(--schedule-card-title);
 }
 
 .meal-row__remove {
@@ -109,8 +109,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(34, 49, 29, 0.06);
-  color: rgba(34, 49, 29, 0.74);
+  background: var(--schedule-card-remove-background);
+  color: var(--schedule-card-remove-foreground);
 }
 
 .meal-row__remove mat-icon {
@@ -122,7 +122,7 @@
   border: 0;
   padding: 0;
   background: transparent;
-  color: #4d514b;
+  color: var(--schedule-card-placeholder-text);
   text-align: left;
 }
 
@@ -133,14 +133,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 2px dashed rgba(60, 69, 57, 0.18);
-  color: #434641;
+  border: 2px dashed var(--schedule-card-placeholder-border);
+  color: var(--schedule-card-placeholder-text);
   flex-shrink: 0;
 }
 
 .meal-row__placeholder-label {
   font-size: 1rem;
-  line-height: 1.2;
+  line-height: var(--type-leading-compact);
 }
 
 .day-card__empty-state {
@@ -148,14 +148,14 @@
   border: 0;
   border-radius: 24px;
   padding: 20px;
-  background: linear-gradient(180deg, rgba(19, 30, 14, 0.02), rgba(19, 30, 14, 0.04));
+  background: linear-gradient(180deg, var(--schedule-card-empty-background-start), var(--schedule-card-empty-background-end));
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 16px;
-  color: rgba(59, 63, 58, 0.52);
-  font-size: 1.05rem;
+  color: var(--schedule-card-empty-text);
+  font-size: var(--type-size-body-lg);
 }
 
 .day-card__empty-icon {
@@ -165,7 +165,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(38, 48, 37, 0.06);
+  background: var(--schedule-card-empty-icon-background);
 }
 
 .day-card__empty-icon mat-icon {

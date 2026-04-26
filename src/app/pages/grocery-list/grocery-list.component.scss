@@ -56,7 +56,7 @@
   border-radius: 999px;
   color: var(--gl-p);
   background: var(--gl-pt);
-  font-weight: 600;
+  font-weight: var(--type-weight-semibold);
 }
 
 .text-button--primary {
@@ -86,7 +86,7 @@
   border-radius: 999px;
   background: var(--gl-c);
   color: var(--gl-m);
-  font-size: 0.9rem;
+  font-size: var(--type-size-chip);
   cursor: pointer;
 }
 
@@ -125,13 +125,13 @@
 }
 
 .progress-label {
-  font-size: 0.9rem;
+  font-size: var(--type-size-chip);
   color: var(--gl-m);
 }
 
 .progress-value {
-  font-size: 0.9rem;
-  font-weight: 700;
+  font-size: var(--type-size-chip);
+  font-weight: var(--type-weight-bold);
   color: var(--gl-p);
 }
 
@@ -163,7 +163,7 @@
   background: var(--gl-c);
   color: var(--gl-m);
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: var(--type-size-chip);
 }
 
 .filter-chip.active {
@@ -182,9 +182,9 @@
 .section h2,
 .empty-state h2 {
   margin: 0 0 14px;
-  font-size: 1.35rem;
-  line-height: 1.08;
-  letter-spacing: -0.04em;
+  font-size: var(--type-size-heading);
+  line-height: var(--type-leading-heading);
+  letter-spacing: var(--type-tracking-tight);
   color: var(--gl-t);
 }
 
@@ -261,19 +261,19 @@
 }
 
 .item-name {
-  font-size: 1.1rem;
-  line-height: 1.1;
-  letter-spacing: -0.04em;
+  font-size: var(--type-size-body-lg);
+  line-height: var(--type-leading-tight);
+  letter-spacing: var(--type-tracking-tight);
   color: var(--gl-t);
 }
 
 .item-meta {
-  font-size: 0.82rem;
+  font-size: var(--type-size-meta);
   color: var(--gl-m);
 }
 
 .item-submeta {
-  font-size: 0.76rem;
+  font-size: var(--type-size-caption);
   color: var(--gl-m);
 }
 
@@ -333,7 +333,7 @@
   align-items: center;
   gap: 8px;
   color: var(--gl-m);
-  font-size: 0.84rem;
+  font-size: var(--type-size-meta);
 }
 
 .item-editor__actions {
@@ -393,12 +393,12 @@
 }
 
 .source-name {
-  font-size: 0.94rem;
+  font-size: var(--type-size-body);
   color: var(--gl-t);
 }
 
 .source-meta {
-  font-size: 0.78rem;
+  font-size: var(--type-size-eyebrow);
   color: var(--gl-m);
 }
 
@@ -441,7 +441,7 @@
   margin: 0;
   max-width: 28ch;
   color: var(--gl-m);
-  font-size: 0.85rem;
+  font-size: var(--type-size-chip);
   line-height: 1.5;
 }
 
@@ -489,13 +489,13 @@
 
 .archive-card__title {
   color: var(--gl-t);
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: var(--type-size-body-lg);
+  font-weight: var(--type-weight-bold);
 }
 
 .archive-card__meta {
   color: var(--gl-m);
-  font-size: 0.84rem;
+  font-size: var(--type-size-meta);
 }
 
 .archive-detail {
@@ -514,14 +514,14 @@
 
 .archive-detail__header h2 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: var(--type-size-heading);
   color: var(--gl-t);
 }
 
 .archive-detail__header p {
   margin: 8px 0 0;
   color: var(--gl-m);
-  font-size: 0.85rem;
+  font-size: var(--type-size-chip);
 }
 
 .archive-detail__items {
@@ -576,7 +576,7 @@
 
 .archive-detail__sources {
   color: var(--gl-m);
-  font-size: 0.78rem;
+  font-size: var(--type-size-eyebrow);
 }
 
 .archive-detail__item.checked .archive-detail__copy,

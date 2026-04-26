@@ -56,8 +56,8 @@ mat-card {
   border-radius: 999px;
   background: rgba(34, 97, 0, 0.92);
   color: #fffef8;
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-size: var(--type-size-caption);
+  font-weight: var(--type-weight-bold);
 }
 
 .status-badge.is-failed {
