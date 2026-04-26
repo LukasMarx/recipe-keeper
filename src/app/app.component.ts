@@ -18,7 +18,6 @@ export class AppComponent {
     inject(RecipeService);
   }
 
-  hideHeader = signal(false);
   hideNavbar = signal(false);
   title = signal('Cookbook');
 
@@ -28,36 +27,27 @@ export class AppComponent {
     this.title.set('Cookbook');
 
     if (currentUrl === '/recipes') {
-      this.hideHeader.set(true);
       this.hideNavbar.set(false);
     } else if (currentUrl === '/new-recipe') {
-      this.hideHeader.set(true);
       this.hideNavbar.set(true);
     } else if (
       currentUrl === '/login' ||
       currentUrl === '/register'
     ) {
-      this.hideHeader.set(true);
       this.hideNavbar.set(true);
     } else if (currentUrl.includes('recipe/')) {
-      this.hideHeader.set(true);
       this.hideNavbar.set(true);
     } else if (currentUrl.includes('schedule')) {
       this.title.set('Schedule');
-      this.hideHeader.set(true);
       this.hideNavbar.set(false);
     } else if (currentUrl.includes('grocery-list')) {
       this.title.set('Grocery list');
-      this.hideHeader.set(true);
       this.hideNavbar.set(false);
     } else if (currentUrl.includes('account')) {
-      this.hideHeader.set(true);
       this.hideNavbar.set(false);
     } else if (currentUrl.includes('household')) {
-      this.hideHeader.set(true);
       this.hideNavbar.set(true);
     } else {
-      this.hideHeader.set(false);
       this.hideNavbar.set(false);
     }
   }

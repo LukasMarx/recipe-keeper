@@ -1,7 +1,4 @@
 <div class="theme-container">
-  @if (!hideHeader()) {
-  <app-header [title]="title()" [showLogo]="true"></app-header>
-  }
   <div class="content">
     <router-outlet
       (activate)="modify($event)"

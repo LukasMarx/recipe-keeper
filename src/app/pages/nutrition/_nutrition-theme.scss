@@ -1,0 +1,28 @@
+@use "sass:color";
+@use "@angular/material" as mat;
+
+@mixin theme($theme) {
+  app-nutrition {
+    --nutrition-bg: #{mat.get-theme-color($theme, surface)};
+
+    // Energy card: dark green background
+    --nutrition-card-bg: #{(mat.get-theme-color($theme, primary))};
+    --nutrition-card-text: #ffffff;
+    --nutrition-highlight:#ffffff;
+    --nutrition-panel-bg: rgba(0, 0, 0, 0.28);
+    --nutrition-track-bg: rgba(0, 0, 0, 0.22);
+
+    // Macro progress bars
+    --nutrition-bar-protein: rgba(255, 255, 255, 0.92);
+    --nutrition-bar-carbs: rgba(255, 255, 255, 0.62);
+    --nutrition-bar-fat: #f0c420;
+
+    // Chart cards
+    --nutrition-chart-bg: #{mat.get-theme-color($theme, surface-container)};
+    --nutrition-chart-text: #{mat.get-theme-color($theme, on-surface)};
+    --nutrition-chart-avg-text: #{color.scale(mat.get-theme-color($theme, primary), $lightness: -18%)};
+    --nutrition-chart-bar: #{color.change(mat.get-theme-color($theme, primary), $alpha: 0.42)};
+    --nutrition-chart-bar-today: #{mat.get-theme-color($theme, primary)};
+    --nutrition-chart-avg-line: #{color.change(mat.get-theme-color($theme, primary), $alpha: 0.52)};
+  }
+}

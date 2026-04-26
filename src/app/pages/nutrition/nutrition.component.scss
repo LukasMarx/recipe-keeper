@@ -1,0 +1,151 @@
+:host {
+  display: block;
+  min-height: 100%;
+}
+
+.nutrition-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 100%;
+  padding: 0 var(--page-padding) 32px;
+  box-sizing: border-box;
+  background: var(--nutrition-bg);
+}
+
+// Status messages
+.status-banner {
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  background: var(--nutrition-chart-bg);
+  color: var(--nutrition-chart-text);
+
+  &--error {
+    background: rgba(200, 60, 60, 0.12);
+    color: #c83c3c;
+  }
+}
+
+// Energy Balance Card
+.energy-card {
+  border-radius: 20px;
+  padding: 20px;
+  background: var(--nutrition-card-bg);
+  color: var(--nutrition-card-text);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.energy-card__title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.energy-card__subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  opacity: 0.65;
+}
+
+.energy-card__remaining-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+.energy-card__remaining-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.energy-card__remaining-number {
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--nutrition-highlight);
+  font-variant-numeric: tabular-nums;
+}
+
+.energy-card__remaining-unit {
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+// Macro Panel (inner card)
+.macro-panel {
+  border-radius: 14px;
+  background: var(--nutrition-panel-bg);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.macro-row__info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.macro-row__name {
+  font-weight: 600;
+}
+
+.macro-row__value {
+  opacity: 0.68;
+  font-size: 12px;
+}
+
+.macro-row__track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--nutrition-track-bg);
+  overflow: hidden;
+}
+
+.macro-row__bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+
+  &--protein {
+    background: var(--nutrition-bar-protein);
+  }
+
+  &--carbs {
+    background: var(--nutrition-bar-carbs);
+  }
+
+  &--fat {
+    background: var(--nutrition-bar-fat);
+  }
+}
+
+// Charts Section
+.charts-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  @media (min-width: 500px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

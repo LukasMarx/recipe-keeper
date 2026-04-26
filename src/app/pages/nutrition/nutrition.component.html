@@ -1,0 +1,106 @@
+<section class="nutrition-page">
+  <app-header
+    eyebrow="Nutrition"
+    title="Daily Goals"
+    subtitle="Track your calories and macronutrients."
+  ></app-header>
+
+  @if (isLoading()) {
+    <p class="status-banner" aria-live="polite">Loading nutrition data...</p>
+  } @else if (hasError()) {
+    <p class="status-banner status-banner--error" aria-live="polite">
+      Failed to load nutrition data. Please try again later.
+    </p>
+  } @else if (hasData()) {
+
+    <!-- Energy Balance Card -->
+    <div class="energy-card">
+      <div>
+        <h2 class="energy-card__title">Energy Balance</h2>
+        <p class="energy-card__subtitle">Today's nutritional overview.</p>
+      </div>
+
+      <div class="energy-card__remaining">
+        <span class="energy-card__remaining-label">Remaining</span>
+        <div class="energy-card__remaining-row">
+          <span class="energy-card__remaining-number">
+            {{ remainingCalories() | number }}
+          </span>
+          <span class="energy-card__remaining-unit">kcal</span>
+        </div>
+      </div>
+
+      <div class="macro-panel">
+        <div class="macro-row">
+          <div class="macro-row__info">
+            <span class="macro-row__name">Protein</span>
+            <span class="macro-row__value">
+              {{ todayTotals().protein | number: '1.0-0' }}g&thinsp;/&thinsp;{{ goals.protein }}g
+            </span>
+          </div>
+          <div class="macro-row__track" role="progressbar" [attr.aria-valuenow]="todayTotals().protein" [attr.aria-valuemax]="goals.protein" aria-label="Protein">
+            <div class="macro-row__bar macro-row__bar--protein" [style.width.%]="proteinPercent()"></div>
+          </div>
+        </div>
+
+        <div class="macro-row">
+          <div class="macro-row__info">
+            <span class="macro-row__name">Carbs</span>
+            <span class="macro-row__value">
+              {{ todayTotals().totalCarbohydrates | number: '1.0-0' }}g&thinsp;/&thinsp;{{ goals.totalCarbohydrates }}g
+            </span>
+          </div>
+          <div class="macro-row__track" role="progressbar" [attr.aria-valuenow]="todayTotals().totalCarbohydrates" [attr.aria-valuemax]="goals.totalCarbohydrates" aria-label="Carbs">
+            <div class="macro-row__bar macro-row__bar--carbs" [style.width.%]="carbsPercent()"></div>
+          </div>
+        </div>
+
+        <div class="macro-row">
+          <div class="macro-row__info">
+            <span class="macro-row__name">Fat</span>
+            <span class="macro-row__value">
+              {{ todayTotals().totalFat | number: '1.0-0' }}g&thinsp;/&thinsp;{{ goals.totalFat }}g
+            </span>
+          </div>
+          <div class="macro-row__track" role="progressbar" [attr.aria-valuenow]="todayTotals().totalFat" [attr.aria-valuemax]="goals.totalFat" aria-label="Fat">
+            <div class="macro-row__bar macro-row__bar--fat" [style.width.%]="fatPercent()"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <section class="charts-section" aria-label="Nutrition charts for the last 30 days">
+      <app-nutrition-bar-chart
+        title="Calories"
+        [entries]="caloriesEntries()"
+        [average]="averageCalories()"
+        unit="kcal"
+      ></app-nutrition-bar-chart>
+
+      <div class="charts-grid">
+        <app-nutrition-bar-chart
+          title="Carbs"
+          [entries]="carbsEntries()"
+          [average]="averageCarbs()"
+          unit="g"
+        ></app-nutrition-bar-chart>
+
+        <app-nutrition-bar-chart
+          title="Protein"
+          [entries]="proteinEntries()"
+          [average]="averageProtein()"
+          unit="g"
+        ></app-nutrition-bar-chart>
+
+        <app-nutrition-bar-chart
+          title="Fat"
+          [entries]="fatEntries()"
+          [average]="averageFat()"
+          unit="g"
+        ></app-nutrition-bar-chart>
+      </div>
+    </section>
+
+  }
+</section>

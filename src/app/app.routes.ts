@@ -8,6 +8,7 @@ import { ScheduleComponent } from './pages/schedule/schedule.component';
 import { GroceryListComponent } from './pages/grocery-list/grocery-list.component';
 import { AccountComponent } from './pages/account/account.component';
 import { HouseholdComponent } from './pages/household/household.component';
+import { NutritionComponent } from './pages/nutrition/nutrition.component';
 
 export const routes: Routes = [
   {
@@ -55,5 +56,9 @@ export const routes: Routes = [
   {
     path: 'household',
     component: HouseholdComponent,
+  },
+  {
+    path: 'nutrition',
+    component: NutritionComponent,
   },
 ];
