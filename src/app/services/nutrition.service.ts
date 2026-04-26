@@ -14,14 +14,30 @@ export interface NutritionDayEntry {
 }
 
 export interface NutritionMealEntry {
+  scheduledRecipeId: number;
+  recipeName: string;
+  recipeImageUrl: string | null;
   mealType: string;
-  totals: MacroTotals;
+  portionCount: number;
+  nutrition: MacroTotals;
+}
+
+export interface NutritionFoodLogEntry {
+  foodLogId: number;
+  foodProductId?: number;
+  foodProductName: string;
+  brand: string | null;
+  imageUrl: string | null;
+  mealType: string;
+  amountInGrams: number;
+  nutrition: MacroTotals;
 }
 
 export interface NutritionDailyResponse {
   date: string;
   totals: MacroTotals;
   meals: NutritionMealEntry[];
+  foodLogs: NutritionFoodLogEntry[];
 }
 
 export interface NutritionRangeResponse {

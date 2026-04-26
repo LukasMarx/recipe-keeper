@@ -1,0 +1,157 @@
+<h2 mat-dialog-title>Add Food Entry</h2>
+
+<mat-dialog-content class="modal-content">
+  @if (!selectedProduct()) {
+    <!-- Mode toggle -->
+    <div class="mode-toggle">
+      <button
+        type="button"
+        class="mode-btn"
+        [class.mode-btn--active]="searchMode() === 'name'"
+        (click)="searchMode.set('name')"
+      >Search by name</button>
+      <button
+        type="button"
+        class="mode-btn"
+        [class.mode-btn--active]="searchMode() === 'barcode'"
+        (click)="searchMode.set('barcode')"
+      >Barcode scannen</button>
+    </div>
+
+    @if (searchMode() === 'name') {
+      <mat-form-field class="full-width">
+        <mat-label>Product name</mat-label>
+        <input
+          matInput
+          [ngModel]="searchQuery()"
+          (ngModelChange)="onSearchInput($event)"
+          placeholder="e.g. Snickers, Greek Yoghurt…"
+          autocomplete="off"
+        />
+      </mat-form-field>
+
+      @if (isSearching()) {
+        <div class="spinner-row">
+          <mat-spinner diameter="20"></mat-spinner>
+          <span>Searching…</span>
+        </div>
+      }
+
+      @if (searchResults().length > 0) {
+        <ul class="results-list" role="listbox">
+          @for (product of searchResults(); track product.id) {
+            <li
+              class="result-item"
+              role="option"
+              (click)="selectProduct(product)"
+              (keydown.enter)="selectProduct(product)"
+              tabindex="0"
+            >
+              <div class="result-item__name">{{ product.name }}</div>
+              @if (product.brand) {
+                <span class="result-item__brand">{{ product.brand }}</span>
+              }
+              @if (product.nutrition?.calories != null) {
+                <span class="result-item__kcal">{{ product.nutrition!.calories | number: '1.0-0' }} kcal/100g</span>
+              }
+            </li>
+          }
+        </ul>
+      }
+
+      @if (!isSearching() && searchQuery().length > 1 && searchResults().length === 0) {
+        <p class="no-results">No products found. Try a different search term.</p>
+      }
+    }
+
+    @if (searchMode() === 'barcode') {
+      @if (scannerActive()) {
+        <app-barcode-scanner (barcodeDetected)="onBarcodeScan($event)"></app-barcode-scanner>
+      }
+
+      @if (isSearching()) {
+        <div class="spinner-row">
+          <mat-spinner diameter="20"></mat-spinner>
+          <span>Produkt wird gesucht…</span>
+        </div>
+      }
+    }
+
+  } @else {
+
+    <!-- Product selected: show details + form -->
+    <div class="selected-product">
+      <div class="selected-product__img-wrap" aria-hidden="true">
+        @if (selectedProduct()!.imageUrl) {
+          <img
+            [src]="selectedProduct()!.imageUrl"
+            [alt]="selectedProduct()!.name"
+            class="selected-product__img"
+          />
+        } @else {
+          <div class="selected-product__img-skeleton"></div>
+        }
+      </div>
+      <div class="selected-product__text">
+        <span class="selected-product__name">{{ selectedProduct()!.name }}</span>
+        @if (selectedProduct()!.brand) {
+          <span class="selected-product__brand">{{ selectedProduct()!.brand }}</span>
+        }
+      </div>
+      <button mat-icon-button type="button" aria-label="Remove selection" (click)="clearProduct()">
+        ✕
+      </button>
+    </div>
+
+    <div class="entry-fields">
+      <mat-form-field class="field-amount">
+        <mat-label>Amount (g)</mat-label>
+        <input
+          matInput
+          type="number"
+          [ngModel]="amountInGrams()"
+          (ngModelChange)="amountInGrams.set(+$event)"
+          min="0.1"
+          step="0.5"
+        />
+      </mat-form-field>
+
+      <mat-form-field class="field-meal">
+        <mat-label>Meal</mat-label>
+        <mat-select [ngModel]="mealType()" (ngModelChange)="mealType.set($event)">
+          @for (type of mealTypes; track type) {
+            <mat-option [value]="type">{{ type | titlecase }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    @if (calculatedCalories() > 0) {
+      <div class="calories-preview">
+        ≈ <strong>{{ calculatedCalories() }}</strong> kcal
+      </div>
+    }
+
+  }
+
+  @if (error()) {
+    <p class="form-error" role="alert">{{ error() }}</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+  <button
+    mat-flat-button
+    color="primary"
+    type="button"
+    [disabled]="!selectedProduct() || amountInGrams() < 0.1 || isSaving()"
+    (click)="save()"
+  >
+    @if (isSaving()) {
+      <mat-spinner diameter="16"></mat-spinner>
+    } @else {
+      Add Entry
+    }
+  </button>
+</mat-dialog-actions>

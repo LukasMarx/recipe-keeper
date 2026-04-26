@@ -1,0 +1,38 @@
+<div class="scanner-shell" [class.scanner-shell--success]="scanSuccess()">
+  @if (isStarting()) {
+    <div class="scanner-state">
+      <mat-spinner diameter="36"></mat-spinner>
+      <span>Kamera wird gestartet…</span>
+    </div>
+  }
+
+  @if (permissionDenied()) {
+    <div class="scanner-state scanner-state--error">
+      <span class="scanner-state__icon">🚫</span>
+      <span>Kamerazugriff verweigert. Bitte erlaube den Kamerazugriff in den Browsereinstellungen.</span>
+    </div>
+  }
+
+  @if (cameraError()) {
+    <div class="scanner-state scanner-state--error">
+      <span class="scanner-state__icon">📷</span>
+      <span>Keine Kamera verfügbar.</span>
+      @if (cameraErrorMsg()) {
+        <small class="scanner-state__detail">{{ cameraErrorMsg() }}</small>
+      }
+    </div>
+  }
+
+  <video
+    #videoEl
+    class="scanner-viewport"
+    [class.scanner-viewport--hidden]="isStarting() || permissionDenied() || cameraError()"
+    autoplay
+    muted
+    playsinline
+  ></video>
+
+  @if (!isStarting() && !permissionDenied() && !cameraError()) {
+    <div class="scanner-hint">Barcode in den Rahmen halten</div>
+  }
+</div>

@@ -1,8 +1,8 @@
 <section class="nutrition-page">
   <app-header
     eyebrow="Nutrition"
-    title="Daily Goals"
-    subtitle="Track your calories and macronutrients."
+    title="Track Your Vitality"
+    subtitle="Monitor your daily calorie and macro goals."
   ></app-header>
 
   @if (isLoading()) {
@@ -13,94 +13,175 @@
     </p>
   } @else if (hasData()) {
 
-    <!-- Energy Balance Card -->
-    <div class="energy-card">
-      <div>
-        <h2 class="energy-card__title">Energy Balance</h2>
-        <p class="energy-card__subtitle">Today's nutritional overview.</p>
-      </div>
-
-      <div class="energy-card__remaining">
-        <span class="energy-card__remaining-label">Remaining</span>
-        <div class="energy-card__remaining-row">
-          <span class="energy-card__remaining-number">
-            {{ remainingCalories() | number }}
-          </span>
-          <span class="energy-card__remaining-unit">kcal</span>
-        </div>
-      </div>
-
-      <div class="macro-panel">
-        <div class="macro-row">
-          <div class="macro-row__info">
-            <span class="macro-row__name">Protein</span>
-            <span class="macro-row__value">
-              {{ todayTotals().protein | number: '1.0-0' }}g&thinsp;/&thinsp;{{ goals.protein }}g
-            </span>
-          </div>
-          <div class="macro-row__track" role="progressbar" [attr.aria-valuenow]="todayTotals().protein" [attr.aria-valuemax]="goals.protein" aria-label="Protein">
-            <div class="macro-row__bar macro-row__bar--protein" [style.width.%]="proteinPercent()"></div>
-          </div>
-        </div>
-
-        <div class="macro-row">
-          <div class="macro-row__info">
-            <span class="macro-row__name">Carbs</span>
-            <span class="macro-row__value">
-              {{ todayTotals().totalCarbohydrates | number: '1.0-0' }}g&thinsp;/&thinsp;{{ goals.totalCarbohydrates }}g
-            </span>
-          </div>
-          <div class="macro-row__track" role="progressbar" [attr.aria-valuenow]="todayTotals().totalCarbohydrates" [attr.aria-valuemax]="goals.totalCarbohydrates" aria-label="Carbs">
-            <div class="macro-row__bar macro-row__bar--carbs" [style.width.%]="carbsPercent()"></div>
-          </div>
-        </div>
-
-        <div class="macro-row">
-          <div class="macro-row__info">
-            <span class="macro-row__name">Fat</span>
-            <span class="macro-row__value">
-              {{ todayTotals().totalFat | number: '1.0-0' }}g&thinsp;/&thinsp;{{ goals.totalFat }}g
-            </span>
-          </div>
-          <div class="macro-row__track" role="progressbar" [attr.aria-valuenow]="todayTotals().totalFat" [attr.aria-valuemax]="goals.totalFat" aria-label="Fat">
-            <div class="macro-row__bar macro-row__bar--fat" [style.width.%]="fatPercent()"></div>
-          </div>
-        </div>
-      </div>
+    <!-- Tab Bar -->
+    <div class="tab-bar" role="tablist">
+      <button
+        class="tab-bar__tab"
+        [class.tab-bar__tab--active]="activeTab() === 'today'"
+        role="tab"
+        [attr.aria-selected]="activeTab() === 'today'"
+        (click)="activeTab.set('today')"
+      >Today</button>
+      <button
+        class="tab-bar__tab"
+        [class.tab-bar__tab--active]="activeTab() === 'weekly'"
+        role="tab"
+        [attr.aria-selected]="activeTab() === 'weekly'"
+        (click)="activeTab.set('weekly')"
+      >Weekly</button>
     </div>
 
-    <!-- Charts Section -->
-    <section class="charts-section" aria-label="Nutrition charts for the last 30 days">
-      <app-nutrition-bar-chart
-        title="Calories"
-        [entries]="caloriesEntries()"
-        [average]="averageCalories()"
-        unit="kcal"
-      ></app-nutrition-bar-chart>
+    <!-- TODAY TAB -->
+    @if (activeTab() === 'today') {
 
-      <div class="charts-grid">
-        <app-nutrition-bar-chart
-          title="Carbs"
-          [entries]="carbsEntries()"
-          [average]="averageCarbs()"
-          unit="g"
-        ></app-nutrition-bar-chart>
+      <!-- Energy Balance Card -->
+      <div class="energy-card">
+        <div>
+          <h2 class="energy-card__title">Energy Balance</h2>
+          <p class="energy-card__subtitle">You're doing great today.</p>
+        </div>
 
-        <app-nutrition-bar-chart
-          title="Protein"
-          [entries]="proteinEntries()"
-          [average]="averageProtein()"
-          unit="g"
-        ></app-nutrition-bar-chart>
+        <div class="energy-card__remaining">
+          <span class="energy-card__remaining-label">Remaining</span>
+          <div class="energy-card__remaining-row">
+            <span class="energy-card__remaining-number">
+              {{ remainingCalories() | number }}
+            </span>
+            <span class="energy-card__remaining-unit">kcal</span>
+          </div>
+        </div>
 
-        <app-nutrition-bar-chart
-          title="Fat"
-          [entries]="fatEntries()"
-          [average]="averageFat()"
-          unit="g"
-        ></app-nutrition-bar-chart>
+        <div class="macro-panel">
+          <div class="macro-row">
+            <div class="macro-row__info">
+              <span class="macro-row__name">Protein</span>
+              <span class="macro-row__value">
+                {{ todayTotals().protein | number: '1.0-0' }}g&thinsp;/&thinsp;{{ goals.protein }}g
+              </span>
+            </div>
+            <div class="macro-row__track" role="progressbar" [attr.aria-valuenow]="todayTotals().protein" [attr.aria-valuemax]="goals.protein" aria-label="Protein">
+              <div class="macro-row__bar macro-row__bar--protein" [style.width.%]="proteinPercent()"></div>
+            </div>
+          </div>
+
+          <div class="macro-row">
+            <div class="macro-row__info">
+              <span class="macro-row__name">Carbs</span>
+              <span class="macro-row__value">
+                {{ todayTotals().totalCarbohydrates | number: '1.0-0' }}g&thinsp;/&thinsp;{{ goals.totalCarbohydrates }}g
+              </span>
+            </div>
+            <div class="macro-row__track" role="progressbar" [attr.aria-valuenow]="todayTotals().totalCarbohydrates" [attr.aria-valuemax]="goals.totalCarbohydrates" aria-label="Carbs">
+              <div class="macro-row__bar macro-row__bar--carbs" [style.width.%]="carbsPercent()"></div>
+            </div>
+          </div>
+
+          <div class="macro-row">
+            <div class="macro-row__info">
+              <span class="macro-row__name">Fat</span>
+              <span class="macro-row__value">
+                {{ todayTotals().totalFat | number: '1.0-0' }}g&thinsp;/&thinsp;{{ goals.totalFat }}g
+              </span>
+            </div>
+            <div class="macro-row__track" role="progressbar" [attr.aria-valuenow]="todayTotals().totalFat" [attr.aria-valuemax]="goals.totalFat" aria-label="Fat">
+              <div class="macro-row__bar macro-row__bar--fat" [style.width.%]="fatPercent()"></div>
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
+
+      <!-- Today's Ledger -->
+      <section class="ledger" aria-label="Today's ledger">
+        <div class="ledger__header">
+          <h3 class="ledger__title">Today's Ledger</h3>
+          <button class="ledger__add-btn" type="button" (click)="openAddEntry()">
+            Add Entry
+          </button>
+        </div>
+
+        @if (ledgerItems().length === 0) {
+          <div class="ledger__empty">
+            <p>Nothing logged yet. Add your first entry above.</p>
+          </div>
+        } @else {
+          <div class="ledger__list">
+            @for (item of ledgerItems(); track item.kind + '-' + item.id) {
+              <div class="ledger-item">
+                <div class="ledger-item__icon" aria-hidden="true">
+                  @if (item.imageUrl) {
+                    <img [src]="item.imageUrl" [alt]="item.name" class="ledger-item__img" />
+                  } @else if (item.kind === 'foodlog') {
+                    <div class="ledger-item__img-skeleton"></div>
+                  } @else {
+                    <span>🍽️</span>
+                  }
+                </div>
+                <div class="ledger-item__body">
+                  <div class="ledger-item__top-row">
+                    <span class="ledger-item__name">{{ item.name }}</span>
+                    <span class="ledger-item__kcal">{{ item.calories | number: '1.0-0' }} kcal</span>
+                  </div>
+                  <div class="ledger-item__meta">
+                    {{ item.mealType | titlecase }}
+                    @if (item.brand) {
+                      &bull; {{ item.brand }}
+                    }
+                  </div>
+                  <div class="ledger-item__macros">
+                    <span class="macro-pill">{{ item.protein | number: '1.0-0' }}g P</span>
+                    <span class="macro-pill">{{ item.carbs | number: '1.0-0' }}g C</span>
+                    <span class="macro-pill">{{ item.fat | number: '1.0-0' }}g F</span>
+                  </div>
+                </div>
+                @if (item.kind === 'foodlog') {
+                  <button
+                    class="ledger-item__delete"
+                    type="button"
+                    aria-label="Delete food log entry"
+                    (click)="deleteFoodLog(item.id)"
+                  >✕</button>
+                }
+              </div>
+            }
+          </div>
+        }
+      </section>
+    }
+
+    <!-- WEEKLY TAB -->
+    @if (activeTab() === 'weekly') {
+      <section class="charts-section" aria-label="Nutrition charts for the last 30 days">
+        <app-nutrition-bar-chart
+          title="Calories"
+          [entries]="caloriesEntries()"
+          [average]="averageCalories()"
+          unit="kcal"
+        ></app-nutrition-bar-chart>
+
+        <div class="charts-grid">
+          <app-nutrition-bar-chart
+            title="Carbs"
+            [entries]="carbsEntries()"
+            [average]="averageCarbs()"
+            unit="g"
+          ></app-nutrition-bar-chart>
+
+          <app-nutrition-bar-chart
+            title="Protein"
+            [entries]="proteinEntries()"
+            [average]="averageProtein()"
+            unit="g"
+          ></app-nutrition-bar-chart>
+
+          <app-nutrition-bar-chart
+            title="Fat"
+            [entries]="fatEntries()"
+            [average]="averageFat()"
+            unit="g"
+          ></app-nutrition-bar-chart>
+        </div>
+      </section>
+    }
 
   }
 </section>

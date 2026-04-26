@@ -6,9 +6,11 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, TitleCasePipe } from '@angular/common';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { format, subDays } from 'date-fns';
 import { forkJoin } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { HeaderComponent } from '../../components/header/header.component';
 import {
@@ -21,8 +23,12 @@ import {
   BarChartEntry,
   NutritionBarChartComponent,
 } from './nutrition-bar-chart/nutrition-bar-chart.component';
+import { AddFoodLogModalComponent } from '../../components/modals/add-food-log-modal/add-food-log-modal.component';
+import { FoodLogService } from '../../services/food-log.service';
 
 const DAYS = 30;
+
+const MEAL_TYPE_ORDER = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK', 'OTHER'];
 
 const DAILY_GOALS: MacroTotals = {
   calories: 2000,
@@ -31,22 +37,37 @@ const DAILY_GOALS: MacroTotals = {
   totalFat: 70,
 };
 
+type LedgerItem = {
+  kind: 'recipe' | 'foodlog';
+  id: number;
+  name: string;
+  brand: string | null;
+  imageUrl: string | null;
+  mealType: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+};
+
 @Component({
   selector: 'app-nutrition',
   standalone: true,
-  imports: [DecimalPipe, HeaderComponent, NutritionBarChartComponent],
+  imports: [DecimalPipe, TitleCasePipe, MatDialogModule, HeaderComponent, NutritionBarChartComponent],
   templateUrl: './nutrition.component.html',
   styleUrl: './nutrition.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NutritionComponent implements OnInit {
   private readonly nutritionService = inject(NutritionService);
-
+  private readonly foodLogService = inject(FoodLogService);
+  private readonly dialog = inject(MatDialog);
   protected readonly goals = DAILY_GOALS;
   protected readonly isLoading = signal(true);
   protected readonly hasError = signal(false);
   protected readonly data = signal<NutritionRangeResponse | null>(null);
   protected readonly dailyData = signal<NutritionDailyResponse | null>(null);
+  protected readonly activeTab = signal<'today' | 'weekly'>('today');
 
   private readonly todayStr = format(new Date(), 'yyyy-MM-dd');
 
@@ -72,6 +93,41 @@ export class NutritionComponent implements OnInit {
     Math.min((this.todayTotals().totalFat / DAILY_GOALS.totalFat) * 100, 100)
   );
 
+  protected readonly ledgerItems = computed((): LedgerItem[] => {
+    const d = this.dailyData();
+    if (!d) return [];
+
+    const fromMeals: LedgerItem[] = (d.meals ?? []).map((m) => ({
+      kind: 'recipe',
+      id: m.scheduledRecipeId,
+      name: m.recipeName,
+      brand: null,
+      imageUrl: m.recipeImageUrl ?? null,
+      mealType: m.mealType,
+      calories: m.nutrition.calories,
+      protein: m.nutrition.protein,
+      carbs: m.nutrition.totalCarbohydrates,
+      fat: m.nutrition.totalFat,
+    }));
+
+    const fromLogs: LedgerItem[] = (d.foodLogs ?? []).map((fl) => ({
+      kind: 'foodlog',
+      id: fl.foodLogId,
+      name: fl.foodProductName,
+      brand: fl.brand,
+      imageUrl: fl.imageUrl ?? null,
+      mealType: fl.mealType,
+      calories: fl.nutrition.calories,
+      protein: fl.nutrition.protein,
+      carbs: fl.nutrition.totalCarbohydrates,
+      fat: fl.nutrition.totalFat,
+    }));
+
+    return [...fromMeals, ...fromLogs].sort(
+      (a, b) => MEAL_TYPE_ORDER.indexOf(a.mealType) - MEAL_TYPE_ORDER.indexOf(b.mealType)
+    );
+  });
+
   protected readonly caloriesEntries = computed(() =>
     this.buildChartEntries((t) => t.calories)
   );
@@ -95,6 +151,30 @@ export class NutritionComponent implements OnInit {
 
   protected readonly hasData = computed(() => !this.isLoading() && !this.hasError() && this.data() !== null);
 
+  constructor() {
+    this.foodLogService.foodProductImageUpdated$
+      .pipe(takeUntilDestroyed())
+      .subscribe(({ foodProductId, imageUrl }) => {
+        const d = this.dailyData();
+        if (!d) return;
+
+        const logs = d.foodLogs ?? [];
+        const hasMatch = logs.some((fl) => fl.foodProductId === foodProductId);
+
+        if (hasMatch) {
+          this.dailyData.set({
+            ...d,
+            foodLogs: logs.map((fl) =>
+              fl.foodProductId === foodProductId ? { ...fl, imageUrl } : fl
+            ),
+          });
+        } else {
+          // foodProductId not included in nutrition/daily response → re-fetch
+          this.refreshDaily();
+        }
+      });
+  }
+
   ngOnInit(): void {
     forkJoin({
       daily: this.nutritionService.getDaily(),
@@ -110,6 +190,26 @@ export class NutritionComponent implements OnInit {
         this.isLoading.set(false);
       },
     });
+  }
+
+  protected openAddEntry(): void {
+    const ref = this.dialog.open(AddFoodLogModalComponent, {
+      width: '480px',
+      maxWidth: '95vw',
+    });
+    ref.afterClosed().subscribe((newLog) => {
+      if (newLog) {
+        this.refreshDaily();
+      }
+    });
+  }
+
+  protected deleteFoodLog(id: number): void {
+    this.foodLogService.deleteFoodLog(id).subscribe(() => this.refreshDaily());
+  }
+
+  private refreshDaily(): void {
+    this.nutritionService.getDaily().subscribe((daily) => this.dailyData.set(daily));
   }
 
   private buildChartEntries(getValue: (t: MacroTotals) => number): BarChartEntry[] {

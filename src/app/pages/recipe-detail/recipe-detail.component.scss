@@ -524,6 +524,19 @@
   align-items: center;
 }
 
+ .ingredient-card {
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    &__image {
+      img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      }
+    }
+  }
+
 @media (max-width: 420px) {
   .summary-card {
     margin-left: 20px;
@@ -552,16 +565,5 @@
     flex: 1;
   }
 
-  .ingredient-card {
-    grid-template-columns: 48px minmax(0, 1fr) auto;
-    &__image {
-      img {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      overflow: hidden;
-      flex-shrink: 0;
-      }
-    }
-  }
+ 
 }
