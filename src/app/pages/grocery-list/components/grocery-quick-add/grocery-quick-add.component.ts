@@ -17,6 +17,7 @@ import {
   debounceTime,
   distinctUntilChanged,
   finalize,
+  forkJoin,
   map,
   of,
   startWith,
@@ -26,6 +27,8 @@ import {
   getIngredientDisplayName,
   getIngredientDisplayPlural,
 } from '../../../../interfaces/ingredient';
+import { CustomItem } from '../../../../interfaces/custom-item';
+import { CustomItemService } from '../../../../services/custom-item.service';
 import { IngredientService, IngredientSearchResult } from '../../../../services/ingredient.service';
 import { GroceryListService } from '../../../../services/grocery-list.service';
 import { GroceryCategory, QuickAddSuggestion } from './grocery-quick-add.models';
@@ -72,6 +75,7 @@ function extractErrorMessage(error: unknown) {
 })
 export class GroceryQuickAddComponent {
   private readonly ingredientService = inject(IngredientService);
+  private readonly customItemService = inject(CustomItemService);
   private readonly groceryListService = inject(GroceryListService);
 
   private readonly categoryOrder: GroceryCategory[] = [
@@ -85,6 +89,8 @@ export class GroceryQuickAddComponent {
     'seasoning',
     'candy',
     'beverages',
+    'household',
+    'hygiene',
     'other',
   ];
 
@@ -115,15 +121,23 @@ export class GroceryQuickAddComponent {
       startWith(this.addItemForm.controls.name.value),
       map((value) => value.trim()),
       distinctUntilChanged(),
-      debounceTime(250),
+      debounceTime(300),
       switchMap((query) => {
-        if (!this.isQuickAddFocused() || !query.length) {
+        if (!this.isQuickAddFocused() || query.length < 2) {
           return of<QuickAddSuggestion[]>([]);
         }
 
-        return this.ingredientService.search(query, 8).pipe(
-          map((ingredients) => ingredients.map((ingredient) => this.mapQuickAddSuggestion(ingredient))),
-          catchError(() => of<QuickAddSuggestion[]>([]))
+        return forkJoin([
+          this.ingredientService.search(query, 5).pipe(
+            map((ingredients) => ingredients.map((i) => this.mapIngredientSuggestion(i))),
+            catchError(() => of<QuickAddSuggestion[]>([])),
+          ),
+          this.customItemService.search(query, this.householdId()).pipe(
+            map((items) => items.map((item) => this.mapCustomItemSuggestion(item))),
+            catchError(() => of<QuickAddSuggestion[]>([])),
+          ),
+        ]).pipe(
+          map(([ingredients, customItems]) => [...ingredients, ...customItems]),
         );
       })
     ),
@@ -275,7 +289,8 @@ export class GroceryQuickAddComponent {
       .addManualItem({
         amount: value.amount,
         householdId: this.householdId(),
-        ingredientId: selectedSuggestion?.id,
+        ingredientId: selectedSuggestion?.id ?? undefined,
+        customItemId: selectedSuggestion?.customItemId ?? undefined,
         name: value.name.trim(),
         unit: value.unit.trim() || undefined,
       })
@@ -294,7 +309,7 @@ export class GroceryQuickAddComponent {
       });
   }
 
-  private mapQuickAddSuggestion(ingredient: IngredientSearchResult): QuickAddSuggestion {
+  private mapIngredientSuggestion(ingredient: IngredientSearchResult): QuickAddSuggestion {
     return {
       key: ingredient.id,
       id: ingredient.id,
@@ -304,7 +319,27 @@ export class GroceryQuickAddComponent {
         ingredient.id,
       category: this.normalizeIngredientCategory(ingredient.category),
       imageUrl: ingredient.imageUrl ?? null,
+      customItemId: null,
     };
+  }
+
+  private mapCustomItemSuggestion(item: CustomItem): QuickAddSuggestion {
+    return {
+      key: `custom-${item.id}`,
+      id: null,
+      name: item.name,
+      category: this.normalizeCustomItemCategory(item.category),
+      imageUrl: item.imageUrl ?? null,
+      customItemId: item.id,
+    };
+  }
+
+  private normalizeCustomItemCategory(category: string): GroceryCategory {
+    const validCategories: GroceryCategory[] = ['household', 'hygiene', 'other'];
+    if (validCategories.includes(category as GroceryCategory)) {
+      return category as GroceryCategory;
+    }
+    return 'other';
   }
 
   private normalizeIngredientCategory(category: string | null | undefined): GroceryCategory {

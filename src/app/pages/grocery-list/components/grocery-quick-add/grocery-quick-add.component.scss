@@ -44,6 +44,34 @@
   box-sizing: border-box;
 }
 
+.quick-add-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 4px 2px;
+}
+
+.category-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border: 1.5px solid transparent;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--gl-c) 60%, white);
+  color: var(--gl-t);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.category-chip.active {
+  border-color: var(--gl-p);
+  background: color-mix(in srgb, var(--gl-p) 15%, white);
+  color: var(--gl-p);
+  font-weight: 600;
+}
+
 .quick-add-prefix {
   width: 28px;
   height: 28px;

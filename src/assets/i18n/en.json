@@ -23,5 +23,7 @@
   "groceryList.categories.seasoning": "Seasoning",
   "groceryList.categories.candy": "Candy",
   "groceryList.categories.beverages": "Beverages",
+  "groceryList.categories.household": "Household",
+  "groceryList.categories.hygiene": "Hygiene",
   "groceryList.categories.other": "Other"
 }

@@ -23,5 +23,7 @@
   "groceryList.categories.seasoning": "Gewürz",
   "groceryList.categories.candy": "Süßigkeiten",
   "groceryList.categories.beverages": "Getränke",
+  "groceryList.categories.household": "Haushalt",
+  "groceryList.categories.hygiene": "Hygiene",
   "groceryList.categories.other": "Sonstiges"
 }

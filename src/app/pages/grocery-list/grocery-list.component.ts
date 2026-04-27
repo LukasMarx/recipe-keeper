@@ -93,6 +93,8 @@ export class GroceryListComponent {
     'seasoning',
     'candy',
     'beverages',
+    'household',
+    'hygiene',
     'other',
   ];
 
@@ -254,7 +256,7 @@ export class GroceryListComponent {
 
   public getItemImageUrl(item: AggregatedGroceryListEntry | GroceryListEntry) {
     if (this.isAggregatedItem(item)) {
-      return item.ingredient?.imageUrl ?? null;
+      return item.ingredient?.imageUrl ?? item.customItem?.imageUrl ?? null;
     }
 
     return item.recipeIngredient?.ingredient?.imageUrl ?? null;
@@ -677,19 +679,38 @@ export class GroceryListComponent {
   public getItemCategory(
     item: AggregatedGroceryListEntry | GroceryListEntry
   ): GroceryCategory {
-    const category =
-      this.isAggregatedItem(item)
-        ? item.ingredient?.category
-        : item.recipeIngredient?.ingredient.category;
+    if (this.isAggregatedItem(item)) {
+      const itemCategory = item.category;
 
+      // Custom-item categories take direct precedence
+      if (itemCategory === 'household' || itemCategory === 'hygiene') {
+        return itemCategory;
+      }
+
+      // Custom item flagged as 'other'
+      if (itemCategory === 'other' && item.customItemId) {
+        return 'other';
+      }
+
+      // Food/ingredient-based item — use fine-grained ingredient subcategory
+      const category = item.ingredient?.category;
+      if (category === 'fisch') {
+        return 'fish';
+      }
+      if (this.categoryOrder.includes(category as GroceryCategory)) {
+        return category as GroceryCategory;
+      }
+      return 'other';
+    }
+
+    const category =
+      item.recipeIngredient?.ingredient.category;
     if (category === 'fisch') {
       return 'fish';
     }
-
     if (this.categoryOrder.includes(category as GroceryCategory)) {
       return category as GroceryCategory;
     }
-
     return 'other';
   }
 

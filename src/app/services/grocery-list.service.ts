@@ -18,6 +18,14 @@ export interface GroceryListQuantity {
   unit?: string | null;
 }
 
+export interface CustomItemRef {
+  id: number;
+  name: string;
+  category: string;
+  defaultUnit: string | null;
+  imageUrl: string | null;
+}
+
 export interface AggregatedGroceryListEntry {
   id: number;
   name: string;
@@ -33,6 +41,9 @@ export interface AggregatedGroceryListEntry {
   quantityLabel?: string | null;
   amount: number | null;
   unit?: string | null;
+  category: string;
+  customItemId: number | null;
+  customItem: CustomItemRef | null;
 }
 
 export interface GroceryList {
@@ -65,6 +76,7 @@ export interface CreateManualGroceryListItemDto {
   householdId?: number | null;
   name: string;
   ingredientId?: Ingredient['id'];
+  customItemId?: number;
   unit?: string;
   amount: number;
 }
@@ -145,7 +157,9 @@ export class GroceryListService {
   }
 
   public addManualItem(input: CreateManualGroceryListItemDto) {
-    return this.http.post<GroceryListEntry>('grocery-list/items', input);
+    return this.http.post<GroceryListEntry>('grocery-list/items', input, {
+      params: this.buildParams({ locale: this.translocoService.getActiveLang() }),
+    });
   }
 
   public updateItem(itemId: number, input: UpdateGroceryListItemDto) {
@@ -191,6 +205,12 @@ export class GroceryListService {
       other: this.translocoService.selectTranslate(
         'groceryList.categories.other'
       ),
+      household: this.translocoService.selectTranslate(
+        'groceryList.categories.household'
+      ),
+      hygiene: this.translocoService.selectTranslate(
+        'groceryList.categories.hygiene'
+      ),
     }[category];
   }
 
@@ -206,6 +226,8 @@ export class GroceryListService {
       seasoning: 'grain',
       candy: 'icecream',
       beverages: 'local_bar',
+      household: 'cleaning_services',
+      hygiene: 'soap',
       other: 'category',
     }[category] || 'category';
   }
@@ -269,6 +291,9 @@ export class GroceryListService {
         item.quantityLabel ?? this.formatQuantityLabel(item.amount, item.unit),
       amount: item.amount ?? null,
       unit: item.unit ?? null,
+      category: item.category ?? 'other',
+      customItemId: item.customItemId ?? null,
+      customItem: item.customItem ?? null,
     };
   }
 
@@ -295,6 +320,9 @@ export class GroceryListService {
       quantityLabel: this.formatQuantityLabel(item.amount, item.unit),
       amount: item.amount,
       unit: item.unit ?? null,
+      category: item.recipeIngredient ? 'food' : 'other',
+      customItemId: null,
+      customItem: null,
     };
   }
 
